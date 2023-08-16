@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "wuhu-client",
+	"version": "${version}",
+	"name": "WuHu Client",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"website": "https://space.bilibili.com/31545812",
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/wuhu-client/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"com.zxy.wuhuclient.WuHuClientMod"
+		],
+		"modmenu": [
+			"com.zxy.wuhuclient.config.ModMenu"
+		]
+	},
+	"mixins": [
+		"wuhu-client.mixins.json"
+	],
+	"depends": {
+		"fabricloader": "*",
+		"minecraft": "*",
+		"java": "*",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
