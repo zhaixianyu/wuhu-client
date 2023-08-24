@@ -12,6 +12,6 @@
     "ClientPlayerEMixin",
     "ClientPlayNetworkHandlerMixin",
     "MinecraftClientMixin",
-    "MixinClientPlayerInteractionManager"
+    "ClientPlayerInteractionManagerMixin"
   ]
 }

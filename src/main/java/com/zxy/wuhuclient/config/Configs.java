@@ -23,10 +23,12 @@ public class Configs implements IConfigHandler {
     private static final File CONFIG_DIR = new File("./config");
     public static final ConfigBooleanHotkeyed SYNTHESIS = new ConfigBooleanHotkeyed( "合成助手", false, "Z,C","");
     public static final ConfigHotkey WUHU_CLIENT = new ConfigHotkey( "打开设置菜单", "Z,X","");
+    public static final ConfigBooleanHotkeyed AUTO_STORAGE = new ConfigBooleanHotkeyed( "合成后自动装箱",false,"","记录第一个右键的容器，当背包有合成物且大于1的时候，就会重复尝试打开记录的容器并放入");
 
     public static final ImmutableList<IConfigBase> ALL_CONFIGS = ImmutableList.of(
             SYNTHESIS,
-            WUHU_CLIENT
+            WUHU_CLIENT,
+            AUTO_STORAGE
     );
     //按下时激活
     public static final ImmutableList<ConfigHotkey> KEY_LIST = ImmutableList.of(
@@ -34,7 +36,8 @@ public class Configs implements IConfigHandler {
     );
     //切换型开关
     public static final ImmutableList<IHotkeyTogglable> SWITCH_KEY = ImmutableList.of(
-            SYNTHESIS
+            SYNTHESIS,
+            AUTO_STORAGE
     );
     @Override
     public void load() {
