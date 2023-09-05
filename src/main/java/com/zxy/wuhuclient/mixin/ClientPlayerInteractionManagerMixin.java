@@ -31,6 +31,7 @@ public class ClientPlayerInteractionManagerMixin {
 
     @Inject(at = @At("HEAD"),method = "interactBlock")
     public void interactBlock(ClientPlayerEntity player, ClientWorld world, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir){
+//        System.out.println("interactBlock");
         if(isLoadMod && Configs.SYNTHESIS.getBooleanValue() && step != 1){
             if (Synthesis.isInventory(hitResult.getBlockPos())) {
                 if(Configs.AUTO_STORAGE.getBooleanValue()){

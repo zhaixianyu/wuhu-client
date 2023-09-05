@@ -4,6 +4,7 @@ package com.zxy.wuhuclient.featuresList;
 import com.zxy.wuhuclient.config.Configs;
 import fi.dy.masa.itemscroller.recipes.RecipePattern;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
+import fi.dy.masa.itemscroller.util.ClickPacketBuffer;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
@@ -17,6 +18,7 @@ import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
@@ -31,6 +33,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -47,21 +51,35 @@ public class Synthesis {
     public static int step = 0;
     //记录合成点击的方块位置
     public static BlockPos pos;
-    public static boolean runIng = false;
-
     public static void tick() {
         if(!Configs.SYNTHESIS.getBooleanValue()) return;
         if (Synthesis.pos != null && step == 2) {
-            synthesis();
+            ScreenHandler sc = client.player.currentScreenHandler;
+            ItemStack[] recipeItems = recipe.getRecipeItems();
+            if (((recipeItems.length == 9 && !(sc instanceof CraftingScreenHandler)) || (recipeItems.length == 4 && !(sc instanceof PlayerScreenHandler))) ) {
+                if (recipeItems.length == 9 && sc instanceof PlayerScreenHandler && closeScreen == 0) {
+//                    System.out.println(".............");
+                    closeScreen = 1;
+                    client.player.networkHandler.sendPacket(new ClientCommandC2SPacket(client.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+                    client.interactionManager.interactBlock(client.player, client.world, Hand.MAIN_HAND,
+                            new BlockHitResult(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
+                    return;
+                }
+            }else /*if(step == 2)*/{
+                synthesis2();
+            }
         }
-        if (storagePos != null && Configs.AUTO_STORAGE.getBooleanValue()) {
+        if (storagePos != null && Configs.AUTO_STORAGE.getBooleanValue() && step == 0) {
             autoStorage();
         }
     }
 
     public static void onInventory() {
+        if(!Configs.SYNTHESIS.getBooleanValue()) return;
+//        System.out.println("onInventory");
         if (step == 1) dropInventory();
-        if (step == 3) Synthesis.storage();
+//        if (step == 2) tick = 0;
+        if (step == 3) storage();
     }
 
     public static boolean isInventory(BlockPos pos) {
@@ -100,11 +118,10 @@ public class Synthesis {
                 //工作台合成
                 step = 2;
                 Synthesis.pos = pos;
-                closeScreen = 1;
-
+//                closeScreen = 1;
 //                    mc.interactionManager.interactBlock(mc.player, mc.world, Hand.MAIN_HAND, (BlockHitResult) mc.crosshairTarget);
-                client.interactionManager.interactBlock(client.player, client.world, Hand.MAIN_HAND,
-                        new BlockHitResult(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
+//                client.interactionManager.interactBlock(client.player, client.world, Hand.MAIN_HAND,
+//                        new BlockHitResult(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
                 return;
             }
             if (!isInventory(pos)) {
@@ -115,6 +132,7 @@ public class Synthesis {
                 }
                 return;
             }
+            if(closeScreen != 0) return;
             step = 1;
             closeScreen = 1;
 //                client.interactionManager.interactBlock(client.player, client.world, Hand.MAIN_HAND, (BlockHitResult) client.crosshairTarget);
@@ -123,26 +141,12 @@ public class Synthesis {
         }
 //        }
     }
-
-    public synchronized static void synthesis() {
-        if (!updateRecipe()) return;
-        ClientPlayerEntity player = client.player;
-        ScreenHandler sc = player.currentScreenHandler;
-        client.inGameHud.setOverlayMessage(Text.of("合成中..."), false);
-        //检查是否满足合成条件
+    private static Map<Item, Integer> must = new HashMap<>();
+    public static boolean isSynthesis(){
         ItemStack[] recipeItems = recipe.getRecipeItems();
-        if ((recipeItems.length == 9 && !(sc instanceof CraftingScreenHandler)) || (recipeItems.length == 4 && !(sc instanceof PlayerScreenHandler))) {
-            if (recipeItems.length == 9 && sc instanceof PlayerScreenHandler && closeScreen != 1) {
-                closeScreen = 1;
-                client.interactionManager.interactBlock(client.player, client.world, Hand.MAIN_HAND,
-                        new BlockHitResult(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
-            }
-            return;
-        }
-
 
         Map<Item, Integer> recipeMap = new HashMap<>();
-        Map<Item, Integer> must = new HashMap<>();
+        must = new HashMap<>();
         for (ItemStack recipeItem : recipeItems) {
             if (recipeItem.isEmpty()) continue;
             Item item = recipeItem.getItem();
@@ -151,6 +155,7 @@ public class Synthesis {
             } else {
                 must.put(item, recipeItem.getCount());
             }
+
             recipeMap.put(item, 0);
         }
         for (Slot slot : client.player.currentScreenHandler.slots) {
@@ -171,17 +176,29 @@ public class Synthesis {
             }
 
         });
+        //            System.out.println("111");
+        //            player.closeHandledScreen();
+        return result.get();
+    }
 
-        if (!result.get()) {
-            return;
-        }
+    public static void synthesis() {
+//        step = 0;
+        if (!updateRecipe()) return;
+        ClientPlayerEntity player = client.player;
+        ScreenHandler sc = player.currentScreenHandler;
+        client.inGameHud.setOverlayMessage(Text.of("合成中..."), false);
+        //检查是否满足合成条件
+        if (!isSynthesis()) return;
 
-//        System.out.println("合成");
+        ItemStack[] recipeItems = recipe.getRecipeItems();
+//        System.out.println("222");
 //        if(runIng)return;
 //        new Thread(() ->{
 //            runIng = true;
         int recipeLength = recipeItems.length;
         for (int i = recipeLength + 1; i < sc.slots.size(); i++) {
+            client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.QUICK_CRAFT, client.player);
+
             ItemStack stack = sc.slots.get(i).getStack().copy();
             if (stack.isEmpty() || (stack.getMaxCount() != 1 && stack.getCount() == 1)) continue;
 
@@ -198,10 +215,20 @@ public class Synthesis {
             if (!sc.getCursorStack().isEmpty()) {
                 client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.PICKUP, player);
             }
+
+            int invCount = stack.getCount() - 1;
+            int synCount = sc.slots.get(index).getStack().getCount();
+            if(synCount>stack.getMaxCount()) {
+                System.out.println("+++++++++++++++++++");
+                System.out.println(synCount);
+            }
             client.interactionManager.clickSlot(sc.syncId, i, 0, SlotActionType.PICKUP, player);
             client.interactionManager.clickSlot(sc.syncId, i, 1, SlotActionType.PICKUP, player);
+            //改为拖动
+
             client.interactionManager.clickSlot(sc.syncId, index, 0, SlotActionType.PICKUP, player);
 
+            //sc.getCursorStack()在一个游戏刻多次点击后获取的数量不靠谱，
 
             //处理跟随鼠标物品
             if (!sc.getCursorStack().isEmpty()) {
@@ -240,10 +267,10 @@ public class Synthesis {
                     .count();
             if (count1 == 0
             ) {
+                System.out.println("average");
 //                for (int i2 = 0; i2 < recipeLength; i2++) {
 //                    System.out.println(sc.slots.get(i2 + 1).getStack());
 //                }
-//                System.out.println("==================1");
 //                检测背包是否有满足的物品 如果没有则将物品均分
                 int itemCount = 0;
                 for (int i2 = 0; i2 < recipeLength; i2++) {
@@ -259,7 +286,7 @@ public class Synthesis {
                         for (int i3 = 0; i3 < recipeLength; i3++) {
                             if (!InventoryUtils.areStacksEqual(recipeItems[i3], stack) || stack.getMaxCount() == 1)
                                 continue;
-                            while (sc.slots.get(i3 + 1).getStack().getCount() < average) {
+                            for (int i4 = 0 ; sc.slots.get(i3 + 1).getStack().getCount() < average && i4 < 64 ;i4++) {
                                 client.interactionManager.clickSlot(sc.syncId, i3 + 1, 1, SlotActionType.PICKUP, player);
                                 if (sc.getCursorStack().isEmpty()) break b1;
                             }
@@ -289,40 +316,115 @@ public class Synthesis {
         }
     }
 
-    public static boolean isRequired() {
+
+
+    public static void synthesis2(){
+        client.inGameHud.setOverlayMessage(Text.of("合成中..."), false);
+        if (!updateRecipe() || !isSynthesis()) return;
+
+        ClientPlayerEntity player = client.player;
+        ScreenHandler sc = player.currentScreenHandler;
         ItemStack[] recipeItems = recipe.getRecipeItems();
-        Map<Item, Integer> recipeMap = new HashMap<>();
-        Map<Item, Integer> must = new HashMap<>();
-        for (ItemStack recipeItem : recipeItems) {
-            if (recipeItem.isEmpty()) continue;
-            Item item = recipeItem.getItem();
-            if (must.containsKey(item)) {
-                must.put(item, must.get(item) + recipeItem.getCount());
-            } else {
-                must.put(item, recipeItem.getCount());
+//        int[] playerInv = new int[sc.slots.size()];
+
+        int[] recInv = new int[recipeItems.length];
+//        for (int i = 0; i < recInv.length; i++) {
+//            recInv[i] = sc.slots.get(i+1).getStack().getCount();
+//        }
+
+        for (int i = recipeItems.length+1; i < sc.slots.size(); i++) {
+            ItemStack stack = sc.slots.get(i).getStack().copy();
+            if (stack.isEmpty() || (stack.getMaxCount() != 1 && stack.getCount() == 1)) continue;
+            if (Arrays.stream(recipeItems).noneMatch(rec -> InventoryUtils.areStacksEqual(rec,stack))) continue;
+
+            int stackCount = stack.getCount()-1;
+            if(!sc.getCursorStack().isEmpty()) client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.PICKUP, player);
+            client.interactionManager.clickSlot(sc.syncId, i, 0, SlotActionType.PICKUP, player);
+            client.interactionManager.clickSlot(sc.syncId, i, 1, SlotActionType.PICKUP, player);
+
+            client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.QUICK_CRAFT, client.player);
+            int cursorStackCount = stack.getCount()-1;
+            int skip = 0;
+            int craft = 0;
+            ArrayList<Integer> numArr = new ArrayList<>();
+            for (int i1 = 1; i1 <= recipeItems.length; i1++) {
+                ItemStack stack1 = sc.slots.get(i1).getStack();
+                if (craft >= stackCount) break;
+                if(!InventoryUtils.areStacksEqual(stack,recipeItems[i1-1])) continue;
+
+                if (recInv[i1-1] >= stack.getMaxCount()){
+                    skip++;
+                    continue;
+                }
+                numArr.add(i1-1);
+                craft++;
+                client.interactionManager.clickSlot(sc.syncId, i1, 1, SlotActionType.QUICK_CRAFT, client.player);
             }
-            recipeMap.put(item, 0);
-        }
-        for (Slot slot : client.player.currentScreenHandler.slots) {
-            ItemStack stack = slot.getStack();
-            if (stack.isEmpty() || stack.hasNbt()) continue;
-            recipeMap.forEach((k, v) -> {
-                int num = stack.getMaxCount() == 1 ? 0 : 1;
-                if (stack.getItem().equals(k)) recipeMap.put(k, v + (stack.getCount() - num));
-            });
-        }
-        AtomicReference<Boolean> result = new AtomicReference<>(true);
-        recipeMap.forEach((k, v) -> {
-//            System.out.println(k + "\t" + v);
-//            System.out.println(must.get(k));
-            if (v < must.get(k)) {
-                result.set(false);
-                return;
+            client.interactionManager.clickSlot(sc.syncId, -999, 2, SlotActionType.QUICK_CRAFT, client.player);
+
+            if(craft== 0){
+                client.interactionManager.clickSlot(sc.syncId, i, 0, SlotActionType.PICKUP, player);
+                continue;
+            }
+            if(craft > cursorStackCount){
+                int craftCopy = craft;
+                for (Integer integer : numArr) {
+                    recInv[integer] += 1;
+                    if(--craftCopy <= 0) break;
+                }
+            }else {
+                for (Integer integer : numArr) {
+
+                    if(recInv[integer] + stackCount/craft >= stack.getMaxCount()){
+                        int num = stack.getMaxCount() - recInv[integer];
+                        cursorStackCount -= num;
+                        recInv[integer] += num;
+                    }else {
+                        cursorStackCount -= stackCount/craft;
+                        recInv[integer] += stackCount/craft;
+                    }
+                }
             }
 
-        });
-        return result.get();
+
+//            System.out.println("---");
+//            for (int i1 : recInv) {
+//                System.out.println(i1);
+//            }
+
+//            System.out.println("-=-=-=-=-=-");
+//            if(craft != 0) System.out.println(stackCount/craft);
+//            else System.out.println(0);
+//
+//            System.out.println(craft);
+//            System.out.println(stackCount2);
+//            if(craft != 0){
+//                System.out.println(stackCount % craft);
+//            }else {
+//                System.out.println(0);
+//            }
+
+            if(cursorStackCount > 0){
+//                System.out.println("=============");
+//                System.out.println("c  " + i);
+//                System.out.println(cursorStackCount);
+//                System.out.println("pickup");
+                client.interactionManager.clickSlot(sc.syncId, i, 0, SlotActionType.PICKUP, player);
+            }
+
+
+            if(skip == recipeItems.length) break;
+//            if(remainder1 > 0 && remainder2 != 0) client.interactionManager.clickSlot(sc.syncId, i, 0, SlotActionType.PICKUP, player);
+//            if (sc.slots.stream().skip(1).limit(recipeItems.length).allMatch(slot -> slot.getStack().getCount() == slot.getStack().getMaxCount())) break;
+
+        }
+        for (int i2 = 0; InventoryUtils.areStacksEqual(sc.slots.get(0).getStack(), recipe.getResult()) && i2 < 64; i2++) {
+            client.interactionManager.clickSlot(sc.syncId, 0, 1, SlotActionType.THROW, player);
+        }
+        player.closeHandledScreen();
     }
+
+
 
     public static void dropItem(ItemStack itemStack, boolean isPlayerInventory) {
         ClientPlayerEntity player = client.player;
@@ -360,16 +462,15 @@ public class Synthesis {
     public static BlockPos storagePos = null;
 
     public static void autoStorage() {
-        if (client.player == null) return;
-        if (!updateRecipe()) return;
+        if (client.player == null || !updateRecipe() || !isInventory(storagePos)) return;
         ClientPlayerEntity player = client.player;
         DefaultedList<Slot> slots = player.currentScreenHandler.slots;
-        if (storagePos != null && storagePos.isWithinDistance(player.getPos(), 5) && step != 3) {
+        if (storagePos != null && storagePos.isWithinDistance(player.getPos(), 5) && step != 3 && closeScreen == 0) {
             if (slots.stream()
                     .anyMatch(slot -> InventoryUtils.areStacksEqual(slot.getStack(), recipe.getResult()) && slot.getStack().getCount() > 1))
             {
-                if(step == 2)closeScreen = 3;
-                else closeScreen = 1;
+                System.out.println("autoStorage");
+                closeScreen = 1;
                 step = 3;
                 client.interactionManager.interactBlock(client.player, client.world, Hand.MAIN_HAND,
                         new BlockHitResult(new Vec3d(storagePos.getX() + 0.5, storagePos.getY() + 0.5, storagePos.getZ() + 0.5), Direction.UP, storagePos, false));
