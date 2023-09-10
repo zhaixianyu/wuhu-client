@@ -34,7 +34,7 @@ public class ClientPlayerInteractionManagerMixin {
 //        System.out.println("interactBlock");
         if(isLoadMod && Configs.SYNTHESIS.getBooleanValue() && step != 1){
             if (Synthesis.isInventory(hitResult.getBlockPos())) {
-                if(Configs.AUTO_STORAGE.getBooleanValue()){
+                if(autoStorage){
                     storagePos = hitResult.getBlockPos();
                 }else {
                     step = 3;

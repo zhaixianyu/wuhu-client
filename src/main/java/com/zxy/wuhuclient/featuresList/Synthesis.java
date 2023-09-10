@@ -33,10 +33,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.zxy.wuhuclient.Utils.ScreenManagement.closeScreen;
@@ -51,35 +48,59 @@ public class Synthesis {
     public static int step = 0;
     //记录合成点击的方块位置
     public static BlockPos pos;
+//    public static Set<Integer> updatedSlot = new HashSet<>();
+    public static boolean invUpdated = false;
+    public static int tick = 0;
     public static void tick() {
+//        tick++;
+//        tick %= Integer.MAX_VALUE;
+//        if(step != 0) System.out.println(step);
         if(!Configs.SYNTHESIS.getBooleanValue()) return;
         if (Synthesis.pos != null && step == 2) {
             ScreenHandler sc = client.player.currentScreenHandler;
             ItemStack[] recipeItems = recipe.getRecipeItems();
-            if (((recipeItems.length == 9 && !(sc instanceof CraftingScreenHandler)) || (recipeItems.length == 4 && !(sc instanceof PlayerScreenHandler))) ) {
-                if (recipeItems.length == 9 && sc instanceof PlayerScreenHandler && closeScreen == 0) {
+            if (((recipeItems.length == 9 && !(sc instanceof CraftingScreenHandler)) || (recipeItems.length == 4 && !(sc instanceof PlayerScreenHandler)))) {
+                if (recipeItems.length == 9 && sc instanceof PlayerScreenHandler && closeScreen <= 0) {
 //                    System.out.println(".............");
                     closeScreen = 1;
+//                    tick = 0;
+                    invUpdated = false;
                     client.player.networkHandler.sendPacket(new ClientCommandC2SPacket(client.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                     client.interactionManager.interactBlock(client.player, client.world, Hand.MAIN_HAND,
                             new BlockHitResult(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
                     return;
+                }else if(recipeItems.length == 4){
+                    client.player.closeHandledScreen();
+                    return;
                 }
-            }else /*if(step == 2)*/{
+            }else /*if(tick >= 2)*/{
                 synthesis2();
-            }
         }
-        if (storagePos != null && Configs.AUTO_STORAGE.getBooleanValue() && step == 0) {
+        if (storagePos != null && autoStorage && step != 1) {
+            System.out.println(client.player.currentScreenHandler.getClass());
             autoStorage();
         }
+    }
+//        if (step == 1) dropInventory();
+//        if (storagePos != null && Configs.AUTO_STORAGE.getBooleanValue()/* && step == 0*/) {
     }
 
     public static void onInventory() {
         if(!Configs.SYNTHESIS.getBooleanValue()) return;
+        if(step == 2) {
+//            System.out.println("5555");
+            invUpdated = true;
+        }
 //        System.out.println("onInventory");
-        if (step == 1) dropInventory();
-//        if (step == 2) tick = 0;
-        if (step == 3) storage();
+        if (step == 1) {
+            dropInventory();
+            if(!continueSynthesis()) step = 0;
+        }
+//        if (step == 2) synthesis2();
+        if (step == 3) {
+            storage();
+            if(!continueSynthesis()) step = 0;
+        }
     }
 
     public static boolean isInventory(BlockPos pos) {
@@ -93,7 +114,7 @@ public class Synthesis {
                     (blockEntity instanceof ShulkerBoxBlockEntity entity &&
                             !client.world.isSpaceEmpty(ShulkerEntity.calculateBoundingBox(blockState.get(FACING), 0.0f, 0.5f).offset(pos).contract(1.0E-6)) &&
                             entity.getAnimationStage() == ShulkerBoxBlockEntity.AnimationStage.CLOSED)) {
-                client.inGameHud.setOverlayMessage(new TranslatableText("八嘎，目标容器无法打开"), false);
+                client.inGameHud.setOverlayMessage(new TranslatableText("目标无法打开"), false);
                 return false;
             }
         } catch (Exception e) {
@@ -106,6 +127,7 @@ public class Synthesis {
     }
 
     public static void start(BlockPos pos) {
+        tick = 0;
         if (!updateRecipe()) {
             client.inGameHud.setOverlayMessage(new TranslatableText("当前快捷合成配方为空"), false);
             return;
@@ -118,10 +140,6 @@ public class Synthesis {
                 //工作台合成
                 step = 2;
                 Synthesis.pos = pos;
-//                closeScreen = 1;
-//                    mc.interactionManager.interactBlock(mc.player, mc.world, Hand.MAIN_HAND, (BlockHitResult) mc.crosshairTarget);
-//                client.interactionManager.interactBlock(client.player, client.world, Hand.MAIN_HAND,
-//                        new BlockHitResult(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
                 return;
             }
             if (!isInventory(pos)) {
@@ -133,13 +151,32 @@ public class Synthesis {
                 return;
             }
             if(closeScreen != 0) return;
-            step = 1;
-            closeScreen = 1;
-//                client.interactionManager.interactBlock(client.player, client.world, Hand.MAIN_HAND, (BlockHitResult) client.crosshairTarget);
-            client.interactionManager.interactBlock(client.player, client.world, Hand.MAIN_HAND,
-                    new BlockHitResult(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
+            dropPos = pos;
+            dropStart();
+            if (client.player.isSneaking()) {
+                client.inGameHud.setOverlayMessage(Text.of("合成取物已标记"), false);
+                autoDtop = true;
+            }else{
+                autoDtop = false;
+            }
+
         }
 //        }
+    }
+
+    static BlockPos dropPos;
+    static boolean autoDtop;
+    static void dropStart(){
+        if(closeScreen != 0 || !isInventory(dropPos)) return;
+        step = 1;
+        closeScreen = 1;
+        if(!dropPos.isWithinDistance(client.player.getPos(),5)){
+            dropPos = null;
+            return;
+        }
+        client.player.networkHandler.sendPacket(new ClientCommandC2SPacket(client.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+        client.interactionManager.interactBlock(client.player, client.world, Hand.MAIN_HAND,
+                new BlockHitResult(new Vec3d(dropPos.getX() + 0.5, dropPos.getY() + 0.5, dropPos.getZ() + 0.5), Direction.UP, dropPos, false));
     }
     private static Map<Item, Integer> must = new HashMap<>();
     public static boolean isSynthesis(){
@@ -172,15 +209,17 @@ public class Synthesis {
 //            System.out.println(must.get(k));
             if (v < must.get(k)) {
                 result.set(false);
+//                System.out.println("000");
                 return;
             }
-
         });
-        //            System.out.println("111");
-        //            player.closeHandledScreen();
+//        if(!result.get() && dropPos != null && Configs.AUTO_DROP.getBooleanValue()) {
+        if(!result.get() && dropPos != null && autoDtop && closeScreen <= 0) {
+            client.player.closeHandledScreen();
+            dropStart();
+        }
         return result.get();
     }
-
     public static void synthesis() {
 //        step = 0;
         if (!updateRecipe()) return;
@@ -316,12 +355,14 @@ public class Synthesis {
         }
     }
 
-
-
     public static void synthesis2(){
         client.inGameHud.setOverlayMessage(Text.of("合成中..."), false);
-        if (!updateRecipe() || !isSynthesis()) return;
-
+        if(!pos.isWithinDistance(client.player.getPos(),5)){
+            client.inGameHud.setOverlayMessage(Text.of("工作台或标记的方块超出范围，已重置。请再次点击开始合成"), false);
+            pos = null;
+            return;
+        }
+        if (!updateRecipe() || !isSynthesis() || !invUpdated) return;
         ClientPlayerEntity player = client.player;
         ScreenHandler sc = player.currentScreenHandler;
         ItemStack[] recipeItems = recipe.getRecipeItems();
@@ -338,12 +379,12 @@ public class Synthesis {
             if (Arrays.stream(recipeItems).noneMatch(rec -> InventoryUtils.areStacksEqual(rec,stack))) continue;
 
             int stackCount = stack.getCount()-1;
-            if(!sc.getCursorStack().isEmpty()) client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.PICKUP, player);
+            int cursorStackCount = stack.getCount()-1;
+            client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.PICKUP, player);
             client.interactionManager.clickSlot(sc.syncId, i, 0, SlotActionType.PICKUP, player);
             client.interactionManager.clickSlot(sc.syncId, i, 1, SlotActionType.PICKUP, player);
-
             client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.QUICK_CRAFT, client.player);
-            int cursorStackCount = stack.getCount()-1;
+
             int skip = 0;
             int craft = 0;
             ArrayList<Integer> numArr = new ArrayList<>();
@@ -421,10 +462,10 @@ public class Synthesis {
         for (int i2 = 0; InventoryUtils.areStacksEqual(sc.slots.get(0).getStack(), recipe.getResult()) && i2 < 64; i2++) {
             client.interactionManager.clickSlot(sc.syncId, 0, 1, SlotActionType.THROW, player);
         }
+        client.interactionManager.clickSlot(sc.syncId, -999, 2, SlotActionType.QUICK_CRAFT, client.player);
+        client.interactionManager.clickSlot(sc.syncId, -999, 2, SlotActionType.QUICK_CRAFT, client.player);
         player.closeHandledScreen();
     }
-
-
 
     public static void dropItem(ItemStack itemStack, boolean isPlayerInventory) {
         ClientPlayerEntity player = client.player;
@@ -445,7 +486,6 @@ public class Synthesis {
     }
 
     public static void dropInventory() {
-        step = 0;
         if (!updateRecipe()) return;
         client = MinecraftClient.getInstance();
         ClientPlayerEntity player;
@@ -455,30 +495,29 @@ public class Synthesis {
         for (ItemStack recipeItem : recipe.getRecipeItems()) {
             dropItem(recipeItem, false);
         }
-        client.player.closeHandledScreen();
-        continueSynthesis();
     }
 
     public static BlockPos storagePos = null;
+    public static boolean autoStorage = false;
 
     public static void autoStorage() {
         if (client.player == null || !updateRecipe() || !isInventory(storagePos)) return;
         ClientPlayerEntity player = client.player;
         DefaultedList<Slot> slots = player.currentScreenHandler.slots;
-        if (storagePos != null && storagePos.isWithinDistance(player.getPos(), 5) && step != 3 && closeScreen == 0) {
+        if (storagePos != null && storagePos.isWithinDistance(player.getPos(), 5) && step != 3 && closeScreen <= 0) {
             if (slots.stream()
                     .anyMatch(slot -> InventoryUtils.areStacksEqual(slot.getStack(), recipe.getResult()) && slot.getStack().getCount() > 1))
             {
-                System.out.println("autoStorage");
+//                System.out.println("autoStorage");
                 closeScreen = 1;
                 step = 3;
+                client.player.networkHandler.sendPacket(new ClientCommandC2SPacket(client.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                 client.interactionManager.interactBlock(client.player, client.world, Hand.MAIN_HAND,
                         new BlockHitResult(new Vec3d(storagePos.getX() + 0.5, storagePos.getY() + 0.5, storagePos.getZ() + 0.5), Direction.UP, storagePos, false));
             }
-        }
+        }else if(!continueSynthesis()) step = 0;
     }
     public static void storage() {
-        step = 0;
         if (!updateRecipe()) return;
         ClientPlayerEntity player = client.player;
         if (player == null) return;
@@ -489,8 +528,6 @@ public class Synthesis {
                 .allMatch(slot -> InventoryUtils.areStacksEqual(slot.getStack(), recipe.getResult())
                 && slot.getStack().getCount() >= slot.getStack().getMaxCount())) {
             client.inGameHud.setOverlayMessage(Text.of("合成助手: 该容器已满"), false);
-            player.closeHandledScreen();
-            continueSynthesis();
             return;
         }
         //从玩家背包寻找合成物
@@ -513,7 +550,6 @@ public class Synthesis {
             }
         }
         player.closeHandledScreen();
-        continueSynthesis();
     }
 
     private static boolean updateRecipe() {
@@ -521,9 +557,11 @@ public class Synthesis {
         return !recipe.getResult().isEmpty();
     }
 
-    private static boolean continueSynthesis() {
+    public static boolean continueSynthesis() {
         if (pos != null) {
             step = 2;
+            if (client.player != null) client.player.closeHandledScreen();
+            invUpdated = false;
             return true;
         } else return false;
     }

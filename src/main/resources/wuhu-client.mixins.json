@@ -3,15 +3,15 @@
   "package": "com.zxy.wuhuclient.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ExampleMixin"
+    "BlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
     "ClientPlayerEMixin",
+    "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
-    "MinecraftClientMixin",
-    "ClientPlayerInteractionManagerMixin"
+    "MinecraftClientMixin"
   ]
 }
