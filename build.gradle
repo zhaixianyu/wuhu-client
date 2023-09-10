@@ -14,6 +14,9 @@ repositories {
 	maven { url = 'https://masa.dy.fi/maven' }
 	maven { url = "https://www.cursemaven.com" }
 	maven { url = "https://maven.terraformersmc.com/releases"}
+	maven {
+		url = "https://api.modrinth.com/maven"
+	}
 	// Add repositories to retrieve artifacts from in here.
 	// You should only use this when depending on other mods because
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
@@ -33,7 +36,8 @@ dependencies {
 	modImplementation "curse.maven:item-scroller-${project.item_scroller_projectid}:${project.item_scroller_fileid}"
 	modImplementation "com.terraformersmc:modmenu:${project.mod_menu}"
 
-	
+	modImplementation "maven.modrinth:carpet:${project.carpet}"
+
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 
