@@ -152,7 +152,7 @@ public class Synthesis {
             return;
         }
         client.player.networkHandler.sendPacket(new ClientCommandC2SPacket(client.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-        client.interactionManager.interactBlock(client.player, Hand.MAIN_HAND,
+        client.interactionManager.interactBlock(client.player,client.world, Hand.MAIN_HAND,
                 new BlockHitResult(new Vec3d(dropPos.getX() + 0.5, dropPos.getY() + 0.5, dropPos.getZ() + 0.5), Direction.UP, dropPos, false));
     }
     private static Map<Item, Integer> must = new HashMap<>();
@@ -462,7 +462,7 @@ public class Synthesis {
                 closeScreen = 1;
                 step = 3;
                 client.player.networkHandler.sendPacket(new ClientCommandC2SPacket(client.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-                client.interactionManager.interactBlock(client.player, Hand.MAIN_HAND,
+                client.interactionManager.interactBlock(client.player,client.world,  Hand.MAIN_HAND,
                         new BlockHitResult(new Vec3d(storagePos.getX() + 0.5, storagePos.getY() + 0.5, storagePos.getZ() + 0.5), Direction.UP, storagePos, false));
             }
         }
@@ -521,7 +521,7 @@ public class Synthesis {
                     step = 2;
                     invUpdated = false;
                     client.player.networkHandler.sendPacket(new ClientCommandC2SPacket(client.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-                    client.interactionManager.interactBlock(client.player, Hand.MAIN_HAND,
+                    client.interactionManager.interactBlock(client.player,client.world,  Hand.MAIN_HAND,
                             new BlockHitResult(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
                 } else if (recipeItems.length == 4) {
                     client.player.closeHandledScreen();
