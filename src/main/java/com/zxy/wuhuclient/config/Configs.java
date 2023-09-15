@@ -27,14 +27,14 @@ public class Configs implements IConfigHandler {
 
 //    public static final ConfigBooleanHotkeyed AUTO_DROP = new ConfigBooleanHotkeyed( "材料不足自动取出",false,"","记录第一个左键的容器，当背包物品不满足合成的时候，就会重复尝试打开记录的容器并丢出");
 //    public static final ConfigBooleanHotkeyed AUTO_STORAGE = new ConfigBooleanHotkeyed( "合成后自动装箱",false,"","记录第一个右键的容器，当背包有合成物且大于1的时候，就会重复尝试打开记录的容器并放入");
-    public static final ConfigBoolean PinYin = new ConfigBoolean( "拼音搜索",true,"拼音，首字母简拼搜索 支持masa系列和创造搜索栏");
+    public static final ConfigBoolean PINYIN = new ConfigBoolean( "拼音搜索",true,"拼音，首字母简拼搜索 支持masa系列和创造搜索栏");
     public static final ConfigBooleanHotkeyed TEST = new ConfigBooleanHotkeyed( "test",false,"","");
 
     public static final ImmutableList<IConfigBase> ALL_CONFIGS = ImmutableList.of(
             WUHU_CLIENT,
             SYNTHESIS,
             AUTO_MENDING,
-            PinYin,
+            PINYIN,
 //            AUTO_DROP,
 //            AUTO_STORAGE,
             TEST

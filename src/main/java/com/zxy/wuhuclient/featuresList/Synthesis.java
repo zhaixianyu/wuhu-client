@@ -99,9 +99,6 @@ public class Synthesis {
             return false;
         }
         return true;
-//        } else {
-//            return false;
-//        }
     }
 
     public static void start(BlockPos pos) {
