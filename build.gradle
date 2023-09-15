@@ -17,6 +17,10 @@ repositories {
 	maven {
 		url = "https://api.modrinth.com/maven"
 	}
+
+	maven { url = "https://mvnrepository.com/artifact/com.belerweb/pinyin4j" }
+
+//	maven { url = "https://mvnrepository.com/artifact/com.github.open-android/pinyin4j " }
 	// Add repositories to retrieve artifacts from in here.
 	// You should only use this when depending on other mods because
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
@@ -25,6 +29,13 @@ repositories {
 }
 
 dependencies {
+	//拼音
+	implementation include(group: 'com.belerweb', name: 'pinyin4j', version: '2.5.1')
+
+//	implementation include(group: 'com.github.open-android', name: 'pinyin4j', version: '2.5.0')
+
+
+
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"

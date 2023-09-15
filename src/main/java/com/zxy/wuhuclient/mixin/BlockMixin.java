@@ -1,6 +1,5 @@
 package com.zxy.wuhuclient.mixin;
 
-import com.zxy.wuhuclient.featuresList.Synthesis;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

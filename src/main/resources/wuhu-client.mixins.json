@@ -3,7 +3,8 @@
   "package": "com.zxy.wuhuclient.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "BlockMixin"
+    "BlockMixin",
+    "MixinExperienceOrbEntity"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -12,6 +13,8 @@
     "ClientPlayerEMixin",
     "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
-    "MinecraftClientMixin"
+    "MinecraftClientMixin",
+    "SuffixArrayMixin",
+    "masa.WidgetListBaseMixin"
   ]
 }
