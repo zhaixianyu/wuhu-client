@@ -53,32 +53,30 @@ public class Synthesis {
 //        tick %= Integer.MAX_VALUE;
 //        if(step != 0) System.out.println(step);
         if(!Configs.SYNTHESIS.getBooleanValue()) return;
+        if(invUpdated){
+            switch (step) {
+                case 1 -> {
+                    dropInventory();
+                    step = 0;
+                }
+                case 3 -> {
+                    storage();
+                    step = 0;
+                }
+            }
+        }
 
-        if (storagePos != null && autoStorage && step != 1 && step != 2) {
+
+        if (storagePos != null && autoStorage && step != 1) {
             autoStorage();
             if(step == 3) return;
         }
         if(step == 0 || step == 2) continueSynthesis();
     }
-//        if (step == 1) dropInventory();
-//        if (storagePos != null && Configs.AUTO_STORAGE.getBooleanValue()/* && step == 0*/) {
 
     public static void onInventory() {
         if(!Configs.SYNTHESIS.getBooleanValue()) return;
-        switch (step) {
-            case 1 -> {
-                dropInventory();
-                step = 0;
-            }
-            case 2 -> {
-                invUpdated = true;
-            }
-            case 3 -> {
-                storage();
-                step = 0;
-            }
-        }
-
+        invUpdated = true;
     }
 
     public static boolean isInventory(BlockPos pos) {
@@ -144,6 +142,7 @@ public class Synthesis {
         if(closeScreen != 0 || !isInventory(dropPos) || !updateRecipe()) return;
         step = 1;
         closeScreen = 1;
+        invUpdated = false;
         if(!dropPos.isWithinDistance(client.player.getPos(),5)){
             dropPos = null;
             return;
@@ -458,6 +457,7 @@ public class Synthesis {
 //                System.out.println("autoStorage");
                 closeScreen = 1;
                 step = 3;
+                invUpdated = false;
                 client.player.networkHandler.sendPacket(new ClientCommandC2SPacket(client.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                 client.interactionManager.interactBlock(client.player,client.world,  Hand.MAIN_HAND,
                         new BlockHitResult(new Vec3d(storagePos.getX() + 0.5, storagePos.getY() + 0.5, storagePos.getZ() + 0.5), Direction.UP, storagePos, false));
@@ -523,11 +523,8 @@ public class Synthesis {
                 } else if (recipeItems.length == 4) {
                     client.player.closeHandledScreen();
                 }
-            }else if(invUpdated) {
+            }else if(invUpdated && step == 2) {
                 synthesis2();
-                if(step == 2){
-                    step = 0;
-                }
             }
         }
     }

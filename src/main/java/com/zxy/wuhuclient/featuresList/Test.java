@@ -2,6 +2,7 @@ package com.zxy.wuhuclient.featuresList;
 
 import com.zxy.wuhuclient.Utils.PinYinSearch;
 import com.zxy.wuhuclient.config.Configs;
+import net.minecraft.entity.mob.ZombieVillagerEntity;
 import net.minecraft.item.Items;
 
 import java.util.Locale;

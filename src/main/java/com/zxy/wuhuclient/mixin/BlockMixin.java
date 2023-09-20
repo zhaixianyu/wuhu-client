@@ -18,6 +18,7 @@ public class BlockMixin {
     @Inject(at = @At("TAIL"),method = "dropStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/entity/BlockEntity;)V")
     private static void dropStacks(BlockState state, WorldAccess world, BlockPos pos, BlockEntity blockEntity, CallbackInfo ci){
         if((step == 1  && pos.equals(dropPos)) || (step == 3 && (pos.equals(storagePos)))){
+            System.out.println("onBreak  " + step);
             closeScreen = 0;
             if (client.player != null) client.player.closeHandledScreen();
             step = 0;

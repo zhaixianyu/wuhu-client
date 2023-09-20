@@ -37,6 +37,7 @@ public class ClientPlayerInteractionManagerMixin {
                 if(autoStorage){
                     storagePos = hitResult.getBlockPos();
                 }else {
+                    invUpdated = false;
                     step = 3;
                     ScreenManagement.closeScreen = 1;
                 }

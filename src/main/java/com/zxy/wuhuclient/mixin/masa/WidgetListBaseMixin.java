@@ -11,19 +11,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(WidgetListBase.class)
 public class WidgetListBaseMixin{
-
-
     @Inject(at = @At(value = "INVOKE",target = "Ljava/lang/String;contains(Ljava/lang/CharSequence;)Z"),method = "matchesFilter(Ljava/lang/String;Ljava/lang/String;)Z",remap = false, cancellable = true)
     public void matchesFilter(String entryString, String filterText, CallbackInfoReturnable<Boolean> cir){
         if (!Configs.PINYIN.getBooleanValue()) return;
         String translate = StringUtils.translate(entryString);
-        String translate2 = StringUtils.translate(StringUtils.splitCamelCase(entryString));
+//        String translate2 = StringUtils.translate(StringUtils.splitCamelCase(entryString));
 //        System.out.println(StringUtils.splitCamelCase(entryString));
-//        System.out.println(StringUtils.getTranslatedOrFallback(entryString, entryString));
 //        System.out.println("entryString  "+ entryString);
 //        System.out.println("translate  "+ translate);
 //        System.out.println("translate2  "+ translate2);
-        if (PinYinSearch.getPinYin(translate).stream().anyMatch(str -> str.contains(filterText)) || PinYinSearch.getPinYin(translate2).stream().anyMatch(str -> str.contains(filterText)) || translate.contains(filterText)) {
+        if (PinYinSearch.getPinYin(translate).stream().anyMatch(str -> str.contains(filterText))
+//                || PinYinSearch.getPinYin(translate2).stream().anyMatch(str -> str.contains(filterText))
+                || translate.contains(filterText)) {
             cir.setReturnValue(true);
         }
     }
