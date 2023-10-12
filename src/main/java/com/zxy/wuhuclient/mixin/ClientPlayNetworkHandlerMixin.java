@@ -16,6 +16,10 @@ public class ClientPlayNetworkHandlerMixin {
     public void onInventory(InventoryS2CPacket packet, CallbackInfo ci){
         if(Synthesis.step!=0)Synthesis.onInventory();
     }
+    @Inject(at = @At("TAIL"),method = "onPlayerPositionLook")
+    public void onPlayerPositionLook(PlayerPositionLookS2CPacket packet, CallbackInfo ci){
+        System.out.println("speed");
+    }
     @Inject(at = @At("TAIL"),method = "onItemPickupAnimation")
     public void onItemPickupAnimation(ItemPickupAnimationS2CPacket packet, CallbackInfo ci){
 

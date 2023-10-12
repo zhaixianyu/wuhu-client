@@ -48,6 +48,7 @@ dependencies {
 	modImplementation "com.terraformersmc:modmenu:${project.mod_menu}"
 
 	modImplementation "maven.modrinth:carpet:${project.carpet}"
+	modImplementation "maven.modrinth:jei:${project.jei}"
 
 
 
