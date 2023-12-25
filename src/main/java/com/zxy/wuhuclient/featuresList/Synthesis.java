@@ -273,10 +273,13 @@ public class Synthesis {
 //                }
 //            }
 
+            HashMap<String, String> stringStringHashMap = new HashMap<>();
             count1 = sc.slots.stream()
                     .skip(recipeLength + 1)
-                    .filter(slot -> InventoryUtils.areStacksEqual(slot.getStack(), stack)
+                    .filter(
+                            slot -> InventoryUtils.areStacksEqual(slot.getStack(), stack)
                             && slot.getStack().getCount() - 1 > 1)
+
                     .count();
             if (count1 == 0
             ) {
