@@ -8,11 +8,11 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
@@ -45,7 +45,7 @@ public class InventoryUtils {
                         if (s == null) break;
                         try {
                             int c = Integer.parseInt(s) - 1;
-                            if (Registry.ITEM.getId(player.getInventory().getStack(c).getItem()).toString().contains("shulker_box") &&
+                            if (Registries.ITEM.getId(player.getInventory().getStack(c).getItem()).toString().contains("shulker_box") &&
                                     QUICK_SHULKER.getBooleanValue()) {
                                 MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.of("没有可替换的槽位，请将预选位的濳影盒换个位置"),false);
                                 continue;
@@ -120,7 +120,7 @@ public class InventoryUtils {
             ScreenHandler sc = MinecraftClient.getInstance().player.playerScreenHandler;
             for (int i = 9; i < sc.slots.size(); i++) {
                 ItemStack stack = sc.slots.get(i).getStack();
-                String itemid = Registry.ITEM.getId(stack.getItem()).toString();
+                String itemid = Registries.ITEM.getId(stack.getItem()).toString();
                 if(itemid.contains("shulker_box")){
                     DefaultedList<ItemStack> items1 = fi.dy.masa.malilib.util.InventoryUtils.getStoredItems(stack, -1);
                     if(items1.stream().anyMatch(s1 -> s1.getItem().equals(item))){
