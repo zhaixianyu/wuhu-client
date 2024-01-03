@@ -3,19 +3,24 @@
   "package": "com.zxy.wuhuclient.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "BlockMixin",
-    "MixinExperienceOrbEntity",
-    "masa.WidgetListConfigOptionsMixin"
+    "remote_inventory.MixinLootableContainerBlockEntity",
+    "remote_inventory.MixinServerPlayerEntity",
+    "remote_inventory.MixinServerWorld"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
+    "BlockMixin",
     "ClientPlayerEMixin",
     "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
     "MinecraftClientMixin",
+    "MixinExperienceOrbEntity",
     "SuffixArrayMixin",
-    "masa.WidgetListBaseMixin"
+    "masa.Litematica_InventoryUtilsMixin",
+    "masa.MixinInventoryUtils",
+    "masa.WidgetListBaseMixin",
+    "masa.WidgetListConfigOptionsMixin"
   ]
 }

@@ -15,6 +15,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import static com.zxy.wuhuclient.Utils.InventoryUtils.openIng;
+
 @Mixin(ClientPlayerEntity.class)
 public abstract class ClientPlayerEMixin {
     @Mutable
@@ -37,8 +39,8 @@ public abstract class ClientPlayerEMixin {
             AutoMending.getAuto().tick();
         }
     }
-    @Inject(at = @At("TAIL"),method = "closeHandledScreen")
-    public void closeHandledScreen(CallbackInfo ci){
-
+    @Inject(at = @At("TAIL"),method = "closeScreen")
+    public void closeScreen(CallbackInfo ci){
+        openIng = false;
     }
 }

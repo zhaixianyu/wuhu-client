@@ -28,6 +28,8 @@ public class Configs implements IConfigHandler {
 //    public static final ConfigBooleanHotkeyed AUTO_DROP = new ConfigBooleanHotkeyed( "材料不足自动取出",false,"","记录第一个左键的容器，当背包物品不满足合成的时候，就会重复尝试打开记录的容器并丢出");
 //    public static final ConfigBooleanHotkeyed AUTO_STORAGE = new ConfigBooleanHotkeyed( "合成后自动装箱",false,"","记录第一个右键的容器，当背包有合成物且大于1的时候，就会重复尝试打开记录的容器并放入");
     public static final ConfigBoolean PINYIN = new ConfigBoolean( "拼音搜索",true,"拼音，首字母简拼搜索 支持masa系列和创造搜索栏");
+    public static final ConfigBooleanHotkeyed QUICK_SHULKER = new ConfigBooleanHotkeyed( "快捷盒子支持", false, "","需要服务端有快捷盒子mod，否则会出现无法打开UI的情况\n");
+    public static final ConfigBooleanHotkeyed REMOTE_INVENTORY = new ConfigBooleanHotkeyed( "远程库存", false, "","需要服务端有远程库存mod，否则会出现无法打开UI的情况\n");
     public static final ConfigBooleanHotkeyed TEST = new ConfigBooleanHotkeyed( "test",false,"","");
 
     public static final ImmutableList<IConfigBase> ALL_CONFIGS = ImmutableList.of(
@@ -37,6 +39,7 @@ public class Configs implements IConfigHandler {
             PINYIN,
 //            AUTO_DROP,
 //            AUTO_STORAGE,
+            QUICK_SHULKER,
             TEST
     );
     //按下时激活
@@ -46,6 +49,7 @@ public class Configs implements IConfigHandler {
     //切换型开关
     public static final ImmutableList<IHotkeyTogglable> SWITCH_KEY = ImmutableList.of(
             SYNTHESIS,
+            QUICK_SHULKER,
 //            AUTO_STORAGE,
             TEST
     );

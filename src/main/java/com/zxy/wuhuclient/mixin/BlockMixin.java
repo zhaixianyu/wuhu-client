@@ -17,10 +17,12 @@ import static com.zxy.wuhuclient.featuresList.Synthesis.*;
 public class BlockMixin {
     @Inject(at = @At("TAIL"),method = "dropStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/entity/BlockEntity;)V")
     private static void dropStacks(BlockState state, WorldAccess world, BlockPos pos, BlockEntity blockEntity, CallbackInfo ci){
+        if(!world.isClient()) return;
         if((step == 1  && pos.equals(dropPos)) || (step == 3 && (pos.equals(storagePos)))){
-            System.out.println("onBreak  " + step);
+//            System.out.println("onBreak  " + step);
             closeScreen = 0;
-            if (client.player != null) client.player.closeHandledScreen();
+            //加了这一行单机会崩溃！！！？？？
+//            if (client.player != null && !client.player.currentScreenHandler.equals(client.player.playerScreenHandler)) client.player.closeHandledScreen();
             step = 0;
         }
     }

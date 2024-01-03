@@ -472,6 +472,7 @@ public class Synthesis {
         ClientPlayerEntity player = client.player;
         if (player == null) return;
         ScreenHandler sc = player.currentScreenHandler;
+        if(sc.equals(player.playerScreenHandler)) return;
         DefaultedList<Slot> slots = sc.slots;
         if (slots.stream()
                 .limit(slots.get(0).inventory.size())
