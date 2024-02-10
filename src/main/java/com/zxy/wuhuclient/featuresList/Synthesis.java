@@ -65,8 +65,6 @@ public class Synthesis {
                 }
             }
         }
-
-
         if (storagePos != null && autoStorage && step != 1) {
             autoStorage();
             if(step == 3) return;
