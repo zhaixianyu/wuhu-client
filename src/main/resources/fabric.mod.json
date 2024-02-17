@@ -1,18 +1,18 @@
 {
 	"schemaVersion": 1,
-	"id": "wuhu-client",
-	"version": "${version}",
-	"name": "WuHu Client",
+	"id": "${mod_id}",
+	"version": "${mod_version}",
+	"name": "${mod_name}",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
 		"zhaixianyu!"
 	],
 	"contact": {
-		"website": "https://space.bilibili.com/31545812",
-		"homepage": "https://fabricmc.net/",
-		"sources": ""
+		"website": "${mod_homepage}",
+		"homepage": "${mod_sources}",
+		"sources": "${mod_sources}"
 	},
-	"license": "CC0-1.0",
+	"license": "${mod_license}",
 	"icon": "assets/wuhu-client/icon.png",
 	"environment": "client",
 	"entrypoints": {

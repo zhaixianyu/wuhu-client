@@ -24,9 +24,6 @@ public class Configs implements IConfigHandler {
     public static final ConfigBooleanHotkeyed SYNTHESIS = new ConfigBooleanHotkeyed( "合成助手", false, "Z,C","");
     public static final ConfigBooleanHotkeyed AUTO_MENDING = new ConfigBooleanHotkeyed( "自动经验修补", false, "","在获取经验的时候可以将背包中带有经验修补且未满耐久的物品放到副手，"+"\n" +
             "修补完成后或一段时间未获得经验后放回原位。如果经验不是持续获得 可能不稳定");
-
-//    public static final ConfigBooleanHotkeyed AUTO_DROP = new ConfigBooleanHotkeyed( "材料不足自动取出",false,"","记录第一个左键的容器，当背包物品不满足合成的时候，就会重复尝试打开记录的容器并丢出");
-//    public static final ConfigBooleanHotkeyed AUTO_STORAGE = new ConfigBooleanHotkeyed( "合成后自动装箱",false,"","记录第一个右键的容器，当背包有合成物且大于1的时候，就会重复尝试打开记录的容器并放入");
     public static final ConfigBoolean PINYIN = new ConfigBoolean( "拼音搜索",true,"拼音，首字母简拼搜索 支持masa系列和创造搜索栏");
     public static final ConfigBooleanHotkeyed QUICK_SHULKER = new ConfigBooleanHotkeyed( "快捷盒子支持", false, "","需要服务端有快捷盒子mod，否则会出现无法打开UI的情况\n");
     public static final ConfigBooleanHotkeyed REMOTE_INVENTORY = new ConfigBooleanHotkeyed( "远程库存", false, "","需要服务端有远程库存mod，否则会出现无法打开UI的情况\n");
@@ -37,8 +34,6 @@ public class Configs implements IConfigHandler {
             SYNTHESIS,
             AUTO_MENDING,
             PINYIN,
-//            AUTO_DROP,
-//            AUTO_STORAGE,
             QUICK_SHULKER,
             TEST
     );
