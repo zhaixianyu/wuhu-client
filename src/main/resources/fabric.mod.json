@@ -13,8 +13,8 @@
 		"sources": "${mod_sources}"
 	},
 	"license": "${mod_license}",
-	"icon": "assets/wuhu-client/icon.png",
-	"environment": "client",
+	"icon": "assets/wuhuclient/icon.png",
+	"environment": "*",
 	"entrypoints": {
 		"main": [
 			"com.zxy.wuhuclient.WuHuClientMod"
@@ -28,9 +28,6 @@
 	],
 	"depends": {
 		"fabricloader": "*",
-		"minecraft": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
+		"minecraft": "${minecraft_dependency}"
 	}
 }

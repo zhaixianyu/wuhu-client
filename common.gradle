@@ -305,6 +305,7 @@ processResources {
 		}
 
 		expand([
+				"minecraft_dependency": project.minecraft_dependency,
 				"minecraft_version_id": project.minecraft_version.replace(".", "_"),
 				"minecraft_version"   : project.minecraft_version,
 				"mod_description"     : project.mod_description,

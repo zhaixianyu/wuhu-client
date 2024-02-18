@@ -32,6 +32,7 @@ public abstract class ClientPlayerEMixin {
     public void tick(CallbackInfo ci){
         Synthesis.tick();
         Test.tick();
+        System.out.println("000111");
 
         if(AutoMending.getAuto()==null) {
             new AutoMending(client);

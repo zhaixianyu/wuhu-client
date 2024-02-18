@@ -45,7 +45,7 @@ public class Synthesis {
     public static int step = 0;
     //记录合成点击的方块位置
     public static BlockPos pos;
-//    public static Set<Integer> updatedSlot = new HashSet<>();
+    //    public static Set<Integer> updatedSlot = new HashSet<>();
     public static boolean invUpdated = false;
     public static int tick = 0;
     public static void tick() {
@@ -146,8 +146,14 @@ public class Synthesis {
             return;
         }
         client.player.networkHandler.sendPacket(new ClientCommandC2SPacket(client.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-        client.interactionManager.interactBlock(client.player, Hand.MAIN_HAND,
-                new BlockHitResult(new Vec3d(dropPos.getX() + 0.5, dropPos.getY() + 0.5, dropPos.getZ() + 0.5), Direction.UP, dropPos, false));
+        useBlock(dropPos);
+    }
+    public static void useBlock(BlockPos pos){
+        //#if MC < 11900
+        //$$ client.interactionManager.interactBlock(client.player,client.world, Hand.MAIN_HAND, new BlockHitResult(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
+        //#else
+        client.interactionManager.interactBlock(client.player, Hand.MAIN_HAND, new BlockHitResult(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
+        //#endif
     }
     private static Map<Item, Integer> must = new HashMap<>();
     public static boolean isSynthesis(){
@@ -276,7 +282,7 @@ public class Synthesis {
                     .skip(recipeLength + 1)
                     .filter(
                             slot -> InventoryUtils.areStacksEqual(slot.getStack(), stack)
-                            && slot.getStack().getCount() - 1 > 1)
+                                    && slot.getStack().getCount() - 1 > 1)
 
                     .count();
             if (count1 == 0
@@ -460,8 +466,7 @@ public class Synthesis {
                 step = 3;
                 invUpdated = false;
                 client.player.networkHandler.sendPacket(new ClientCommandC2SPacket(client.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-                client.interactionManager.interactBlock(client.player,  Hand.MAIN_HAND,
-                        new BlockHitResult(new Vec3d(storagePos.getX() + 0.5, storagePos.getY() + 0.5, storagePos.getZ() + 0.5), Direction.UP, storagePos, false));
+                useBlock(storagePos);
             }
         }
     }
@@ -475,7 +480,7 @@ public class Synthesis {
         if (slots.stream()
                 .limit(slots.get(0).inventory.size())
                 .allMatch(slot -> InventoryUtils.areStacksEqual(slot.getStack(), recipe.getResult())
-                && slot.getStack().getCount() >= slot.getStack().getMaxCount())) {
+                        && slot.getStack().getCount() >= slot.getStack().getMaxCount())) {
             client.inGameHud.setOverlayMessage(Text.of("合成助手: 该容器已满"), false);
             player.closeHandledScreen();
             return;
@@ -520,8 +525,7 @@ public class Synthesis {
                     step = 2;
                     invUpdated = false;
                     client.player.networkHandler.sendPacket(new ClientCommandC2SPacket(client.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-                    client.interactionManager.interactBlock(client.player,  Hand.MAIN_HAND,
-                            new BlockHitResult(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
+                    useBlock(pos);
                 } else if (recipeItems.length == 4) {
                     client.player.closeHandledScreen();
                 }

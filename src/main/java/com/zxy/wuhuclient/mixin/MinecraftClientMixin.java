@@ -33,7 +33,7 @@ public class MinecraftClientMixin {
     }
     @Inject(at = @At("HEAD"),method = "doItemUse")
     public void doItemUse(CallbackInfo ci){
-        if (Synthesis.autoStorage = Configs.SYNTHESIS.getBooleanValue() && player != null && player.isSneaking()) {
+        if ((Synthesis.autoStorage = Configs.SYNTHESIS.getBooleanValue()) && player != null && player.isSneaking()) {
             client.inGameHud.setOverlayMessage(Text.of("合成装容已标记"), false);
         }
     }

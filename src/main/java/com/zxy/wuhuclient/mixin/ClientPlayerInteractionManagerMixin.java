@@ -30,7 +30,17 @@ public class ClientPlayerInteractionManagerMixin {
     @Shadow @Final private MinecraftClient client;
 
     @Inject(at = @At("HEAD"),method = "interactBlock")
-    public void interactBlock(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir){
+    //#if MC < 11900
+    //$$
+    //#else
+
+    //#endif
+    public void interactBlock(ClientPlayerEntity player,
+                                //#if MC < 11900
+                                //$$ ClientWorld world,
+                                //#else
+                                //#endif
+                                Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir){
 //        System.out.println("interactBlock");
         if(isLoadMod && Configs.SYNTHESIS.getBooleanValue() && step != 1){
             if (Synthesis.isInventory(hitResult.getBlockPos())) {

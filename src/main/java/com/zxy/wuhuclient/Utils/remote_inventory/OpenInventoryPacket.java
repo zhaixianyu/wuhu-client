@@ -11,8 +11,13 @@ import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.network.PacketByteBuf;
+//#if MC < 11900
+//$$ import net.minecraft.util.registry.Registry;
+//$$ import net.minecraft.util.registry.RegistryKey;
+//#else
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+//#endif
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -53,7 +58,12 @@ public class OpenInventoryPacket{
 
         ServerPlayNetworking.registerGlobalReceiver(OPEN_INVENTORY, (server, player, serverPlayNetworkHandler, packetByteBuf, packetSender) -> {
             BlockPos pos = packetByteBuf.readBlockPos();
+            //#if MC < 11900
+            //$$ RegistryKey<World> key = RegistryKey.of(Registry.WORLD_KEY, packetByteBuf.readIdentifier());
+            //#else
             RegistryKey<World> key = RegistryKey.of(RegistryKeys.WORLD, packetByteBuf.readIdentifier());
+            //#endif
+
             server.execute(() -> openInv(server,player,pos,key));
         });
     }
