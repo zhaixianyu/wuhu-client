@@ -73,7 +73,7 @@ processResources {
         ArrayList<?> jars = []
 
         fabric_subprojects.each({
-//            mc_condition.add("${it.minecraft_dependency}")
+            mc_condition.add("${it.minecraft_dependency}")
             jars.add(["file": "META-INF/jars/${project.mod_archives_base_name}-${it.minecraft_version}-${project.version}.jar"])
         })
 

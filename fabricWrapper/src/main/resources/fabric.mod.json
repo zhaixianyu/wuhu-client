@@ -29,6 +29,5 @@
     "malilib": "*"
   },
   "custom": {
-    "modmenu:clientsideOnly": false
   }
 }

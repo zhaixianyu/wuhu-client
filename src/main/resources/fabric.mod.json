@@ -27,7 +27,15 @@
 		"wuhu-client.mixins.json"
 	],
 	"depends": {
-		"fabricloader": "*",
 		"minecraft": "${minecraft_dependency}"
+	},
+	"custom": {
+		"modmenu:parent": "${mod_id}",
+		"modmenu": {
+			"parent": "${mod_id}"
+		}
+	},
+	"suggests": {
+		"modmenu": "*"
 	}
 }

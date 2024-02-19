@@ -36,10 +36,7 @@ repositories {
 	}
 
 	maven{
-		url = uri"https://maven.pkg.github.com/zhaixianyu/litematica-printer"
-		content {
-			includeGroupAndSubgroups("com.zxy")
-		}
+		url = "https://maven.pkg.github.com/JackFred2/WhereIsIt"
 	}
 
 //	maven { url = "https://mvnrepository.com/artifact/com.github.open-android/pinyin4j " }
@@ -88,6 +85,8 @@ dependencies {
 
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+//	modImplementation "com.zxy:litematica_printer:1.20.2-2.4+20240218"
+//	modImplementation ("red.jackf:whereisit:2.3.1+1.20.2")
 
 //	implementation include("com.belerweb:pinyin4j:2.5.1")
 
