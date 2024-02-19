@@ -1,6 +1,6 @@
 {
 	"schemaVersion": 1,
-	"id": "${mod_id}",
+	"id": "${mod_id}-${minecraft_version_id}",
 	"version": "${mod_version}",
 	"name": "${mod_name}",
 	"description": "This is an example description! Tell everyone what your mod is about!",
@@ -13,7 +13,7 @@
 		"sources": "${mod_sources}"
 	},
 	"license": "${mod_license}",
-	"icon": "assets/wuhuclient/icon.png",
+	"icon": "assets/${mod_id}/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
@@ -24,7 +24,7 @@
 		]
 	},
 	"mixins": [
-		"wuhu-client.mixins.json"
+		"wuhuclient.mixins.json"
 	],
 	"depends": {
 		"minecraft": "${minecraft_dependency}"
