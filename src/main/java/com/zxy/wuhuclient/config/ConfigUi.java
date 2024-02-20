@@ -9,27 +9,29 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import java.util.List;
 
 import static com.zxy.wuhuclient.WuHuClientMod.MOD_ID;
+import static com.zxy.wuhuclient.config.ConfigUi.Tab.*;
 
 public class ConfigUi extends GuiConfigsBase {
     private static Tab tab = Tab.ALL;
+
     public ConfigUi() {
         super(10, 50, MOD_ID, null, "wuhu-client");
     }
+
     @Override
-    public void initGui(){
+    public void initGui() {
         super.initGui();
         this.clearOptions();
 
         int x = 10;
         int y = 26;
         for (Tab tab : Tab.values()) {
-            x += this.createButton(x,y,-1,tab);
+            x += this.createButton(x, y, -1, tab);
         }
 
     }
 
-    private int createButton(int x, int y, int width, Tab tab)
-    {
+    private int createButton(int x, int y, int width, Tab tab) {
         ButtonGeneric button = new ButtonGeneric(x, y, width, 20, tab.name);
         button.setEnabled(ConfigUi.tab != tab);
         this.addButton(button, new ButtonListener(tab, this));
@@ -55,32 +57,36 @@ public class ConfigUi extends GuiConfigsBase {
 //    }
 
     @Override
-    public List<ConfigOptionWrapper> getConfigs()
-    {
+    public List<ConfigOptionWrapper> getConfigs() {
         List<? extends IConfigBase> configs;
         Tab tab = ConfigUi.tab;
-        if(tab == Tab.ALL){
+        if (tab == Tab.ALL) {
             configs = Configs.ALL_CONFIGS;
-        }else {
+        } else if(tab == COMPATIBILITY) {
+            configs = Configs.COMPATIBILITY;
+        } else if (tab == FUNCTION) {
+            configs = Configs.FUNCTION;
+        } else if (tab == COLOR) {
+            configs = Configs.COLOR;
+        } else if(tab == null){
+            return null;
+        } else {
             configs = Configs.ALL_CONFIGS;
         }
         return ConfigOptionWrapper.createFor(configs);
     }
 
-    private static class ButtonListener implements IButtonActionListener
-    {
+    private static class ButtonListener implements IButtonActionListener {
         private final ConfigUi parent;
         private final Tab tab;
 
-        public ButtonListener(Tab tab, ConfigUi parent)
-        {
+        public ButtonListener(Tab tab, ConfigUi parent) {
             this.tab = tab;
             this.parent = parent;
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
-        {
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton) {
             ConfigUi.tab = this.tab;
             this.parent.reCreateListWidget();
             this.parent.getListWidget().resetScrollbarPosition();
@@ -88,15 +94,17 @@ public class ConfigUi extends GuiConfigsBase {
         }
     }
 
-    public enum Tab{
-    ALL("全部"),
-    GENERAL("通用"),
+    public enum Tab {
+        ALL("全部"),
+        COMPATIBILITY("兼容"),
+        FUNCTION("功能"),
+        COLOR("颜色"),
+        ;
 
-    ;
+        public final String name;
 
-    public final String name;
-    Tab(String str){
-        name = str;
-    }
+        Tab(String str) {
+            name = str;
+        }
     }
 }

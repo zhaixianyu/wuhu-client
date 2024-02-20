@@ -8,13 +8,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-
-//#if MC < 11900
-//$$ import net.minecraft.util.registry.Registry;
-//#else
 import net.minecraft.registry.Registries;
-//#endif
-
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
@@ -51,12 +45,7 @@ public class InventoryUtils {
                         if (s == null) break;
                         try {
                             int c = Integer.parseInt(s) - 1;
-
-                            //#if MC < 11900
-                            //$$ if (Registry.ITEM.getId(player.getInventory().getStack(c).getItem()).toString().contains("shulker_box") &&
-                            //#else
                             if (Registries.ITEM.getId(player.getInventory().getStack(c).getItem()).toString().contains("shulker_box") &&
-                            //#endif
                                     QUICK_SHULKER.getBooleanValue()) {
                                 MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.of("没有可替换的槽位，请将预选位的濳影盒换个位置"),false);
                                 continue;
@@ -131,12 +120,7 @@ public class InventoryUtils {
             ScreenHandler sc = MinecraftClient.getInstance().player.playerScreenHandler;
             for (int i = 9; i < sc.slots.size(); i++) {
                 ItemStack stack = sc.slots.get(i).getStack();
-                //#if MC < 11900
-                //$$ String itemid = Registry.ITEM.getId(stack.getItem()).toString();
-                //#else
                 String itemid = Registries.ITEM.getId(stack.getItem()).toString();
-                //#endif
-
                 if(itemid.contains("shulker_box")){
                     DefaultedList<ItemStack> items1 = fi.dy.masa.malilib.util.InventoryUtils.getStoredItems(stack, -1);
                     if(items1.stream().anyMatch(s1 -> s1.getItem().equals(item))){

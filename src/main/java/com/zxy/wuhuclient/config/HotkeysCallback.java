@@ -1,10 +1,13 @@
 package com.zxy.wuhuclient.config;
 
+import com.zxy.wuhuclient.featuresList.SyncInventory;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import net.minecraft.client.MinecraftClient;
+
+import static com.zxy.wuhuclient.config.Configs.*;
 
 //监听按键
 public class HotkeysCallback implements IHotkeyCallback {
@@ -13,9 +16,11 @@ public class HotkeysCallback implements IHotkeyCallback {
     //激活的热键会被key记录
     @Override
     public boolean onKeyAction(KeyAction action, IKeybind key) {
-        if(key == Configs.WUHU_CLIENT.getKeybind()){
+        if(key == WUHU_CLIENT.getKeybind()){
             client.setScreen(new ConfigUi());
             return true;
+        }else if(key == SYNC_INVENTORY.getKeybind()){
+            SyncInventory.startOrOffSyncInventory();
         }
         return false;
     }

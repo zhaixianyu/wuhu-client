@@ -1,6 +1,8 @@
 package com.zxy.wuhuclient.mixin;
 
+import com.zxy.wuhuclient.Utils.ZxyUtils;
 import com.zxy.wuhuclient.featuresList.AutoMending;
+import com.zxy.wuhuclient.featuresList.SyncInventory;
 import com.zxy.wuhuclient.featuresList.Synthesis;
 import com.zxy.wuhuclient.featuresList.Test;
 import net.minecraft.client.MinecraftClient;
@@ -30,9 +32,7 @@ public abstract class ClientPlayerEMixin {
 
     @Inject(at = @At("TAIL"),method = "tick")
     public void tick(CallbackInfo ci){
-        Synthesis.tick();
-        Test.tick();
-        System.out.println("000111");
+        ZxyUtils.tick();
 
         if(AutoMending.getAuto()==null) {
             new AutoMending(client);

@@ -7,11 +7,7 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.search.SuffixArray;
 import net.minecraft.item.ItemStack;
-//#if MC < 11900
-//$$ import net.minecraft.util.registry.Registry;
-//#else
 import net.minecraft.registry.Registries;
-//#endif
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,11 +23,7 @@ public class SuffixArrayMixin<T> {
         if (!Configs.PINYIN.getBooleanValue())return;
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player != null && player.currentScreenHandler instanceof CreativeInventoryScreen.CreativeScreenHandler) {
-            //#if MC < 11900
-            //$$ Registry.ITEM.stream().forEach(item -> {
-            //#else
             Registries.ITEM.stream().forEach(item -> {
-            //#endif
                 if (PinYinSearch.getPinYin(item.getName().getString().toLowerCase()).stream().anyMatch(str -> str.contains(text)) || item.toString().contains(text)) {
                     ((CreativeInventoryScreen.CreativeScreenHandler) player.currentScreenHandler).itemList.add(new ItemStack(item));
                 }
