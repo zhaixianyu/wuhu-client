@@ -4,6 +4,7 @@ import com.zxy.wuhuclient.config.Configs;
 import com.zxy.wuhuclient.featuresList.Synthesis;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
@@ -25,7 +26,7 @@ public class MinecraftClientMixin {
 
     @Inject(at = @At("HEAD"),method = "setScreen", cancellable = true)
     public void setScreen(Screen screen, CallbackInfo ci){
-        if(closeScreen > 0 && screen != null){
+        if(closeScreen > 0 /*&& screen != null*/ && screen instanceof HandledScreen<?>){
 //            System.out.println(screen.getClass());
             closeScreen--;
             ci.cancel();

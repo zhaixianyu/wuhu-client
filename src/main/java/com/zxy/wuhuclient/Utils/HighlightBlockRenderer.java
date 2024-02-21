@@ -7,7 +7,7 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.Color4f;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -56,6 +56,7 @@ public class HighlightBlockRenderer implements IRenderer {
         RenderSystem.enableBlend();
         RenderSystem.disableCull();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+//        RenderSystem.setShader(GameRenderer::getPositionColorShader);
         Tessellator instance = Tessellator.getInstance();
         BufferBuilder buffer = instance.getBuffer();
 
@@ -85,14 +86,9 @@ public class HighlightBlockRenderer implements IRenderer {
 
     //如果不注册无法渲染，
     public static void init(){
-        RenderEventHandler.getInstance().registerGameOverlayRenderer(instance);
         RenderEventHandler.getInstance().registerWorldLastRenderer(instance);
     }
 
-    @Override
-    public void onRenderGameOverlayPost(DrawContext drawContext){
-
-    }
     @Override
     public void onRenderWorldLast(MatrixStack matrices, Matrix4f projMatrix){
         for (Map.Entry<Color4f, List<BlockPos>> map : highlightMap.entrySet()) {

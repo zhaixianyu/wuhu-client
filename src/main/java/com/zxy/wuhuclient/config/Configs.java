@@ -31,6 +31,7 @@ public class Configs implements IConfigHandler {
     //功能
     public static final ConfigBooleanHotkeyed SYNTHESIS = new ConfigBooleanHotkeyed( "合成助手", false, "Z,C","");
     public static final ConfigHotkey SYNC_INVENTORY = new ConfigHotkey( "容器同步","","");
+    public static final ConfigBooleanHotkeyed SYNC_INVENTORY_CHECK = new ConfigBooleanHotkeyed( "容器同步是否检查背包",true,"","开启时会检测背包中的物品是否满足填充条件，物品不足时不会打开容器。");
     public static final ConfigBooleanHotkeyed AUTO_MENDING = new ConfigBooleanHotkeyed( "自动经验修补", false, "","在获取经验的时候可以将背包中带有经验修补且未满耐久的物品放到副手，"+"\n" +
             "修补完成后或一段时间未获得经验后放回原位。如果经验不是持续获得 可能不稳定");
 
@@ -59,6 +60,7 @@ public class Configs implements IConfigHandler {
         list.add(SYNTHESIS);
         list.add(AUTO_MENDING);
         list.add(SYNC_INVENTORY);
+        list.add(SYNC_INVENTORY_CHECK);
         list.add(TEST);
 
         return ImmutableList.copyOf(list);
@@ -81,6 +83,7 @@ public class Configs implements IConfigHandler {
     public static final ImmutableList<IHotkeyTogglable> SWITCH_KEY = ImmutableList.of(
             SYNTHESIS,
             QUICK_SHULKER,
+            SYNC_INVENTORY_CHECK,
 //            AUTO_STORAGE,
             TEST
     );

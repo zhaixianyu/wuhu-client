@@ -31,8 +31,7 @@ import java.util.*;
 import static com.zxy.wuhuclient.Utils.InventoryUtils.openIng;
 import static com.zxy.wuhuclient.Utils.ZxyUtils.siftBlock;
 import static com.zxy.wuhuclient.WuHuClientMod.client;
-import static com.zxy.wuhuclient.config.Configs.REMOTE_INVENTORY;
-import static com.zxy.wuhuclient.config.Configs.SYNC_INVENTORY_COLOR;
+import static com.zxy.wuhuclient.config.Configs.*;
 import static net.minecraft.block.ShulkerBoxBlock.FACING;
 
 public class SyncInventory {
@@ -125,17 +124,6 @@ public class SyncInventory {
             // 添加新键值对
             itemsCount.put(itemStack, itemStack.getCount());
         }
-//        if (itemsCount.keySet().stream().noneMatch(k -> ItemStack.canCombine(k,itenStack))) {
-//            itemsCount.put(itenStack,itenStack.getCount());
-//        }else {
-//            itemsCount.forEach((key, value) -> {
-//                if (ItemStack.canCombine(key, itenStack)) {
-//                    Integer count = itemsCount.get(key);
-//                    count += itenStack.getCount();
-//                    itemsCount.put(key, count);
-//                }
-//            });
-//        }
     }
     public static void syncInv() {
         switch (num) {
@@ -167,7 +155,7 @@ public class SyncInventory {
 //                if(targetItemsCount.keySet().stream()
 //                        .noneMatch(itemStack -> playerItemsCount.keySet().stream()
 //                                .anyMatch(itemStack1 -> ItemStack.canCombine(itemStack,itemStack1)))) return;
-                if (!targetItemsCount.entrySet().stream()
+                if (SYNC_INVENTORY_CHECK.getBooleanValue() && !targetItemsCount.entrySet().stream()
                         .allMatch(target -> playerItemsCount.entrySet().stream()
                                 .anyMatch(player ->
                                         ItemStack.canCombine(player.getKey(), target.getKey()) && target.getValue() <= player.getValue()))) return;
