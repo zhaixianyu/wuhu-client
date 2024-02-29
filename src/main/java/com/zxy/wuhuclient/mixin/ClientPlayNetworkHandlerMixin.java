@@ -19,7 +19,7 @@ public class ClientPlayNetworkHandlerMixin {
     @Inject(at = @At("TAIL"),method = "onInventory")
     public void onInventory(InventoryS2CPacket packet, CallbackInfo ci){
         if(Synthesis.step!=0)Synthesis.onInventory();
-        if(InventoryUtils.openIng)switchInv();
+        if(InventoryUtils.switchItem)switchInv();
         if(num == 3 || num == 1)syncInv();
     }
     @Inject(at = @At("TAIL"),method = "onPlayerPositionLook")

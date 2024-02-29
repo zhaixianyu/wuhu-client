@@ -532,6 +532,8 @@ public class Synthesis {
                 }
             }else if(invUpdated && step == 2) {
                 synthesis2();
+            }else{
+                client.player.closeScreen();
             }
         }
     }

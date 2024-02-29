@@ -27,11 +27,13 @@ public class AutoMending {
         if (!sc.equals(player.playerScreenHandler)) return;
 
         if (run) {
-            if(!sc.slots.get(45).getStack().isDamaged()) reSwitch();
+            if(!sc.slots.get(45).getStack().isDamaged() &&
+                    EnchantmentHelper.getLevel(Enchantments.MENDING,sc.getSlot(45).getStack()) > 0) reSwitch();
             else return;
         }
         if (mc == null || !player.equals(mc.player)) return;
-
+        if(!sc.slots.get(45).getStack().isDamaged() &&
+                EnchantmentHelper.getLevel(Enchantments.MENDING,sc.getSlot(45).getStack()) > 0) return;
         for (int i = 0; i < sc.slots.size(); i++) {
             ItemStack item = sc.slots.get(i).getStack();
             if (

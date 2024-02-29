@@ -13,14 +13,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static com.zxy.wuhuclient.Utils.InventoryUtils.items2;
 import static com.zxy.wuhuclient.config.Configs.QUICK_SHULKER;
-import static com.zxy.wuhuclient.config.Configs.REMOTE_INVENTORY;
 
 @Mixin(InventoryUtils.class)
 public class MixinInventoryUtils {
     @Inject(at = @At("TAIL"),method = "schematicWorldPickBlock")
     private static void schematicWorldPickBlock(ItemStack stack, BlockPos pos, World schematicWorld, MinecraftClient mc, CallbackInfo ci){
 //        System.out.println(cir.getReturnValue().booleanValue());
-        if (mc.player != null && !ItemStack.canCombine(mc.player.getMainHandStack(),stack) && (REMOTE_INVENTORY.getBooleanValue() || QUICK_SHULKER.getBooleanValue())) {
+        if (mc.player != null && !ItemStack.canCombine(mc.player.getMainHandStack(),stack) && (QUICK_SHULKER.getBooleanValue())) {
             items2.add(stack.getItem());
             com.zxy.wuhuclient.Utils.InventoryUtils.switchItem();
         }

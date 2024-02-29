@@ -1,6 +1,5 @@
 package com.zxy.wuhuclient.Utils;
 
-import com.zxy.wuhuclient.Utils.remote_inventory.OpenInventoryPacket;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -50,28 +49,23 @@ public class SwitchItem {
         }
         ItemStatistics itemStatistics = itemStacks.get(itemStack);
         if(itemStatistics != null){
-            if (itemStatistics.key != null) {
-                OpenInventoryPacket.sendOpenInventory(itemStatistics.pos,itemStatistics.key);
-                closeScreen++;
-            }else {
-                ScreenHandler sc = client.player.currentScreenHandler;
-                for (int i = 9; i < sc.slots.size() && itemStatistics.shulkerBoxSlot != -1; i++) {
-                    ItemStack stack = sc.slots.get(i).getStack();
-                    if (InventoryUtils.getStoredItems(stack,-1).stream().anyMatch(stack1 -> stack1.isEmpty() ||
-                            (InventoryUtils.areStacksEqual(stack1,reSwitchItem) && stack1.getCount() < stack1.getMaxCount()))
-                    ) {
-                        try {
-                            Class quickShulker = Class.forName("net.kyrptonaught.quickshulker.client.ClientUtil");
-                            Method checkAndSend = quickShulker.getDeclaredMethod("CheckAndSend",ItemStack.class,int.class);
-                            checkAndSend.invoke(checkAndSend,sc.slots.get(itemStatistics.shulkerBoxSlot).getStack(),i);
-                            closeScreen++;
-                            return;
-                        } catch (Exception ignored){}
-                    }
+            ScreenHandler sc = client.player.currentScreenHandler;
+            for (int i = 9; i < sc.slots.size() && itemStatistics.shulkerBoxSlot != -1; i++) {
+                ItemStack stack = sc.slots.get(i).getStack();
+                if (InventoryUtils.getStoredItems(stack,-1).stream().anyMatch(stack1 -> stack1.isEmpty() ||
+                        (InventoryUtils.areStacksEqual(stack1,reSwitchItem) && stack1.getCount() < stack1.getMaxCount()))
+                ) {
+                    try {
+                        Class quickShulker = Class.forName("net.kyrptonaught.quickshulker.client.ClientUtil");
+                        Method checkAndSend = quickShulker.getDeclaredMethod("CheckAndSend",ItemStack.class,int.class);
+                        checkAndSend.invoke(checkAndSend,sc.slots.get(itemStatistics.shulkerBoxSlot).getStack(),i);
+                        closeScreen++;
+                        return;
+                    } catch (Exception ignored){}
                 }
-                removeItem(reSwitchItem);
-                reSwitchItem = null;
             }
+            removeItem(reSwitchItem);
+            reSwitchItem = null;
         }
     }
     public static void checkItems(){

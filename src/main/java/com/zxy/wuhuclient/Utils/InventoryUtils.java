@@ -1,6 +1,5 @@
 package com.zxy.wuhuclient.Utils;
 
-import com.zxy.wuhuclient.Utils.remote_inventory.OpenInventoryPacket;
 import com.zxy.wuhuclient.mixin.masa.Litematica_InventoryUtilsMixin;
 import fi.dy.masa.litematica.config.Configs;
 import net.minecraft.client.MinecraftClient;
@@ -20,15 +19,14 @@ import java.util.HashSet;
 
 import static com.zxy.wuhuclient.Utils.SwitchItem.reSwitchItem;
 import static com.zxy.wuhuclient.config.Configs.QUICK_SHULKER;
-import static com.zxy.wuhuclient.config.Configs.REMOTE_INVENTORY;
 
 public class InventoryUtils {
     public static HashSet<Item> items2 = new HashSet<>();
     @NotNull
     public static MinecraftClient client = MinecraftClient.getInstance();
     public static boolean openIng = false;
+    public static boolean switchItem = false;
     public static void switchInv(){
-
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         ScreenHandler sc = player.currentScreenHandler;
         if(sc.equals(player.playerScreenHandler)){
@@ -50,9 +48,7 @@ public class InventoryUtils {
                                 MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.of("没有可替换的槽位，请将预选位的濳影盒换个位置"),false);
                                 continue;
                             }
-                            if (OpenInventoryPacket.key != null) {
-                                SwitchItem.newItem(slots.get(y).getStack(), OpenInventoryPacket.pos,OpenInventoryPacket.key,y, shulkerBoxSlot);
-                            }else SwitchItem.newItem(slots.get(y).getStack(), null,null,y, shulkerBoxSlot);
+                            SwitchItem.newItem(slots.get(y).getStack(), null,null,y, shulkerBoxSlot);
                             shulkerBoxSlot = -1;
                             int a = Litematica_InventoryUtilsMixin.getEmptyPickBlockableHotbarSlot(player.getInventory()) == -1 ?
                                     Litematica_InventoryUtilsMixin.getPickBlockTargetSlot(player) :
@@ -79,38 +75,13 @@ public class InventoryUtils {
         if(items2.isEmpty()) return false;
         ClientPlayerEntity player = client.player;
         ScreenHandler sc = player.currentScreenHandler;
-        if(!openIng){
+        if(!switchItem){
             if(!player.currentScreenHandler.equals(player.playerScreenHandler)) player.closeHandledScreen();
             if (sc.slots.stream().skip(9).limit(sc.slots.size()-10).noneMatch(slot -> slot.getStack().isEmpty())) {
                 SwitchItem.checkItems();
                 return true;
             }
-            if(QUICK_SHULKER.getBooleanValue() && openShulker(items2)){
-                return true;
-            }else if(REMOTE_INVENTORY.getBooleanValue()){
-//                for (Item item : items2) {
-//                    MemoryUtils.currentMemoryKey = client.world.getDimensionKey().getValue();
-//                    MemoryUtils.itemStack = new ItemStack(item);
-//                    if (SearchItem.search(true)) {
-//                        isOpenHandler = true;
-//                        printerMemorySync = true;
-//                        return true;
-//                    }
-//                }
-
-//                    MemoryDatabase database = MemoryDatabase.getCurrent();
-//                    if (database != null) {
-//                        for (Identifier dimension : database.getDimensions()) {
-//                            for (Memory memory : database.findItems(item.getDefaultStack(), dimension)) {
-//                                OpenInventoryPacket.sendOpenInventory(memory.getPosition(), RegistryKey.of(RegistryKeys.WORLD, dimension));
-//                                isOpenHandler = true;
-//                                return;
-//                            }
-//                        }
-//                    }
-                items2 = new HashSet<>();
-                openIng = false;
-            }
+            if(QUICK_SHULKER.getBooleanValue() && openShulker(items2)) return true;
         }
         return false;
     }
@@ -130,7 +101,7 @@ public class InventoryUtils {
                             Method checkAndSend = quickShulker.getDeclaredMethod("CheckAndSend",ItemStack.class,int.class);
                             checkAndSend.invoke(checkAndSend,stack,i);
                             ScreenManagement.closeScreen++;
-                            openIng = true;
+                            switchItem = true;
                             return true;
                         } catch (Exception e) {
                         }

@@ -39,7 +39,7 @@ public class Configs implements IConfigHandler {
     public static final ConfigBoolean PINYIN = new ConfigBoolean( "拼音搜索",true,"拼音，首字母简拼搜索 支持masa系列和创造搜索栏");
     public static final ConfigBooleanHotkeyed QUICK_SHULKER = new ConfigBooleanHotkeyed( "快捷盒子支持", false, "","需要服务端有快捷盒子mod，否则会出现无法打开UI的情况\n" +
             "中键投影可以从濳影盒中直接取出物品(需要背包中有空位)");
-    public static final ConfigBooleanHotkeyed REMOTE_INVENTORY = new ConfigBooleanHotkeyed( "远程库存", false, "","需要服务端有远程库存mod，否则会出现无法打开UI的情况\n");
+//    public static final ConfigBooleanHotkeyed REMOTE_INVENTORY = new ConfigBooleanHotkeyed( "远程库存", false, "","需要服务端有远程库存mod，否则会出现无法打开UI的情况\n");
 
     //color
     public static final ConfigColor SYNC_INVENTORY_COLOR = new ConfigColor("容器同步高亮颜色","#4CFF4CE6","");
@@ -49,7 +49,7 @@ public class Configs implements IConfigHandler {
         List<IConfigBase> list = new ArrayList<>();
         list.add(WUHU_CLIENT);
         if(isLoadQuiShulker) list.add(QUICK_SHULKER);
-        list.add(REMOTE_INVENTORY);
+//        list.add(REMOTE_INVENTORY);
         list.add(PINYIN);
 
         return ImmutableList.copyOf(list);
@@ -118,5 +118,4 @@ public class Configs implements IConfigHandler {
             JsonUtils.writeJsonToFile(configRoot, new File(FILE_PATH));
         }
     }
-
 }

@@ -2,16 +2,13 @@ package com.zxy.wuhuclient.featuresList;
 
 import com.zxy.wuhuclient.Utils.HighlightBlockRenderer;
 import com.zxy.wuhuclient.Utils.ScreenManagement;
-import com.zxy.wuhuclient.Utils.remote_inventory.OpenInventoryPacket;
 import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.malilib.util.ItemType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
@@ -25,10 +22,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-
 import java.util.*;
-
-import static com.zxy.wuhuclient.Utils.InventoryUtils.openIng;
 import static com.zxy.wuhuclient.Utils.ZxyUtils.siftBlock;
 import static com.zxy.wuhuclient.WuHuClientMod.client;
 import static com.zxy.wuhuclient.config.Configs.*;
@@ -41,9 +35,10 @@ public class SyncInventory {
     static BlockPos blockPos = null;
     static Color4f color4f;
     static List<BlockPos> highlightPosList = new LinkedList<>();
-    static Map<ItemStack,Integer> targetItemsCount = new HashMap<>();
-    static Map<ItemStack,Integer> playerItemsCount = new HashMap<>();
-    private static void getReadyColor(){
+    static Map<ItemStack, Integer> targetItemsCount = new HashMap<>();
+    static Map<ItemStack, Integer> playerItemsCount = new HashMap<>();
+
+    private static void getReadyColor() {
         color4f = SYNC_INVENTORY_COLOR.getColor();
         HighlightBlockRenderer.addHighlightMap(color4f);
         highlightPosList = HighlightBlockRenderer.getPosList(color4f);
@@ -78,7 +73,7 @@ public class SyncInventory {
             if (!syncPosList.isEmpty()) {
                 if (client.player == null) return;
                 client.player.closeHandledScreen();
-                if (!openInv(pos,false))return;
+                if (!openInv(pos, false)) return;
                 ScreenManagement.closeScreen++;
                 num = 1;
             }
@@ -87,29 +82,27 @@ public class SyncInventory {
             syncPosList = new LinkedList<>();
             if (client.player != null) client.player.closeScreen();
             num = 0;
-            client.inGameHud.setOverlayMessage(Text.of("已取消同步"),false);
+            client.inGameHud.setOverlayMessage(Text.of("已取消同步"), false);
         }
     }
-    public static boolean openInv(BlockPos pos,boolean ignoreThePrompt){
-        if(REMOTE_INVENTORY.getBooleanValue()) {
-            OpenInventoryPacket.sendOpenInventory(pos, client.world.getRegistryKey());
+
+    public static boolean openInv(BlockPos pos, boolean ignoreThePrompt) {
+
+        if (client.player != null && client.player.squaredDistanceTo(Vec3d.ofCenter(pos)) > 25D) {
+            if (!ignoreThePrompt) client.inGameHud.setOverlayMessage(Text.of("距离过远无法打开容器"), false);
+            return false;
+        }
+        if (client.interactionManager != null) {
+            //#if MC > 11802
+            client.interactionManager.interactBlock(client.player, Hand.MAIN_HAND, new BlockHitResult(Vec3d.ofCenter(pos), Direction.DOWN, pos, false));
+            //#else
+            //$$ client.interactionManager.interactBlock(client.player,client.world, Hand.MAIN_HAND,new BlockHitResult(Vec3d.ofCenter(pos), Direction.DOWN,pos,false));
+            //#endif
             return true;
-        } else {
-            if (client.player != null && client.player.squaredDistanceTo(Vec3d.ofCenter(pos)) > 25D) {
-                if(!ignoreThePrompt) client.inGameHud.setOverlayMessage(Text.of("距离过远无法打开容器"), false);
-                return false;
-            }
-            if (client.interactionManager != null){
-                //#if MC > 11802
-                client.interactionManager.interactBlock(client.player, Hand.MAIN_HAND,new BlockHitResult(Vec3d.ofCenter(pos), Direction.DOWN,pos,false));
-                //#else
-                //$$ client.interactionManager.interactBlock(client.player,client.world, Hand.MAIN_HAND,new BlockHitResult(Vec3d.ofCenter(pos), Direction.DOWN,pos,false));
-                //#endif
-                return true;
-            } else return false;
-        }
+        } else return false;
     }
-    public static void itemsCount(Map<ItemStack,Integer> itemsCount , ItemStack itemStack){
+
+    public static void itemsCount(Map<ItemStack, Integer> itemsCount, ItemStack itemStack) {
         // 判断是否存在可合并的键
         Optional<Map.Entry<ItemStack, Integer>> entry = itemsCount.entrySet().stream()
                 .filter(e -> ItemStack.canCombine(e.getKey(), itemStack))
@@ -125,16 +118,17 @@ public class SyncInventory {
             itemsCount.put(itemStack, itemStack.getCount());
         }
     }
+
     public static void syncInv() {
         switch (num) {
             case 1 -> {
                 //按下热键后记录看向的容器 开始同步容器 只会触发一次
                 targetBlockInv = new ArrayList<>();
                 targetItemsCount = new HashMap<>();
-                if (client.player != null && (!REMOTE_INVENTORY.getBooleanValue() || openIng) && !client.player.currentScreenHandler.equals(client.player.playerScreenHandler)) {
+                if (client.player != null && !client.player.currentScreenHandler.equals(client.player.playerScreenHandler)) {
                     for (int i = 0; i < client.player.currentScreenHandler.slots.get(0).inventory.size(); i++) {
                         ItemStack copy = client.player.currentScreenHandler.slots.get(i).getStack().copy();
-                        itemsCount(targetItemsCount,copy);
+                        itemsCount(targetItemsCount, copy);
                         targetBlockInv.add(copy);
                     }
                     //上面如果不使用copy()在关闭容器后会使第一个元素号变该物品成总数 非常有趣...
@@ -151,23 +145,23 @@ public class SyncInventory {
                 client.inGameHud.setOverlayMessage(Text.of("剩余 " + syncPosList.size() + " 个容器. 再次按下快捷键取消同步"), false);
                 if (!client.player.currentScreenHandler.equals(client.player.playerScreenHandler)) return;
                 DefaultedList<Slot> slots = client.player.playerScreenHandler.slots;
-                slots.forEach(slot -> itemsCount(playerItemsCount,slot.getStack()));
+                slots.forEach(slot -> itemsCount(playerItemsCount, slot.getStack()));
 //                if(targetItemsCount.keySet().stream()
 //                        .noneMatch(itemStack -> playerItemsCount.keySet().stream()
 //                                .anyMatch(itemStack1 -> ItemStack.canCombine(itemStack,itemStack1)))) return;
                 if (SYNC_INVENTORY_CHECK.getBooleanValue() && !targetItemsCount.entrySet().stream()
                         .allMatch(target -> playerItemsCount.entrySet().stream()
                                 .anyMatch(player ->
-                                        ItemStack.canCombine(player.getKey(), target.getKey()) && target.getValue() <= player.getValue()))) return;
+                                        ItemStack.canCombine(player.getKey(), target.getKey()) && target.getValue() <= player.getValue())))
+                    return;
 
-                if ((!REMOTE_INVENTORY.getBooleanValue() || !openIng) && OpenInventoryPacket.key == null) {
-                    for (BlockPos pos : syncPosList) {
-                        if (!openInv(pos,true)) continue;
-                        ScreenManagement.closeScreen++;
-                        blockPos = pos;
-                        num = 3;
-                        break;
-                    }
+
+                for (BlockPos pos : syncPosList) {
+                    if (!openInv(pos, true)) continue;
+                    ScreenManagement.closeScreen++;
+                    blockPos = pos;
+                    num = 3;
+                    break;
                 }
                 if (syncPosList.isEmpty()) {
                     num = 0;
@@ -178,7 +172,7 @@ public class SyncInventory {
                 //开始同步 在打开容器后触发
                 ScreenHandler sc = client.player.currentScreenHandler;
                 if (sc.equals(client.player.playerScreenHandler)) return;
-                int size = Math.min(targetBlockInv.size(),sc.slots.get(0).inventory.size());
+                int size = Math.min(targetBlockInv.size(), sc.slots.get(0).inventory.size());
 
                 int times = 0;
                 for (int i = 0; i < size; i++) {
@@ -186,8 +180,8 @@ public class SyncInventory {
                     ItemStack item2 = targetBlockInv.get(i).copy();
                     int currNum = item1.getCount();
                     int tarNum = item2.getCount();
-                    boolean same = ItemStack.canCombine(item1,item2.copy()) && !item1.isEmpty();
-                    if(ItemStack.canCombine(item1,item2) && currNum == tarNum) continue;
+                    boolean same = ItemStack.canCombine(item1, item2.copy()) && !item1.isEmpty();
+                    if (ItemStack.canCombine(item1, item2) && currNum == tarNum) continue;
                     //不和背包交互
                     if (same) {
                         //有多
@@ -206,7 +200,7 @@ public class SyncInventory {
                         ItemStack stack = sc.slots.get(i1).getStack();
                         ItemStack currStack = sc.slots.get(i).getStack();
                         currNum = currStack.getCount();
-                        boolean same2 = thereAreItems = ItemStack.canCombine(item2,stack);
+                        boolean same2 = thereAreItems = ItemStack.canCombine(item2, stack);
                         if (same2 && !stack.isEmpty()) {
                             int i2 = stack.getCount();
                             client.interactionManager.clickSlot(sc.syncId, i1, 0, SlotActionType.PICKUP, client.player);

@@ -31,7 +31,6 @@ public class WuHuClientMod implements ClientModInitializer, ModInitializer {
 		InputEventHandler.getKeybindManager().registerKeybindProvider(InputHandler.getInstance());
 		InputEventHandler.getInputManager().registerKeyboardInputHandler(InputHandler.getInstance());
 		HighlightBlockRenderer.init();
-
 		HotkeysCallback.init();
 	}
 	@Override
