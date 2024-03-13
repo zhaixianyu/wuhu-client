@@ -37,4 +37,5 @@ public class WuHuClientMod implements ClientModInitializer, ModInitializer {
 	public void onInitializeClient() {
 		register();
 	}
+
 }
