@@ -2,7 +2,9 @@ package com.zxy.wuhuclient.Utils;
 
 import com.zxy.wuhuclient.mixin.masa.Litematica_InventoryUtilsMixin;
 import fi.dy.masa.litematica.config.Configs;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 
 import net.minecraft.enchantment.Enchantment;
@@ -10,11 +12,15 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -24,13 +30,18 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 //#if MC > 12006
-import net.minecraft.component.type.ItemEnchantmentsComponent;
+//$$ import net.minecraft.component.type.ItemEnchantmentsComponent;
+//$$ import net.minecraft.component.type.ItemEnchantmentsComponent;
+//$$ import net.minecraft.component.DataComponentTypes;
+//$$ import net.minecraft.component.type.NbtComponent;
 //#else
-//$$ import net.minecraft.enchantment.EnchantmentHelper;
-//$$ import net.minecraft.enchantment.Enchantments;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 //#endif
 
+
 import static com.zxy.wuhuclient.Utils.SwitchItem.reSwitchItem;
+import static com.zxy.wuhuclient.Utils.ZxyUtils.getPlayer;
 import static com.zxy.wuhuclient.config.Configs.QUICK_SHULKER;
 
 public class InventoryUtils {
@@ -140,33 +151,59 @@ public class InventoryUtils {
 
     public static boolean equalsItem(ItemStack itemStack1,ItemStack itemStack2){
         //#if MC > 12004
-        return ItemStack.areItemsAndComponentsEqual(itemStack1, itemStack2);
+        //$$ return ItemStack.areItemsAndComponentsEqual(itemStack1, itemStack2);
         //#else
-        //$$ return ItemStack.canCombine(itemStack1, itemStack2);
+        return ItemStack.canCombine(itemStack1, itemStack2);
         //#endif
     }
 
     public static int getEnchantmentLevel(ItemStack itemStack,
                                          //#if MC > 12006
-                                         RegistryKey<Enchantment> enchantment
+                                         //$$ RegistryKey<Enchantment> enchantment
                                          //#else
-                                         //$$ Enchantment enchantment
+                                         Enchantment enchantment
                                          //#endif
     ){
         //#if MC > 12006
-        ItemEnchantmentsComponent enchantments = itemStack.getEnchantments();
-
-        if (enchantments.equals(ItemEnchantmentsComponent.DEFAULT)) return -1;
-        Set<RegistryEntry<Enchantment>> enchantmentsEnchantments = enchantments.getEnchantments();
-        for (RegistryEntry<Enchantment> entry : enchantmentsEnchantments) {
-            if (entry.matchesKey(enchantment)) {
-                return enchantments.getLevel(entry);
-            }
-        }
+        //$$ ItemEnchantmentsComponent enchantments = itemStack.getEnchantments();
+        //$$
+        //$$ if (enchantments.equals(ItemEnchantmentsComponent.DEFAULT)) return -1;
+        //$$ Set<RegistryEntry<Enchantment>> enchantmentsEnchantments = enchantments.getEnchantments();
+        //$$ for (RegistryEntry<Enchantment> entry : enchantmentsEnchantments) {
+        //$$     if (entry.matchesKey(enchantment)) {
+        //$$         return enchantments.getLevel(entry);
+        //$$     }
+        //$$ }
         //#else
-        //$$ EnchantmentHelper.getLevel(Enchantments.MENDING,itemStack);
+        EnchantmentHelper.getLevel(Enchantments.MENDING,itemStack);
         //#endif
         return -1;
+    }
+    public static void refreshPlayerInventory(){
+        ClientPlayNetworkHandler networkHandler = client.getNetworkHandler();
+        if (getPlayer().isEmpty()) return;
+        ClientPlayerEntity player = getPlayer().get();
+        if(networkHandler == null) return;
+        ItemStack uniqueItem = new ItemStack(Items.STONE);
+
+        // Tags with NaN are not equal, so the server will find an inventory desync and send an inventory refresh to the client
+        //#if MC >= 12006
+        //$$ var nbt = new NbtCompound();
+        //$$ nbt.putDouble("force_sync", Double.NaN);
+        //$$ NbtComponent.set(DataComponentTypes.CUSTOM_DATA, uniqueItem, nbt);
+        //#else
+        uniqueItem.getOrCreateNbt().putDouble("force_resync", Double.NaN);
+        //#endif
+
+        networkHandler.sendPacket(new ClickSlotC2SPacket(
+                player.currentScreenHandler.syncId,
+                player.currentScreenHandler.getRevision(),
+                -999, 2,
+                SlotActionType.QUICK_CRAFT,
+                uniqueItem,
+                new Int2ObjectOpenHashMap<>()
+
+        ));
     }
 
     public static boolean isInventory(BlockPos pos) {

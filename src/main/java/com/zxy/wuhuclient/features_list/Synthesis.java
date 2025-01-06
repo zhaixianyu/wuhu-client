@@ -48,6 +48,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.zxy.wuhuclient.Utils.InventoryUtils.isInventory;
+import static com.zxy.wuhuclient.Utils.InventoryUtils.refreshPlayerInventory;
 import static com.zxy.wuhuclient.Utils.ScreenManagement.closeScreen;
 
 
@@ -170,10 +171,10 @@ public class Synthesis {
         for (Slot slot : client.player.currentScreenHandler.slots) {
             ItemStack stack = slot.getStack();
             //#if MC > 12004
-
-            if (stack.isEmpty() || stack.getComponents().isEmpty()) continue;
+            //$$
+            //$$ if (stack.isEmpty() || stack.getComponents().isEmpty()) continue;
             //#else
-            //$$ if (stack.isEmpty() || stack.hasNbt()) continue;
+            if (stack.isEmpty() || stack.hasNbt()) continue;
             //#endif
             recipeMap.forEach((k, v) -> {
                 int num = stack.getMaxCount() == 1 ? 0 : 1;
@@ -350,9 +351,9 @@ public class Synthesis {
             //#else
             RecipeInputInventory rec = ((CraftingScreenHandlerMixin)sc1).getInput();
             //#if MC < 12100
-            //$$ Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec, world);
+            Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec, world);
             //#else
-            Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
+            //$$ Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
             //#endif
             CraftingRecipe recipe = optional.map(RecipeEntry::value).orElse(null);
             RecipeEntry<?> recipeEntry = optional.orElse(null);
@@ -366,16 +367,15 @@ public class Synthesis {
                 {
                     //#if MC > 11802
                         //#if MC >= 12100
-                        stack = recipe.craft(rec.createRecipeInput(), MinecraftClient.getInstance().getNetworkHandler().getRegistryManager());
+                        //$$ stack = recipe.craft(rec.createRecipeInput(), MinecraftClient.getInstance().getNetworkHandler().getRegistryManager());
                         //#else
-                        //$$ stack = recipe.craft(rec, MinecraftClient.getInstance().getNetworkHandler().getRegistryManager());
+                        stack = recipe.craft(rec, MinecraftClient.getInstance().getNetworkHandler().getRegistryManager());
                         //#endif
                     //#else
                     //$$ stack = recipe.craft(rec);
                     //#endif
                 }
                 return !stack.isEmpty() && stack.getItem().equals(Synthesis.recipe.getResult().getItem());
-
             }
         }
         return false;
@@ -465,9 +465,8 @@ public class Synthesis {
         for (int i2 = 1; satisfyCraft() && i2 < 64; i2++) {
             client.interactionManager.clickSlot(sc.syncId, 0, 1, SlotActionType.THROW, player);
         }
-        client.interactionManager.clickSlot(sc.syncId, -999, 2, SlotActionType.QUICK_CRAFT, client.player);
-        client.interactionManager.clickSlot(sc.syncId, -999, 2, SlotActionType.QUICK_CRAFT, client.player);
         player.closeHandledScreen();
+        refreshPlayerInventory();
     }
 
     public static void dropItem(ItemStack itemStack, boolean isPlayerInventory) {

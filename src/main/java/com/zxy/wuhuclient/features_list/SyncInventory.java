@@ -57,9 +57,9 @@ public class SyncInventory {
                     if ((inventory && blockState.createScreenHandlerFactory(client.world,pos) == null)  ||
                             (blockEntity instanceof ShulkerBoxBlockEntity entity &&
                                     //#if MC > 12004
-                                    !client.world.isSpaceEmpty(ShulkerEntity.calculateBoundingBox(1.0F, blockState.get(FACING), 0.0F, 0.5F).offset(pos).contract(1.0E-6)) &&
+                                    //$$ !client.world.isSpaceEmpty(ShulkerEntity.calculateBoundingBox(1.0F, blockState.get(FACING), 0.0F, 0.5F).offset(pos).contract(1.0E-6)) &&
                                     //#else
-                                    //$$ !client.world.isSpaceEmpty(ShulkerEntity.calculateBoundingBox(blockState.get(FACING), 0.0f, 0.5f).offset(pos).contract(1.0E-6)) &&
+                                    !client.world.isSpaceEmpty(ShulkerEntity.calculateBoundingBox(blockState.get(FACING), 0.0f, 0.5f).offset(pos).contract(1.0E-6)) &&
                                     //#endif
                                     entity.getAnimationStage() == ShulkerBoxBlockEntity.AnimationStage.CLOSED)) {
                         client.inGameHud.setOverlayMessage(Text.of("容器无法打开"), false);
@@ -114,9 +114,9 @@ public class SyncInventory {
         // 判断是否存在可合并的键
         Optional<Map.Entry<ItemStack, Integer>> entry = itemsCount.entrySet().stream()
                 //#if MC > 12004
-                .filter(e -> ItemStack.areItemsAndComponentsEqual(e.getKey(), itemStack))
+                //$$ .filter(e -> ItemStack.areItemsAndComponentsEqual(e.getKey(), itemStack))
                 //#else
-                //$$ .filter(e -> ItemStack.canCombine(e.getKey(), itemStack))
+                .filter(e -> ItemStack.canCombine(e.getKey(), itemStack))
                 //#endif
                 .findFirst();
 
