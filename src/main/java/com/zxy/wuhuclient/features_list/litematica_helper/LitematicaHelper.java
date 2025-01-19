@@ -108,9 +108,9 @@ public class LitematicaHelper {
                     String missingColor = missing == 0 ? GuiBase.TXT_GREEN : GuiBase.TXT_GOLD;
                     String stackName = stack.getRarity().
                             //#if MC > 12004
-                            //$$ getFormatting()
+                            getFormatting()
                             //#else
-                            formatting
+                            //$$ formatting
                             //#endif
                             + stack.getName().getString() + GuiBase.TXT_RST;
 

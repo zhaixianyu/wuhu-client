@@ -17,9 +17,9 @@ public class TaskCountBlocksPlacementMixin {
     //获取投影框 修改为选区
 
     //#if MC > 12005
-    //$$ @WrapOperation(method = "<init>(Lfi/dy/masa/litematica/schematic/placement/SchematicPlacement;Lfi/dy/masa/litematica/materials/IMaterialList;Z)V",at = @At(value = "INVOKE", target = "Lfi/dy/masa/litematica/schematic/placement/SchematicPlacement;getSubRegionBoxes(Lfi/dy/masa/litematica/schematic/placement/SubRegionPlacement$RequiredEnabled;)Lcom/google/common/collect/ImmutableMap;"),remap = false)
+    @WrapOperation(method = "<init>(Lfi/dy/masa/litematica/schematic/placement/SchematicPlacement;Lfi/dy/masa/litematica/materials/IMaterialList;Z)V",at = @At(value = "INVOKE", target = "Lfi/dy/masa/litematica/schematic/placement/SchematicPlacement;getSubRegionBoxes(Lfi/dy/masa/litematica/schematic/placement/SubRegionPlacement$RequiredEnabled;)Lcom/google/common/collect/ImmutableMap;"),remap = false)
     //#else
-    @WrapOperation(method = "<init>",at = @At(value = "INVOKE", target = "Lfi/dy/masa/litematica/schematic/placement/SchematicPlacement;getSubRegionBoxes(Lfi/dy/masa/litematica/schematic/placement/SubRegionPlacement$RequiredEnabled;)Lcom/google/common/collect/ImmutableMap;"),remap = false)
+    //$$ @WrapOperation(method = "<init>",at = @At(value = "INVOKE", target = "Lfi/dy/masa/litematica/schematic/placement/SchematicPlacement;getSubRegionBoxes(Lfi/dy/masa/litematica/schematic/placement/SubRegionPlacement$RequiredEnabled;)Lcom/google/common/collect/ImmutableMap;"),remap = false)
     //#endif
     private ImmutableMap<String, Box> getSubRegionBoxes(SchematicPlacement instance, SubRegionPlacement.RequiredEnabled boxOriginAbsolute, Operation<ImmutableMap<String, Box>> original){
         if(Configs.LITEMATICA_HELPER.getBooleanValue() && DataManager.getSelectionManager().getCurrentSelection() != null){

@@ -171,10 +171,10 @@ public class Synthesis {
         for (Slot slot : client.player.currentScreenHandler.slots) {
             ItemStack stack = slot.getStack();
             //#if MC > 12004
-            //$$
-            //$$ if (stack.isEmpty() || stack.getComponents().isEmpty()) continue;
+
+            if (stack.isEmpty() || stack.getComponents().isEmpty()) continue;
             //#else
-            if (stack.isEmpty() || stack.hasNbt()) continue;
+            //$$ if (stack.isEmpty() || stack.hasNbt()) continue;
             //#endif
             recipeMap.forEach((k, v) -> {
                 int num = stack.getMaxCount() == 1 ? 0 : 1;
@@ -351,9 +351,9 @@ public class Synthesis {
             //#else
             RecipeInputInventory rec = ((CraftingScreenHandlerMixin)sc1).getInput();
             //#if MC < 12100
-            Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec, world);
+            //$$ Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec, world);
             //#else
-            //$$ Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
+            Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
             //#endif
             CraftingRecipe recipe = optional.map(RecipeEntry::value).orElse(null);
             RecipeEntry<?> recipeEntry = optional.orElse(null);
@@ -367,9 +367,9 @@ public class Synthesis {
                 {
                     //#if MC > 11802
                         //#if MC >= 12100
-                        //$$ stack = recipe.craft(rec.createRecipeInput(), MinecraftClient.getInstance().getNetworkHandler().getRegistryManager());
+                        stack = recipe.craft(rec.createRecipeInput(), MinecraftClient.getInstance().getNetworkHandler().getRegistryManager());
                         //#else
-                        stack = recipe.craft(rec, MinecraftClient.getInstance().getNetworkHandler().getRegistryManager());
+                        //$$ stack = recipe.craft(rec, MinecraftClient.getInstance().getNetworkHandler().getRegistryManager());
                         //#endif
                     //#else
                     //$$ stack = recipe.craft(rec);

@@ -1,93 +1,59 @@
 package com.zxy.wuhuclient.features_list;
 
-import net.minecraft.client.MinecraftClient;
+import com.zxy.wuhuclient.Utils.InventoryUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 
 import static com.zxy.wuhuclient.Utils.InventoryUtils.client;
-import static com.zxy.wuhuclient.Utils.InventoryUtils.getEnchantmentLevel;
 
 
 public class AutoMending {
-    static AutoMending auto = new AutoMending(client);
-    MinecraftClient mc;
-    ClientPlayerEntity player;
-    int fushou = -1;
-    boolean run = false;
-    int tick = 0;
+    public static final AutoMending AUTO_MENDING = new AutoMending();
+    private boolean patching = false;
+    private ClientPlayerEntity player = client.player;
+    private int tempSlot = -1;
+    public int tick = 0;
 
-    public void autoMenDing(PlayerEntity player) {
-        tick = 0;
+    public void mending(){
         ScreenHandler sc = player.currentScreenHandler;
-        if (!sc.equals(player.playerScreenHandler)) return;
-        ItemStack stack = sc.slots.get(45).getStack();
-        if (run) {
-            if(!stack.isDamaged() &&
-                    getEnchantmentLevel(stack,Enchantments.MENDING) > 0) reSwitch();
+        ItemStack offHandStack = player.getOffHandStack();
+        if(patching){
+            if(!offHandStack.isDamaged() && InventoryUtils.getEnchantmentLevel(offHandStack,Enchantments.MENDING) > 0) restoresSlot();
             else return;
         }
-        if (mc == null || !player.equals(mc.player)) return;
-        if(!stack.isDamaged() &&
-                getEnchantmentLevel(stack,Enchantments.MENDING) > 0) return;
         for (int i = 0; i < sc.slots.size(); i++) {
-            ItemStack item = sc.slots.get(i).getStack();
+            ItemStack copy = sc.slots.get(i).getStack().copy();
             if (
-                    item.isOf(Items.AIR) ||
-                            getEnchantmentLevel(sc.slots.get(i).getStack(),Enchantments.MENDING) <= 0 ||
-                            !item.isDamaged() ||
-                            item.equals(player.getMainHandStack()) ||
-                            i == 45 || i == 5 || i == 6 || i == 7 || i == 8
-            ) continue;
-            autoSwitch(i);
-            fushou = i;
-            run = true;
+                            i <= 8 ||
+                            copy.isEmpty() ||
+                            sc.slots.get(i).getStack() == player.getOffHandStack() ||
+                            InventoryUtils.getEnchantmentLevel(copy, Enchantments.MENDING) <= 0 ||
+                            !copy.isDamaged())
+                continue;
+            switchSlot(sc,i);
+            patching = true;
+            tempSlot = i;
             break;
         }
     }
-
-    public void tick() {
-        if (!run) return;
-        if (0 == ++tick % 10) reSwitch();
-        tick %= Integer.MAX_VALUE;
+    public void tick(){
+        if(tick == 0) mending();
+        tick ++;
+        if(patching && tick % 10 == 0 ) restoresSlot();
     }
-
-    public boolean autoSwitch(int a) {
-        if (mc.interactionManager == null) {
-            return false;
-        }
-        if (player.currentScreenHandler != player.playerScreenHandler) {
-            return false;
-        }
-        ScreenHandler screenHandler = player.currentScreenHandler;
-        mc.interactionManager.clickSlot(screenHandler.syncId, a, 40, SlotActionType.SWAP, player);
-        return true;
-    }
-
-    public void reSwitch() {
-        ScreenHandler sc = player.currentScreenHandler;
-        if (run && sc.equals(player.playerScreenHandler)) {
-//            System.out.println("副手归位: " + temp);
-            if (fushou != -1 && autoSwitch(fushou)) {
-                tick = 0;
-                fushou = -1;
-                run = false;
-            }
+    private void restoresSlot(){
+        if(tempSlot != -1){
+            switchSlot(player.currentScreenHandler,tempSlot);
+            patching = false;
+            tempSlot = -1;
         }
     }
-
-
-    public AutoMending(MinecraftClient client) {
-        this.mc = client;
-        this.player = client.player;
-        auto = this;
+    private void switchSlot(ScreenHandler sc,int i){
+        client.interactionManager.clickSlot(sc.syncId, i, 40, SlotActionType.SWAP, client.player);
     }
 
-    public static AutoMending getAuto() {
-        return auto;
-    }
+    private AutoMending(){}
 }

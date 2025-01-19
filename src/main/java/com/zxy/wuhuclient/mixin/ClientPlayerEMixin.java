@@ -28,7 +28,7 @@ public abstract class ClientPlayerEMixin {
     public void tick(CallbackInfo ci){
         ZxyUtils.tick();
 
-        AutoMending.getAuto().tick();
+        AutoMending.AUTO_MENDING.tick();
     }
     @Inject(at = @At("TAIL"),method = "closeHandledScreen")
     public void closeScreen(CallbackInfo ci){

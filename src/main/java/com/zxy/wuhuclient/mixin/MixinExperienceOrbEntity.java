@@ -3,8 +3,7 @@ package com.zxy.wuhuclient.mixin;
 
 import com.zxy.wuhuclient.config.Configs;
 import com.zxy.wuhuclient.features_list.AutoMending;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,6 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinExperienceOrbEntity {
         @Inject(at = @At("HEAD"),method = "onPlayerCollision")
         public void onPlayerCollision(PlayerEntity player, CallbackInfo ci){
-            if(AutoMending.getAuto()!=null && Configs.AUTO_MENDING.getBooleanValue()) AutoMending.getAuto().autoMenDing(player);
+            if(player instanceof ClientPlayerEntity && Configs.AUTO_MENDING.getBooleanValue()) {
+                AutoMending.AUTO_MENDING.tick = 0;
+            }
     }
 }
