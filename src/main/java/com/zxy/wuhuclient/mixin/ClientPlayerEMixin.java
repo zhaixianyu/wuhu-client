@@ -2,9 +2,14 @@ package com.zxy.wuhuclient.mixin;
 
 import com.zxy.wuhuclient.Utils.InventoryUtils;
 import com.zxy.wuhuclient.Utils.ZxyUtils;
+import com.zxy.wuhuclient.config.Configs;
 import com.zxy.wuhuclient.features_list.AutoMending;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.recipebook.ClientRecipeBook;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.stat.StatHandler;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -24,15 +29,24 @@ public abstract class ClientPlayerEMixin {
         this.client = client;
     }
 
+    @Inject(at = @At("TAIL"),method = "<init>")
+    public void init(MinecraftClient client, ClientWorld world, ClientPlayNetworkHandler networkHandler, StatHandler stats, ClientRecipeBook recipeBook, boolean lastSneaking, boolean lastSprinting, CallbackInfo ci){
+        if(Configs.AUTO_MENDING.getBooleanValue()) {
+            AutoMending.AUTO_MENDING.player = (ClientPlayerEntity) (Object)this;
+        }
+    }
     @Inject(at = @At("TAIL"),method = "tick")
     public void tick(CallbackInfo ci){
         ZxyUtils.tick();
 
         AutoMending.AUTO_MENDING.tick();
     }
+
     @Inject(at = @At("TAIL"),method = "closeHandledScreen")
     public void closeScreen(CallbackInfo ci){
         InventoryUtils.openIng = false;
         InventoryUtils.switchItem = false;
     }
+
+
 }
