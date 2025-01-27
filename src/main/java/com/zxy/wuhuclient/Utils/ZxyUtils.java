@@ -20,6 +20,8 @@ import net.minecraft.util.math.BlockPos;
 
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.minecraft.text.Text;
 
@@ -35,8 +37,7 @@ import static com.zxy.wuhuclient.Utils.BlockFilters.equalsBlockName;
 import static com.zxy.wuhuclient.Utils.ZxyUtils.TempData.max;
 import static com.zxy.wuhuclient.Utils.ZxyUtils.TempData.min;
 import static com.zxy.wuhuclient.WuHuClientMod.client;
-import static com.zxy.wuhuclient.config.Configs.SEARCH_BLOCK_COLOR;
-import static com.zxy.wuhuclient.config.Configs.SEARCH_BLOCK_LIST;
+import static com.zxy.wuhuclient.config.Configs.*;
 import static fi.dy.masa.litematica.selection.SelectionMode.NORMAL;
 
 public class ZxyUtils {
@@ -46,7 +47,7 @@ public class ZxyUtils {
         return FabricLoader.getInstance().isModLoaded(modId);
     }
     public static void tick(){
-        searchBlockThread();
+//        searchBlockThread();
         Synthesis.tick();
         Test.tick();
         if (SyncInventory.num==2) SyncInventory.syncInv();
@@ -115,40 +116,42 @@ public class ZxyUtils {
     }
 
     public static String searchBlockId = "searchBlock";
-    public static boolean searchBlockSwitch = false;
-    public static void startSearchBlock(){
-        searchBlockSwitch = !searchBlockSwitch;
-        Set<BlockPos> highlightBlockPosList = HighlightBlockRenderer.getHighlightBlockPosList(searchBlockId);
-        if(!searchBlockSwitch && highlightBlockPosList != null) {
-            HighlightBlockRenderer.clear(searchBlockId);
-            return;
-        }
-        HighlightBlockRenderer.createHighlightBlockList(searchBlockId,SEARCH_BLOCK_COLOR);
-    }
     public static boolean searchBlockIng = false;
-    public synchronized static void searchBlock(){
-            if(!searchBlockSwitch) return;
-            LinkedHashSet<BlockPos> blockPos = new LinkedHashSet<>();
-            List<String> strings = SEARCH_BLOCK_LIST.getStrings();
 
-            for (String blockName : strings) {
-                LinkedList<BlockPos> blockPosLinkedList = siftBlock(blockName);
-                List<BlockPos> list = blockPosLinkedList.stream().distinct().toList();
-                blockPos.addAll(list);
+    public synchronized static void searchBlock() {
+        boolean searchBlockSwitch = SEARCH_BLOCK.getBooleanValue();
+
+        if (!searchBlockSwitch) {
+            Set<BlockPos> highlightBlockPosList = HighlightBlockRenderer.getHighlightBlockPosList(searchBlockId);
+            if (highlightBlockPosList != null) {
+                HighlightBlockRenderer.clear(searchBlockId);
+                return;
             }
-            HighlightBlockRenderer.setPos(searchBlockId,blockPos);
+        }
+
+        HighlightBlockRenderer.createHighlightBlockList(searchBlockId, SEARCH_BLOCK_COLOR);
+
+        if (!searchBlockSwitch) return;
+        LinkedHashSet<BlockPos> blockPos = new LinkedHashSet<>();
+        List<String> strings = SEARCH_BLOCK_LIST.getStrings();
+
+        for (String blockName : strings) {
+            LinkedList<BlockPos> blockPosLinkedList = siftBlock(blockName);
+            List<BlockPos> list = blockPosLinkedList.stream().distinct().toList();
+            boolean booleanValue = SEARCH_BLOCK_LIMIT.getBooleanValue();
+            blockPos.addAll(list.stream().filter(pos -> !booleanValue || DataManager.getRenderLayerRange().isPositionWithinRange(pos)).toList());
+        }
+        HighlightBlockRenderer.setPos(searchBlockId, blockPos);
     }
-    public static void searchBlockThread(){
+    public static void searchBlockThread() {
         if (!searchBlockIng) {
-            new Thread(() -> {
-                try {
-                    searchBlockIng = true;
-                    searchBlock();
-                    if(isLoadChestTracker) LitematicaHelper.instance.highlightInventoryBlock();
-                }finally {
-                    searchBlockIng = false;
-                }
-            }).start();
+            try {
+                searchBlockIng = true;
+                searchBlock();
+                if (isLoadChestTracker) LitematicaHelper.instance.highlightInventoryBlock();
+            } finally {
+                searchBlockIng = false;
+            }
         }
     }
     public static Optional<ClientPlayerEntity> getPlayer(){

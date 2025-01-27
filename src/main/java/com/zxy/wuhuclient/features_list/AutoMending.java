@@ -13,12 +13,13 @@ import static com.zxy.wuhuclient.Utils.InventoryUtils.client;
 public class AutoMending {
     public static final AutoMending AUTO_MENDING = new AutoMending();
     private boolean patching = false;
-    public ClientPlayerEntity player = null;
     private int tempSlot = -1;
     public int tick = 0;
 
     public void mending(){
-        if(player == null) return;
+        ClientPlayerEntity player = client.player;
+        if(player== null) return;
+
         ScreenHandler sc = player.currentScreenHandler;
         ItemStack offHandStack = player.getOffHandStack();
         if(patching){
@@ -53,8 +54,8 @@ public class AutoMending {
 
     }
     private void restoresSlot(){
-        if(tempSlot != -1){
-            switchSlot(player.currentScreenHandler,tempSlot);
+        if(tempSlot != -1 && client.player != null){
+            switchSlot(client.player.currentScreenHandler,tempSlot);
             tempSlot = -1;
         }
     }

@@ -36,7 +36,7 @@ public class Configs implements IConfigHandler {
     public static final ConfigBooleanHotkeyed AUTO_MENDING = new ConfigBooleanHotkeyed( "自动经验修补", false, "","在获取经验的时候可以将背包中带有经验修补且未满耐久的物品放到副手，"+"\n" + "修补完成后或一段时间未获得经验后放回原位。如果经验不是持续获得 可能不稳定");
     public static final ConfigHotkey QUICK_FIREWORK = new ConfigHotkey( "快捷烟花", "",PRESS_ALLOWEXTRA,"在飞行状态时，按下热键会将背包内的烟花放到副手，使用烟花后再放回原位\n不会使用会爆炸的烟花");
     public static final ConfigHotkey TAKE_OUT_THE_LAST_ITEM = new ConfigHotkey( "取出最后一格物品", "",GUI,"在ui中按下热键后可以视为按住shift点击了打开容器的最后一个格子\n在铁砧，工作台，砂轮等ui中可以帮助你更便捷的取出输出栏物品");
-    public static final ConfigHotkey SEARCH_BLOCK = new ConfigHotkey( "搜索选取内指定方块", "","按下后将选区内列表中的方块高亮，再次按下取消高亮");
+    public static final ConfigBooleanHotkeyed SEARCH_BLOCK = new ConfigBooleanHotkeyed( "搜索选取内指定方块", false,"","按下后将选区内列表中的方块高亮，再次按下取消高亮");
     public static final ConfigBoolean SEARCH_BLOCK_LIMIT = new ConfigBoolean( "搜索方块渲染层数限制", false,"是否受到投影渲染层数限制影响");
     public static final ConfigStringList SEARCH_BLOCK_LIST = new ConfigStringList( "搜索方块列表",ImmutableList.of() ,"");
     public static final ConfigBooleanHotkeyed LITEMATICA_HELPER = new ConfigBooleanHotkeyed("投影材料助手",false,"","开启后将允许选区选中投影方块，会根据框选的投影更新材料列表。打开容器自动拿取对应材料\n安装箱子追踪后可高亮箱子\n"+"取物品功能来自 Fallen_Breath的TweakerMore");
@@ -103,7 +103,6 @@ public class Configs implements IConfigHandler {
             SYNC_INVENTORY,
             QUICK_FIREWORK,
             TAKE_OUT_THE_LAST_ITEM,
-            SEARCH_BLOCK,
             ADD_INVENTORY,
             REFRESH_MATERIALS
     );
@@ -114,6 +113,7 @@ public class Configs implements IConfigHandler {
             SYNC_INVENTORY_CHECK,
             LITEMATICA_HELPER,
             AUTO_MENDING,
+            SEARCH_BLOCK,
 //            AUTO_STORAGE,
             TEST
     );

@@ -29,12 +29,6 @@ public abstract class ClientPlayerEMixin {
         this.client = client;
     }
 
-    @Inject(at = @At("TAIL"),method = "<init>")
-    public void init(MinecraftClient client, ClientWorld world, ClientPlayNetworkHandler networkHandler, StatHandler stats, ClientRecipeBook recipeBook, boolean lastSneaking, boolean lastSprinting, CallbackInfo ci){
-        if(Configs.AUTO_MENDING.getBooleanValue()) {
-            AutoMending.AUTO_MENDING.player = (ClientPlayerEntity) (Object)this;
-        }
-    }
     @Inject(at = @At("TAIL"),method = "tick")
     public void tick(CallbackInfo ci){
         ZxyUtils.tick();

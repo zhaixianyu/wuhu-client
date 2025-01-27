@@ -59,20 +59,20 @@ repositories {
 	maven {
 		name = "Xander Maven"
 		url = uri("https://maven.isxander.dev/releases")
-		content {
-			includeGroupAndSubgroups("dev.isxander")
-			includeGroupAndSubgroups("org.quiltmc")
-		}
+//		content {
+//			includeGroupAndSubgroups("dev.isxander")
+//			includeGroupAndSubgroups("org.quiltmc")
+//		}
 	}
 
 	// YACL Snapshots
 	maven {
 		name = "Xander Snapshot Maven"
 		url = uri("https://maven.isxander.dev/snapshots")
-		content {
-			includeGroupAndSubgroups("dev.isxander")
-			includeGroupAndSubgroups("org.quiltmc")
-		}
+//		content {
+//			includeGroupAndSubgroups("dev.isxander")
+//			includeGroupAndSubgroups("org.quiltmc")
+//		}
 	}
 	maven {
 		name = "CottonMC"
@@ -118,7 +118,7 @@ def mod_dependencies = [
 		[(mcVersion >= 12006 ? "curse.maven:carpet-349239" :"maven.modrinth:carpet")+":${project.carpet_version}"     						, 1],
 
 		["com.blamejared.searchables"                           											+ ":${project.searchables}",        mcVersion >= 12001 ? 1 : 0],
-		["maven.modrinth:yacl"                                  											+ ":${project.yacl}",               mcVersion >= 12001 ? 1 : 0],
+//		["maven.modrinth:yacl"                                  											+ ":${project.yacl}",               mcVersion >= 12001 ? 1 : 0],
 //        ["maven.modrinth:yacl"                                  ":${project.}, "yacl",               mcVersion >= 12001 ? 1 : 0],
 //        ["maven.modrinth:yacl"                                  ":${project.}, "yacl",               mcVersion > 12001 ? 1 : 0],
 		[(mcVersion >= 12001 ? "red.jackf:chesttracker" : "maven.modrinth:chest-tracker")                   + ":${project.chesttracker}",       1],

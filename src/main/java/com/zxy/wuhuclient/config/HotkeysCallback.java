@@ -5,13 +5,13 @@ import com.zxy.wuhuclient.features_list.QuickFirework;
 import com.zxy.wuhuclient.features_list.SyncInventory;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.materials.MaterialListBase;
+import fi.dy.masa.malilib.config.IHotkeyTogglable;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import net.minecraft.client.MinecraftClient;
 
-import static com.zxy.wuhuclient.Utils.ZxyUtils.startSearchBlock;
 import static com.zxy.wuhuclient.config.Configs.*;
 import static com.zxy.wuhuclient.features_list.QuickClickSlot.clickLastSlot;
 
@@ -25,8 +25,6 @@ public class HotkeysCallback implements IHotkeyCallback {
         if(key == WUHU_CLIENT.getKeybind()){
             client.setScreen(new ConfigUi());
             return true;
-        }else if(key == SEARCH_BLOCK.getKeybind()){
-            startSearchBlock();
         }else if(key == SYNC_INVENTORY.getKeybind()){
             SyncInventory.startOrOffSyncInventory();
         }else if(key == TAKE_OUT_THE_LAST_ITEM.getKeybind()){
@@ -48,5 +46,6 @@ public class HotkeysCallback implements IHotkeyCallback {
         for (ConfigHotkey configHotkey : Configs.KEY_LIST) {
             configHotkey.getKeybind().setCallback(hotkeysCallback);
         }
+
     }
 }
