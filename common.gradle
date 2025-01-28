@@ -118,9 +118,7 @@ def mod_dependencies = [
 		[(mcVersion >= 12006 ? "curse.maven:carpet-349239" :"maven.modrinth:carpet")+":${project.carpet_version}"     						, 1],
 
 		["com.blamejared.searchables"                           											+ ":${project.searchables}",        mcVersion >= 12001 ? 1 : 0],
-//		["maven.modrinth:yacl"                                  											+ ":${project.yacl}",               mcVersion >= 12001 ? 1 : 0],
-//        ["maven.modrinth:yacl"                                  ":${project.}, "yacl",               mcVersion >= 12001 ? 1 : 0],
-//        ["maven.modrinth:yacl"                                  ":${project.}, "yacl",               mcVersion > 12001 ? 1 : 0],
+		["maven.modrinth:yacl"                                  											+ ":${project.yacl}",               mcVersion >= 12001 ? 1 : 0],
 		[(mcVersion >= 12001 ? "red.jackf:chesttracker" : "maven.modrinth:chest-tracker")                   + ":${project.chesttracker}",       1],
 		[(mcVersion >= 12001 ? "red.jackf:whereisit" : "maven.modrinth:where-is-it")                        + ":${project.whereisit}",          1],
 		["maven.modrinth:cloth-config"                          											+ ":${project.cloth_config}",       mcVersion < 12001 ? 1 : 0],

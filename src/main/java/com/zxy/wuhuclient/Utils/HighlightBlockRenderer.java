@@ -220,6 +220,7 @@ public class HighlightBlockRenderer implements IRenderer {
 
             }
         }));
+
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client1) -> {
             for (Map.Entry<String, HighlightTheProject> stringHighlightTheProjectEntry : highlightTheProjectMap.entrySet()) {
                 stringHighlightTheProjectEntry.getValue().pos.clear();
