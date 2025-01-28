@@ -41,34 +41,34 @@ public class PinYinSearch {
 
     @NotNull
     private static ArrayList<String> getStrings(ArrayList<String[]> pinyin) {
+        if(pinyin == null || pinyin.isEmpty()) return new ArrayList<>();
         //全拼
-        ArrayList<String> pys1 = new ArrayList<>();
-        ArrayList<String> pys2;
+        ArrayList<String> quanPin = new ArrayList<>();
         //首字母简拼
-        ArrayList<String> pys3 = new ArrayList<>();
-        ArrayList<String> pys4;
+        ArrayList<String> jianPin = new ArrayList<>();
         //如果输入的是 曾长 那么pinyin中的内容为 ["zeng","ceng"],["chang","zhang"]
-        for (int i = 0; i < pinyin.size(); i++) {
-            pys2 = new ArrayList<>();
-            pys4 = new ArrayList<>();
-            for (int i1 = 0; i1 < pinyin.get(i).length && pinyin.get(i).length > 0; i1++) {
-                if (i == 0) {
-                    pys1.add(pinyin.get(i)[i1]);
-                    pys3.add("" + pinyin.get(i)[i1].charAt(0));
-                } else {
-                    for (int i2 = 0; i2 < pys1.size(); i2++) {
-                        pys2.add(pys1.get(i2) + pinyin.get(i)[i1]);
-                        pys4.add(pys3.get(i2) + pinyin.get(i)[i1].charAt(0));
-                    }
+        //处理第一个字 不要信idea的用getFirst方法 旧版jdk不支持
+        for (String py : pinyin.get(0)) {
+            quanPin.add(py);
+            jianPin.add("" + py.charAt(0));
+        }
+
+        //从第二个字开始遍历
+        for (int i = 1; i < pinyin.size(); i++) {
+            ArrayList<String> tempQuanPin = new ArrayList<>();
+            ArrayList<String> tempJianPin = new ArrayList<>();
+            //遍历当前字的全部读音
+            for (String currPinYin : pinyin.get(i)) {
+                for (int i1 = 0; i1 < quanPin.size(); i1++) {
+                    tempQuanPin.add(quanPin.get(i1) + currPinYin);
+                    tempJianPin.add(jianPin.get(i1) + currPinYin.charAt(0));
                 }
             }
-            if (i != 0) {
-                pys1 = pys2;
-                pys3 = pys4;
-            }
+            quanPin = tempQuanPin;
+            jianPin = tempJianPin;
         }
-        pys1.addAll(pys3);
-        return pys1;
+        quanPin.addAll(jianPin);
+        return quanPin;
     }
 
 }
