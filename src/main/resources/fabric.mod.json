@@ -2,8 +2,9 @@
 	"schemaVersion": 1,
 	"id": "${mod_id}-${minecraft_version_id}",
 	"version": "${mod_version}",
-	"name": "${mod_name}",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"icon": "assets/${mod_id}/icon.png",
+	"name": "${mod_name} for ${minecraft_version}",
+	"description": "阿巴阿巴",
 	"authors": [
 		"zhaixianyu"
 	],
@@ -13,7 +14,6 @@
 		"sources": "${mod_sources}"
 	},
 	"license": "${mod_license}",
-	"icon": "assets/${mod_id}/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
@@ -30,12 +30,8 @@
 		"minecraft": "${minecraft_dependency}"
 	},
 	"custom": {
-		"modmenu:parent": "${mod_id}",
 		"modmenu": {
 			"parent": "${mod_id}"
 		}
-	},
-	"suggests": {
-		"modmenu": "*"
 	}
 }

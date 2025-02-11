@@ -6,6 +6,22 @@ plugins {
 
 }
 
+//configurations.all {
+//    resolutionStrategy {
+//        cacheDynamicVersionsFor(365, 'days')
+//        cacheChangingModulesFor(365, 'days')
+//        preferProjectModules() // 优先使用项目自身配置
+//
+//        eachDependency { DependencyResolveDetails details ->
+////            if (details.requested.group == 'dev.isxander') {
+//                // 强制匹配主版本号
+//                details.useVersion details.requested.version.split('\\+')[0]
+////            }
+//        }
+//    }
+//}
+
+
 preprocess {
 //    def mc11404 = createNode("1.14.4", 1_14_04, "mojang")
 //    def mc11502 = createNode("1.15.2", 1_15_02, "mojang")

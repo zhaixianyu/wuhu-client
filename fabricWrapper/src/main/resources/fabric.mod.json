@@ -2,7 +2,6 @@
   "schemaVersion": 1,
   "id": "${mod_id}",
   "version": "${mod_version}",
-  "icon": "assets/${mod_id}/icon.png",
   "name": "${mod_name}",
   "description": "${mod_description}",
   "authors": [
@@ -21,9 +20,6 @@
   "license": "${mod_license}",
   "environment": "*",
   "entrypoints": {
-    "modmenu": [
-      "com.zxy.wuhuclient.config.ModMenu"
-    ]
   },
   "depends": {
     "malilib": "*"

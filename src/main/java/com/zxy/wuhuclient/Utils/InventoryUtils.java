@@ -30,11 +30,11 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 //#if MC >= 12006
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
+//$$ import net.minecraft.component.type.ItemEnchantmentsComponent;
+//$$ import net.minecraft.component.DataComponentTypes;
+//$$ import net.minecraft.component.type.NbtComponent;
 //#else
-//$$
+
 //#endif
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -150,31 +150,31 @@ public class InventoryUtils {
 
     public static boolean equalsItem(ItemStack itemStack1,ItemStack itemStack2){
         //#if MC > 12004
-        return ItemStack.areItemsAndComponentsEqual(itemStack1, itemStack2);
+        //$$ return ItemStack.areItemsAndComponentsEqual(itemStack1, itemStack2);
         //#else
-        //$$ return ItemStack.canCombine(itemStack1, itemStack2);
+        return ItemStack.canCombine(itemStack1, itemStack2);
         //#endif
     }
 
     public static int getEnchantmentLevel(ItemStack itemStack,
                                          //#if MC > 12006
-                                         RegistryKey<Enchantment> enchantment
+                                         //$$ RegistryKey<Enchantment> enchantment
                                          //#else
-                                         //$$ Enchantment enchantment
+                                         Enchantment enchantment
                                          //#endif
     ){
         //#if MC > 12006
-        ItemEnchantmentsComponent enchantments = itemStack.getEnchantments();
-        if (enchantments.equals(ItemEnchantmentsComponent.DEFAULT)) return -1;
-        Set<RegistryEntry<Enchantment>> enchantmentsEnchantments = enchantments.getEnchantments();
-        for (RegistryEntry<Enchantment> entry : enchantmentsEnchantments) {
-            if (entry.matchesKey(enchantment)) {
-                return enchantments.getLevel(entry);
-            }
-        }
-        return -1;
+        //$$ ItemEnchantmentsComponent enchantments = itemStack.getEnchantments();
+        //$$ if (enchantments.equals(ItemEnchantmentsComponent.DEFAULT)) return -1;
+        //$$ Set<RegistryEntry<Enchantment>> enchantmentsEnchantments = enchantments.getEnchantments();
+        //$$ for (RegistryEntry<Enchantment> entry : enchantmentsEnchantments) {
+        //$$     if (entry.matchesKey(enchantment)) {
+        //$$         return enchantments.getLevel(entry);
+        //$$     }
+        //$$ }
+        //$$ return -1;
         //#else
-        //$$ return EnchantmentHelper.getLevel(Enchantments.MENDING,itemStack);
+        return EnchantmentHelper.getLevel(Enchantments.MENDING,itemStack);
         //#endif
     }
     public static void refreshPlayerInventory(){
@@ -186,11 +186,11 @@ public class InventoryUtils {
 
         // Tags with NaN are not equal, so the server will find an inventory desync and send an inventory refresh to the client
         //#if MC >= 12006
-        var nbt = new NbtCompound();
-        nbt.putDouble("force_sync", Double.NaN);
-        NbtComponent.set(DataComponentTypes.CUSTOM_DATA, uniqueItem, nbt);
+        //$$ var nbt = new NbtCompound();
+        //$$ nbt.putDouble("force_sync", Double.NaN);
+        //$$ NbtComponent.set(DataComponentTypes.CUSTOM_DATA, uniqueItem, nbt);
         //#else
-        //$$ uniqueItem.getOrCreateNbt().putDouble("force_resync", Double.NaN);
+        uniqueItem.getOrCreateNbt().putDouble("force_resync", Double.NaN);
         //#endif
 
         networkHandler.sendPacket(new ClickSlotC2SPacket(

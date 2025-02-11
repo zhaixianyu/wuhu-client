@@ -52,7 +52,6 @@ public class HighlightBlockRenderer implements IRenderer {
     public static Map<String,HighlightTheProject> highlightTheProjectMap = new HashMap<>();
     public static String threadName = "wuhuRenderThread";
     public static boolean shaderIng = false;
-    private static final Object lock = new Object();
     public static void createHighlightBlockList(String id,ConfigColor color4f){
         if (highlightTheProjectMap.get(id) == null) {
             highlightTheProjectMap.put(id,new HighlightTheProject(color4f,new LinkedHashSet <>()));
@@ -97,7 +96,7 @@ public class HighlightBlockRenderer implements IRenderer {
         GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
         GL11.glPolygonOffset(-1.0F, -1.0F);
         //#if MC > 12006
-        BuiltBuffer meshData;
+        //$$ BuiltBuffer meshData;
         //#endif
         RenderSystem.depthMask(false);
         RenderSystem.enableBlend();
@@ -105,63 +104,63 @@ public class HighlightBlockRenderer implements IRenderer {
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         Tessellator instance = Tessellator.getInstance();
         //#if MC > 12006
-        BufferBuilder buffer = instance.begin(VertexFormat.DrawMode.QUADS, POSITION_COLOR);
+        //$$ BufferBuilder buffer = instance.begin(VertexFormat.DrawMode.QUADS, POSITION_COLOR);
         //#else
-        //$$ BufferBuilder buffer = instance.getBuffer();
+        BufferBuilder buffer = instance.getBuffer();
         //#endif
 
         //#if MC > 12006
-        voxelShape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) ->
-                RenderUtils.drawBoxAllSidesBatchedQuads(
-                        (float)(minX + x),
-                        (float)(minY + y),
-                        (float)(minZ + z),
-                        (float)(maxX + x),
-                        (float)(maxY + y),
-                        (float)(maxZ + z),
-                        color4f, buffer));
-        //#else
-        //$$ if (!buffer.isBuilding()) buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         //$$ voxelShape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) ->
         //$$         RenderUtils.drawBoxAllSidesBatchedQuads(
-        //$$                 minX + x,
-        //$$                 minY + y,
-        //$$                 minZ + z,
-        //$$                 maxX + x,
-        //$$                 maxY + y,
-        //$$                 maxZ + z,
+        //$$                 (float)(minX + x),
+        //$$                 (float)(minY + y),
+        //$$                 (float)(minZ + z),
+        //$$                 (float)(maxX + x),
+        //$$                 (float)(maxY + y),
+        //$$                 (float)(maxZ + z),
         //$$                 color4f, buffer));
+        //#else
+        if (!buffer.isBuilding()) buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        voxelShape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) ->
+                RenderUtils.drawBoxAllSidesBatchedQuads(
+                        minX + x,
+                        minY + y,
+                        minZ + z,
+                        maxX + x,
+                        maxY + y,
+                        maxZ + z,
+                        color4f, buffer));
         //#endif
 
         //#if MC > 12006
-        try
-        {
-            meshData = buffer.end();
-            BufferRenderer.drawWithGlobalProgram(meshData);
-            meshData.close();
-        }
-        catch (Exception e)
-        {
-            Litematica.logger.error("renderSchematicMismatches: Failed to draw Schematic Mismatches (Step 2) (Error: {})", e.getLocalizedMessage());
-        }
-
-        RenderSystem.enableCull();
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
-        //#else
-        //$$ instance.draw();
+        //$$ try
+        //$$ {
+        //$$     meshData = buffer.end();
+        //$$     BufferRenderer.drawWithGlobalProgram(meshData);
+        //$$     meshData.close();
+        //$$ }
+        //$$ catch (Exception e)
+        //$$ {
+        //$$     Litematica.logger.error("renderSchematicMismatches: Failed to draw Schematic Mismatches (Step 2) (Error: {})", e.getLocalizedMessage());
+        //$$ }
+        //$$
         //$$ RenderSystem.enableCull();
-        //$$ RenderSystem.disableBlend();
+        //$$ RenderSystem.depthMask(true);
         //$$ RenderSystem.enableDepthTest();
+        //#else
+        instance.draw();
+        RenderSystem.enableCull();
+        RenderSystem.disableBlend();
+        RenderSystem.enableDepthTest();
         //#endif
 
         GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
     }
 
     //#if MC > 12004
-    public void test3(Matrix4f matrices,Color4f color4f, Set<BlockPos> posSet){
+    //$$ public void test3(Matrix4f matrices,Color4f color4f, Set<BlockPos> posSet){
     //#else
-    //$$ public void test3(MatrixStack matrices ,Color4f color4f, Set<BlockPos> posSet){
+    public void test3(MatrixStack matrices ,Color4f color4f, Set<BlockPos> posSet){
     //#endif
 //        for (BlockPos pos : posSet) {
 //            renderAreaSides(pos,pos,color4f,matrices,client);
@@ -174,11 +173,11 @@ public class HighlightBlockRenderer implements IRenderer {
         Tessellator tessellator = Tessellator.getInstance();
 
         //#if MC > 12006
-        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        BuiltBuffer meshData;
+        //$$ BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        //$$ BuiltBuffer meshData;
         //#else
-        //$$ BufferBuilder buffer = tessellator.getBuffer();
-        //$$ buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         //#endif
         for (BlockPos pos : posSet) {
             renderAreaSidesBatched(pos, pos, color4f, 0.002, buffer, client);
@@ -188,11 +187,11 @@ public class HighlightBlockRenderer implements IRenderer {
         {
             if(buffer != null){
                 //#if MC > 12006
-                meshData = buffer.end();
-                BufferRenderer.drawWithGlobalProgram(meshData);
-                meshData.close();
+                //$$ meshData = buffer.end();
+                //$$ BufferRenderer.drawWithGlobalProgram(meshData);
+                //$$ meshData.close();
                 //#else
-                //$$ tessellator.draw();
+                tessellator.draw();
                 //#endif
             }
         }
@@ -230,9 +229,9 @@ public class HighlightBlockRenderer implements IRenderer {
 
     @Override
     //#if MC > 12004
-    public void onRenderWorldLast(Matrix4f matrices, Matrix4f projMatrix){
+    //$$ public void onRenderWorldLast(Matrix4f matrices, Matrix4f projMatrix){
     //#else
-    //$$ public void onRenderWorldLast(MatrixStack matrices, Matrix4f projMatrix){
+    public void onRenderWorldLast(MatrixStack matrices, Matrix4f projMatrix){
     //#endif
         //更改渲染
         setMap.forEach((k,v) -> {
