@@ -2,25 +2,9 @@ plugins {
     id("maven-publish")
     id("fabric-loom").version("1.7-SNAPSHOT").apply(false)
     id("org.ajoberstar.grgit").version("5.2.0")
-    id("com.replaymod.preprocess").version("ce1aeb2b")
+    id("com.replaymod.preprocess").version("9d21b334a7")
 
 }
-
-//configurations.all {
-//    resolutionStrategy {
-//        cacheDynamicVersionsFor(365, 'days')
-//        cacheChangingModulesFor(365, 'days')
-//        preferProjectModules() // 优先使用项目自身配置
-//
-//        eachDependency { DependencyResolveDetails details ->
-////            if (details.requested.group == 'dev.isxander') {
-//                // 强制匹配主版本号
-//                details.useVersion details.requested.version.split('\\+')[0]
-////            }
-//        }
-//    }
-//}
-
 
 preprocess {
 //    def mc11404 = createNode("1.14.4", 1_14_04, "mojang")

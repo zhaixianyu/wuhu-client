@@ -37,59 +37,6 @@ pluginManagement {
 	}
 }
 
-ext.privateRepos = [
-		[
-				name: "SB_YACL",
-				url: "https://maven.isxander.dev/releases",
-				groups: ["dev.isxander.*"]
-		],
-		[
-//				name: "SB_LIBGUI",
-//				url: "https://server.bbkr.space/artifactory/libs-release",
-//				groups: [".*"],
-//				credentials: true // 需要认证
-		]
-]
-
-//dependencyResolutionManagement {
-//	repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
-//
-//	repositories {
-//		// 加载私有仓库配置
-//		privateRepos.each { repoConfig ->
-//			maven {
-//				name = repoConfig.name
-//				url = repoConfig.url
-//
-//				// 元数据获取策略
-//				metadataSources {
-//					mavenPom()
-//					artifact()
-//					ignoreGradleMetadataRedirection()
-//				}
-//
-//				// 认证配置
-//				if (repoConfig.credentials) {
-//					credentials {
-//						username = providers.gradleProperty("${repoConfig.name}_USER").orNull
-//						password = providers.gradleProperty("${repoConfig.name}_PWD").orNull
-//					}
-//				}
-//
-//				// 内容过滤
-//				content {
-//					repoConfig.groups.each { groupPattern ->
-//						includeGroupByRegex(groupPattern)
-//					}
-//				}
-//			}
-//		}
-//
-//		// 公共仓库后置
-//		mavenCentral()
-//	}
-//}
-
 def versions = Arrays.asList(
 //		"1.14.4",
 //		"1.15.2",

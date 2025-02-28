@@ -38,6 +38,7 @@ import static com.zxy.wuhuclient.Utils.ZxyUtils.TempData.max;
 import static com.zxy.wuhuclient.Utils.ZxyUtils.TempData.min;
 import static com.zxy.wuhuclient.WuHuClientMod.client;
 import static com.zxy.wuhuclient.config.Configs.*;
+import static com.zxy.wuhuclient.features_list.CloseTheContainerAfterOpening.step;
 import static fi.dy.masa.litematica.selection.SelectionMode.NORMAL;
 
 public class ZxyUtils {
@@ -50,6 +51,7 @@ public class ZxyUtils {
 //        searchBlockThread();
         Synthesis.tick();
         Test.tick();
+        step();
         if (SyncInventory.num==2) SyncInventory.syncInv();
     }
     public static class TempData {

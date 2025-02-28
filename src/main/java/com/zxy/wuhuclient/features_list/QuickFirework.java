@@ -23,6 +23,7 @@ import java.util.List;
 
 import static com.zxy.wuhuclient.WuHuClientMod.*;
 //快捷烟花 在飞行时按下快捷键可以从背包中拿出烟花并使用，然后还原副手物品
+//TODO 从盒子中取出烟花
 public class QuickFirework {
 
     public static void accelerated(){
@@ -35,20 +36,19 @@ public class QuickFirework {
             //#if MC > 12004
             //$$ FireworksComponent fireworksComponent = stack.get(DataComponentTypes.FIREWORKS);
             //$$ if (fireworksComponent != null && fireworksComponent.explosions().isEmpty()) {
-            //$$     buiBuiBui(sc,i);
+            //$$     interactItem(sc,i);
             //$$     return;
             //$$ }
             //#else
             NbtCompound nbtCompound = stack.getSubNbt("Fireworks");
             if(nbtCompound != null && nbtCompound.getList("Explosions", 10).isEmpty()){
-                buiBuiBui(sc,i);
+                interactItem(sc,i);
                 return;
             }
             //#endif
-
         }
     }
-    public static void buiBuiBui(ScreenHandler sc , int i) {
+    public static void interactItem(ScreenHandler sc , int i) {
         client.interactionManager.clickSlot(sc.syncId, i, 40, SlotActionType.SWAP, client.player);
         //#if MC > 11802
         client.interactionManager.interactItem(client.player, Hand.OFF_HAND);

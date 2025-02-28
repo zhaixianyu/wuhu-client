@@ -13,14 +13,15 @@ apply(plugin: "com.replaymod.preprocess")
 
 int mcVersion = 1
 
+
 preprocess {
     mcVersion = vars.get().get("MC")
-    tabIndentation.set(false)
+//    tabIndentation.set(false)
 }
 
 repositories {
 
-    mavenLocal()
+//    mavenLocal()
 
     maven { url = 'https://masa.dy.fi/maven' }
     maven { url = "https://www.cursemaven.com" }
@@ -125,7 +126,7 @@ configurations {
     }
 
     register("productionRuntimeServer")
-    register("productionRuntimeMods")
+//    register("productionRuntimeMods")
 }
 
 def sakura = mcVersion > 12006
@@ -142,17 +143,18 @@ def mod_dependencies = [
         ["com.terraformersmc:modmenu:${project.modmenu_version}", 1],
         [(mcVersion >= 12006 ? "curse.maven:carpet-349239" : "maven.modrinth:carpet") + ":${project.carpet_version}", 1],
 
+
+        //注释掉以下内容可以加快启动速度，但是会报错
         ["com.blamejared.searchables" + ":${project.searchables}"   , mcVersion >= 12001 ? 1 : 0],
-        [getSbYacl() + ":${project.yacl}"                           , mcVersion >= 12001 ? 1 : 0],
+        [getYacl() + ":${project.yacl}", mcVersion >= 12001 ? 1 : 0],
         [(mcVersion >= 12001 ? "red.jackf:chesttracker" :  "maven.modrinth:chest-tracker") + ":${project.chesttracker}", 1],
-        [(mcVersion >= 12001 ? "red.jackf:whereisit" : "maven.modrinth:where-is-it") + ":${project.whereisit}", 1],
-//		[(/*mcVersion >= 12001 ? "red.jackf:whereisit" :*/ "maven.modrinth:where-is-it")                        + ":${project.whereisit}",          1],
+        [(mcVersion >= 12001 ? "red.jackf:whereisit" : "maven.modrinth:where-is-it") + ":${project.whereisit}", 10],
         ["maven.modrinth:cloth-config" + ":${project.cloth_config}", mcVersion < 12001 ? 1 : 0],
         ["me.shedaniel.cloth.api:cloth-api" + ":${project.cloth_api}", mcVersion < 11904 ? 1 : 0],
         ["io.github.cottonmc:LibGui" + ":${project.LibGui}", mcVersion < 12001 ? 1 : 0],
 ]
 
-String getSbYacl() {
+String getYacl() {
 //    return "maven.modrinth:yacl";
     return mcVersion == 12002 ? "maven.modrinth:yacl" : "dev.isxander:yet-another-config-lib";
 }
@@ -171,8 +173,6 @@ dependencies {
     modImplementation ("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
 //    modImplementation "dev.isxander:yet-another-config-lib:3.6.0+1.21-fabric"
-
-
     mod_dependencies.forEach { item ->
         def dependencyNotation = item[0]
         def mode = item[1]
@@ -189,8 +189,8 @@ dependencies {
             modCompileOnly (idFix)
         } else if (mode == 10) {
             modImplementation (idFix){
-//                exclude group: 'dev.isxander', module: 'yet-another-config-lib'
-                changing = false
+                exclude group: 'dev.isxander', module: 'yet-another-config-lib'
+//                changing = false
 //                transitive = false
             }
         }
@@ -205,16 +205,6 @@ dependencies {
 
     runtimeOnly(project(path: ":fabricWrapper"))
 }
-
-tasks.register('showCache') {
-    doLast {
-        configurations.modRuntimeClasspath.resolvedConfiguration.resolvedArtifacts.each {
-            println "${it.moduleVersion.id} → ${it.file}"
-        }
-    }
-}
-
-
 def time = new Date().format("yyyyMMdd", TimeZone.getTimeZone("GMT+08:00"))
 version = project.mod_version + "+" + time
 group = project.mod_maven_group
