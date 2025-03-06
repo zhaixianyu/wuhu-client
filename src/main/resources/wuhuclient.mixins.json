@@ -22,6 +22,7 @@
     "MinecraftClientMixin",
     "MixinExperienceOrbEntity",
     "SuffixArrayMixin",
+    "jackf.fix.InteractionTrackerImplMixin",
     "masa.Litematica_InventoryUtilsMixin",
     "masa.MixinInventoryUtils",
     "masa.litematica_easy_place_fix.ClientPlayerInteractionManagerMixin_EasyPlaceFix",

@@ -14,11 +14,11 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
 import java.util.List;
 //#if MC > 12004
-//$$ import net.minecraft.component.DataComponentTypes;
-//$$ import net.minecraft.component.type.FireworksComponent;
-//$$ import net.minecraft.component.type.FireworkExplosionComponent;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FireworksComponent;
+import net.minecraft.component.type.FireworkExplosionComponent;
 //#else
-
+//$$
 //#endif
 
 import static com.zxy.wuhuclient.WuHuClientMod.*;
@@ -34,17 +34,17 @@ public class QuickFirework {
         for (int i = 0; i < slots.size(); i++) {
             ItemStack stack = slots.get(i).getStack();
             //#if MC > 12004
-            //$$ FireworksComponent fireworksComponent = stack.get(DataComponentTypes.FIREWORKS);
-            //$$ if (fireworksComponent != null && fireworksComponent.explosions().isEmpty()) {
-            //$$     interactItem(sc,i);
-            //$$     return;
-            //$$ }
-            //#else
-            NbtCompound nbtCompound = stack.getSubNbt("Fireworks");
-            if(nbtCompound != null && nbtCompound.getList("Explosions", 10).isEmpty()){
+            FireworksComponent fireworksComponent = stack.get(DataComponentTypes.FIREWORKS);
+            if (fireworksComponent != null && fireworksComponent.explosions().isEmpty()) {
                 interactItem(sc,i);
                 return;
             }
+            //#else
+            //$$ NbtCompound nbtCompound = stack.getSubNbt("Fireworks");
+            //$$ if(nbtCompound != null && nbtCompound.getList("Explosions", 10).isEmpty()){
+            //$$     interactItem(sc,i);
+            //$$     return;
+            //$$ }
             //#endif
         }
     }

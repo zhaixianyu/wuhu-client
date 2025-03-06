@@ -44,6 +44,7 @@ import static fi.dy.masa.litematica.selection.SelectionMode.NORMAL;
 public class ZxyUtils {
     public static boolean isLoadQuiShulker = isLoadMod("quickshulker");
     public static boolean isLoadChestTracker = isLoadMod("chesttracker");
+    public static boolean isLoadPrinter = isLoadMod("litematica-printer");
     public static boolean isLoadMod(String modId){
         return FabricLoader.getInstance().isModLoaded(modId);
     }

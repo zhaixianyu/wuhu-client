@@ -38,10 +38,10 @@ import net.minecraft.world.GameRules;
 //#if MC < 12001
 //$$ import net.minecraft.inventory.CraftingInventory;
 //#elseif MC == 12001
-import net.minecraft.inventory.RecipeInputInventory;
-//#else
 //$$ import net.minecraft.inventory.RecipeInputInventory;
-//$$ import net.minecraft.recipe.RecipeEntry;
+//#else
+import net.minecraft.inventory.RecipeInputInventory;
+import net.minecraft.recipe.RecipeEntry;
 //#endif
 
 import java.util.*;
@@ -171,10 +171,10 @@ public class Synthesis {
         for (Slot slot : client.player.currentScreenHandler.slots) {
             ItemStack stack = slot.getStack();
             //#if MC > 12004
-            //$$
-            //$$ if (stack.isEmpty() || stack.getComponents().isEmpty()) continue;
+
+            if (stack.isEmpty() || stack.getComponents().isEmpty()) continue;
             //#else
-            if (stack.isEmpty() || stack.hasNbt()) continue;
+            //$$ if (stack.isEmpty() || stack.hasNbt()) continue;
             //#endif
             recipeMap.forEach((k, v) -> {
                 int num = stack.getMaxCount() == 1 ? 0 : 1;
@@ -341,22 +341,22 @@ public class Synthesis {
             ItemStack stack = ItemStack.EMPTY;
             //#if MC <= 12001
                 //#if MC == 12001
-                RecipeInputInventory rec = ((CraftingScreenHandlerMixin)sc1).getInput();
+                //$$ RecipeInputInventory rec = ((CraftingScreenHandlerMixin)sc1).getInput();
                 //#else
                 //$$ CraftingInventory rec = ((CraftingScreenHandlerMixin)sc1).getInput();
                 //#endif
-            Optional<CraftingRecipe> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec, world);
-            CraftingRecipe recipe = optional.isPresent() ? optional.get() : null;
-            CraftingRecipe recipeEntry = optional.isPresent() ? optional.get() : null;
+            //$$ Optional<CraftingRecipe> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec, world);
+            //$$ CraftingRecipe recipe = optional.isPresent() ? optional.get() : null;
+            //$$ CraftingRecipe recipeEntry = optional.isPresent() ? optional.get() : null;
             //#else
-            //$$ RecipeInputInventory rec = ((CraftingScreenHandlerMixin)sc1).getInput();
+            RecipeInputInventory rec = ((CraftingScreenHandlerMixin)sc1).getInput();
             //#if MC < 12100
             //$$ Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec, world);
             //#else
-            //$$ Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
+            Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
             //#endif
-            //$$ CraftingRecipe recipe = optional.map(RecipeEntry::value).orElse(null);
-            //$$ RecipeEntry<?> recipeEntry = optional.orElse(null);
+            CraftingRecipe recipe = optional.map(RecipeEntry::value).orElse(null);
+            RecipeEntry<?> recipeEntry = optional.orElse(null);
             //#endif
 
             if (recipe != null)
@@ -367,9 +367,9 @@ public class Synthesis {
                 {
                     //#if MC > 11802
                         //#if MC >= 12100
-                        //$$ stack = recipe.craft(rec.createRecipeInput(), MinecraftClient.getInstance().getNetworkHandler().getRegistryManager());
+                        stack = recipe.craft(rec.createRecipeInput(), MinecraftClient.getInstance().getNetworkHandler().getRegistryManager());
                         //#else
-                        stack = recipe.craft(rec, MinecraftClient.getInstance().getNetworkHandler().getRegistryManager());
+                        //$$ stack = recipe.craft(rec, MinecraftClient.getInstance().getNetworkHandler().getRegistryManager());
                         //#endif
                     //#else
                     //$$ stack = recipe.craft(rec);
