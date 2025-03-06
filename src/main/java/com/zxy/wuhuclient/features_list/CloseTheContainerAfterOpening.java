@@ -5,13 +5,17 @@
 
 package com.zxy.wuhuclient.features_list;
 
+import com.zxy.wuhuclient.Utils.InventoryUtils;
 import com.zxy.wuhuclient.Utils.ZxyUtils;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+
+import static com.zxy.wuhuclient.Utils.InventoryUtils.canOpenInv;
 
 public class CloseTheContainerAfterOpening {
     static LinkedList<BlockPos> pos = new LinkedList();
@@ -21,7 +25,7 @@ public class CloseTheContainerAfterOpening {
     }
 
     private static void addPos() {
-        LinkedList<BlockPos> blockPos = ZxyUtils.siftBlock(",inv");
+        List<BlockPos> blockPos = ZxyUtils.siftBlock(",inv").stream().filter(InventoryUtils::canOpenInv).toList();
         pos.addAll(blockPos);
     }
 

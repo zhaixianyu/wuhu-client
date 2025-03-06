@@ -208,15 +208,15 @@ public class HighlightBlockRenderer implements IRenderer {
 //        fi.dy.masa.litematica.render.RenderUtils.renderAreaSides(pos, pos, color4f, matrices, client);
     }
 
-    //如果不注册无法渲染，
     public static void init(){
+        //如果不注册无法渲染，
         RenderEventHandler.getInstance().registerWorldLastRenderer(instance);
         MyThreadManager.createThread(threadName,new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()){
                 try {
                     Thread.sleep(80);
                 } catch (InterruptedException ignored) {}
-                //投影材料助手渲染
+                //投影材料助手、搜索方块渲染
                 searchBlockThread();
 
             }
@@ -254,13 +254,10 @@ public class HighlightBlockRenderer implements IRenderer {
         clearList.clear();
 
         shaderIng = true;
-        highlightTheProjectMap.entrySet().stream().parallel().forEach(stringHighlightTheProjectEntry -> {
-            String key = stringHighlightTheProjectEntry.getKey();
-            HighlightTheProject value = stringHighlightTheProjectEntry.getValue();
-            if(!LITEMATICA_HELPER.getBooleanValue() && LitematicaHelper.instance.litematicaHelper.equals(key)) return;
-
+        highlightTheProjectMap.forEach((key, value) -> {
+            if (!LITEMATICA_HELPER.getBooleanValue() && LitematicaHelper.instance.litematicaHelper.equals(key)) return;
             Color4f color = value.color4f.getColor();
-            test3(matrices ,color,value.pos);
+            test3(matrices, color, value.pos);
 
         });
         shaderIng = false;
