@@ -1,6 +1,7 @@
 package com.zxy.wuhuclient.features_list;
 
 import com.zxy.wuhuclient.Utils.InventoryUtils;
+import com.zxy.wuhuclient.config.Configs;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
@@ -14,7 +15,7 @@ public class AutoMending {
     public static final AutoMending AUTO_MENDING = new AutoMending();
     private boolean patching = false;
     private int tempSlot = -1;
-    public int tick = 0;
+    public int tick = 1;
 
     public void mending(){
         ClientPlayerEntity player = client.player;
@@ -42,6 +43,7 @@ public class AutoMending {
         }
     }
     public void tick(){
+        if(!Configs.AUTO_MENDING.getBooleanValue()) return;
         if(tick == 0) mending();
 
         if (patching) {

@@ -1,6 +1,6 @@
 package com.zxy.wuhuclient.mixin;
 
-import net.minecraft.screen.CraftingScreenHandler;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -9,9 +9,27 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 //#else
 import net.minecraft.inventory.RecipeInputInventory;
 //#endif
-@Mixin(CraftingScreenHandler.class)
+
+//#if MC < 12104
+//$$ import net.minecraft.screen.CraftingScreenHandler;
+//#else
+import net.minecraft.screen.AbstractCraftingScreenHandler;
+//#endif
+
+@Mixin(
+        //#if MC < 12104
+        //$$ CraftingScreenHandler.class
+        //#else
+        AbstractCraftingScreenHandler.class
+        //#endif
+)
 public interface CraftingScreenHandlerMixin {
-    @Accessor("input")
+    //#if MC < 12104
+    //$$ @Accessor("input")
+    //#else
+    @Accessor("craftingInventory")
+    //#endif
+
     //#if MC < 12001
     //$$ CraftingInventory
     //#else

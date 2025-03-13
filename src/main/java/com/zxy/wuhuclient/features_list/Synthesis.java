@@ -339,22 +339,27 @@ public class Synthesis {
         if(sc instanceof CraftingScreenHandler sc1
         ){
             ItemStack stack = ItemStack.EMPTY;
+
+            //#if MC >= 12001
+            RecipeInputInventory rec = ((CraftingScreenHandlerMixin)sc1).getInput();
+            //#else
+            //$$ CraftingInventory rec = ((CraftingScreenHandlerMixin)sc1).getInput();
+            //#endif
+
             //#if MC <= 12001
-                //#if MC == 12001
-                //$$ RecipeInputInventory rec = ((CraftingScreenHandlerMixin)sc1).getInput();
-                //#else
-                //$$ CraftingInventory rec = ((CraftingScreenHandlerMixin)sc1).getInput();
-                //#endif
             //$$ Optional<CraftingRecipe> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec, world);
             //$$ CraftingRecipe recipe = optional.isPresent() ? optional.get() : null;
             //$$ CraftingRecipe recipeEntry = optional.isPresent() ? optional.get() : null;
             //#else
-            RecipeInputInventory rec = ((CraftingScreenHandlerMixin)sc1).getInput();
+
             //#if MC < 12100
             //$$ Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec, world);
-            //#else
-            Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
+            //#elseif MC < 12104 && MC >= 12100
+            //$$ Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
+            //#elseif MC >= 12104
+            Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
             //#endif
+
             CraftingRecipe recipe = optional.map(RecipeEntry::value).orElse(null);
             RecipeEntry<?> recipeEntry = optional.orElse(null);
             //#endif
@@ -362,8 +367,13 @@ public class Synthesis {
             if (recipe != null)
             {
                 if ((recipe.isIgnoredInRecipeBook() ||
-                        world.getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) == false ||
-                        ((ClientPlayerEntity) player).getRecipeBook().contains(recipeEntry)))
+                        //#if MC < 12104
+                        //$$ world.getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) == false ||
+                        //$$ ((ClientPlayerEntity) player).getRecipeBook().contains(recipeEntry)))
+                        //#else
+                        world.getServer().getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) == false ||
+                            ((ClientPlayerEntity) player).getRecipeBook().getOrderedResults().contains(recipeEntry)))
+                        //#endif
                 {
                     //#if MC > 11802
                         //#if MC >= 12100

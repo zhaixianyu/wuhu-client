@@ -78,91 +78,12 @@ public class HighlightBlockRenderer implements IRenderer {
     }
     public static Method method;
 
-    public void highlightBlock(Color4f color4f, BlockPos pos) {
 
-        BlockState blockState = client.world.getBlockState(pos);
-        Entity cameraEntity = client.cameraEntity;
-        if(cameraEntity == null) return;
-        VoxelShape voxelShape = blockState.getCollisionShape(client.world, pos,ShapeContext.of(cameraEntity));
-        voxelShape = voxelShape.getBoundingBoxes().stream()
-                .map(VoxelShapes::cuboid)
-                .reduce(VoxelShapes::union)
-                .orElse(VoxelShapes.empty()).simplify();
-        Vec3d pos1 = client.gameRenderer.getCamera().getPos();
-        double x = pos.getX() - pos1.x;
-        double y = pos.getY() - pos1.y;
-        double z = pos.getZ() - pos1.z;
-
-        RenderSystem.disableDepthTest();
-
-        GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
-        GL11.glPolygonOffset(-1.0F, -1.0F);
-        //#if MC > 12006
-        BuiltBuffer meshData;
-        //#endif
-        RenderSystem.depthMask(false);
-        RenderSystem.enableBlend();
-        RenderSystem.disableCull();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        Tessellator instance = Tessellator.getInstance();
-        //#if MC > 12006
-        BufferBuilder buffer = instance.begin(VertexFormat.DrawMode.QUADS, POSITION_COLOR);
-        //#else
-        //$$ BufferBuilder buffer = instance.getBuffer();
-        //#endif
-
-        //#if MC > 12006
-        voxelShape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) ->
-                RenderUtils.drawBoxAllSidesBatchedQuads(
-                        (float)(minX + x),
-                        (float)(minY + y),
-                        (float)(minZ + z),
-                        (float)(maxX + x),
-                        (float)(maxY + y),
-                        (float)(maxZ + z),
-                        color4f, buffer));
-        //#else
-        //$$ if (!buffer.isBuilding()) buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        //$$ voxelShape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) ->
-        //$$         RenderUtils.drawBoxAllSidesBatchedQuads(
-        //$$                 minX + x,
-        //$$                 minY + y,
-        //$$                 minZ + z,
-        //$$                 maxX + x,
-        //$$                 maxY + y,
-        //$$                 maxZ + z,
-        //$$                 color4f, buffer));
-        //#endif
-
-        //#if MC > 12006
-        try
-        {
-            meshData = buffer.end();
-            BufferRenderer.drawWithGlobalProgram(meshData);
-            meshData.close();
-        }
-        catch (Exception e)
-        {
-            Litematica.logger.error("renderSchematicMismatches: Failed to draw Schematic Mismatches (Step 2) (Error: {})", e.getLocalizedMessage());
-        }
-
-        RenderSystem.enableCull();
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
-        //#else
-        //$$ instance.draw();
-        //$$ RenderSystem.enableCull();
-        //$$ RenderSystem.disableBlend();
-        //$$ RenderSystem.enableDepthTest();
-        //#endif
-
-        GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
-    }
 
     //#if MC > 12004
-    public void test3(Matrix4f matrices,Color4f color4f, Set<BlockPos> posSet){
+    public void highlightBlock(Matrix4f matrices, Color4f color4f, Set<BlockPos> posSet){
     //#else
-    //$$ public void test3(MatrixStack matrices ,Color4f color4f, Set<BlockPos> posSet){
+    //$$ public void highlightBlock(MatrixStack matrices ,Color4f color4f, Set<BlockPos> posSet){
     //#endif
 //        for (BlockPos pos : posSet) {
 //            renderAreaSides(pos,pos,color4f,matrices,client);
@@ -171,7 +92,12 @@ public class HighlightBlockRenderer implements IRenderer {
         RenderSystem.enableBlend();
         RenderSystem.disableCull();
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        //#if MC >= 12104
+        RenderSystem.setShader(RenderSystem.getShader());
+        //#else
+        //$$ RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        //#endif
+
         Tessellator tessellator = Tessellator.getInstance();
 
         //#if MC > 12006
@@ -257,7 +183,7 @@ public class HighlightBlockRenderer implements IRenderer {
         highlightTheProjectMap.forEach((key, value) -> {
             if (!LITEMATICA_HELPER.getBooleanValue() && LitematicaHelper.instance.litematicaHelper.equals(key)) return;
             Color4f color = value.color4f.getColor();
-            test3(matrices, color, value.pos);
+            highlightBlock(matrices, color, value.pos);
 
         });
         shaderIng = false;
