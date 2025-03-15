@@ -50,7 +50,7 @@ import static net.minecraft.client.render.VertexFormats.POSITION_COLOR;
 public class HighlightBlockRenderer implements IRenderer {
     public static HighlightBlockRenderer instance = new HighlightBlockRenderer();
     public record HighlightTheProject(ConfigColor color4f, Set<BlockPos> pos){}
-    public static Map<String,HighlightTheProject> highlightTheProjectMap = new HashMap<>();
+    public static Map<String,HighlightTheProject> highlightTheProjectMap = new ConcurrentHashMap<>();
     public static String threadName = "wuhuRenderThread";
     public static boolean shaderIng = false;
     public static void createHighlightBlockList(String id,ConfigColor color4f){

@@ -20,12 +20,14 @@ import net.minecraft.recipe.CraftingRecipe;
 
 
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.ServerRecipeManager;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
@@ -357,7 +359,15 @@ public class Synthesis {
             //#elseif MC < 12104 && MC >= 12100
             //$$ Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
             //#elseif MC >= 12104
-            Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
+//            Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
+
+            ServerWorld serverWorld = client.getServer() == null ? null : client.getServer().getWorld(world.getRegistryKey());
+            if (serverWorld == null) return false;
+            ServerRecipeManager serverRecipeManager = serverWorld.getRecipeManager();
+            Optional<RecipeEntry<CraftingRecipe>> optional;
+            if(serverRecipeManager != null){
+                optional = serverRecipeManager.getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
+            }else return false;
             //#endif
 
             CraftingRecipe recipe = optional.map(RecipeEntry::value).orElse(null);
@@ -371,7 +381,7 @@ public class Synthesis {
                         //$$ world.getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) == false ||
                         //$$ ((ClientPlayerEntity) player).getRecipeBook().contains(recipeEntry)))
                         //#else
-                        world.getServer().getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) == false ||
+                        serverWorld.getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) == false ||
                             ((ClientPlayerEntity) player).getRecipeBook().getOrderedResults().contains(recipeEntry)))
                         //#endif
                 {
