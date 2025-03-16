@@ -21,8 +21,6 @@ preprocess {
 
 repositories {
 
-//    mavenLocal()
-
     maven { url = 'https://masa.dy.fi/maven' }
     maven { url = "https://www.cursemaven.com" }
     maven { url = "https://maven.terraformersmc.com/releases" }
@@ -38,12 +36,13 @@ repositories {
         }
     }
 
-//	maven{
-//		url = "https://maven.pkg.github.com/JackFred2/WhereIsIt"
-//	}
     maven {
-        url 'https://jitpack.io'
+        url = "https://jitpack.io"
+        content {
+            includeGroupAndSubgroups("com.github")
+        }
     }
+
     maven {
         name = "BlameJared"
         url = uri("https://maven.blamejared.com")
@@ -64,15 +63,8 @@ repositories {
         name = "Xander Maven"
         url = uri("https://maven.isxander.dev/releases")
         content {
-//			includeGroupAndSubgroups("dev.isxander")
-//			includeGroupAndSubgroups("org.quiltmc")
-
-            // 禁用元数据更新
-//            metadataSources {
-//                mavenPom()
-//                artifact()
-//                ignoreGradleMetadataRedirection()
-//            }
+			includeGroupAndSubgroups("dev.isxander")
+			includeGroupAndSubgroups("org.quiltmc")
 		}
     }
 
@@ -81,26 +73,15 @@ repositories {
         name = "Xander Snapshot Maven"
         url = uri("https://maven.isxander.dev/snapshots")
 		content {
-//			includeGroupAndSubgroups("dev.isxander")
-//			includeGroupAndSubgroups("org.quiltmc")
-//            metadataSources {
-//                mavenPom()
-//                artifact()
-//                ignoreGradleMetadataRedirection()
-//            }
+			includeGroupAndSubgroups("dev.isxander")
+			includeGroupAndSubgroups("org.quiltmc")
 		}
     }
     maven {
         name = "CottonMC"
         url = "https://server.bbkr.space/artifactory/libs-release"
-        content {
-//            metadataSources {
-//                mavenPom()
-//                artifact()
-//                ignoreGradleMetadataRedirection()
-//            }
-        }
     }
+
     maven { url = "https://maven.shedaniel.me/" }
 
 //	maven { url = "https://mvnrepository.com/artifact/com.github.open-android/pinyin4j " }
@@ -189,7 +170,7 @@ dependencies {
             modCompileOnly (idFix)
         } else if (mode == 10) {
             modImplementation (idFix){
-                exclude group: 'dev.isxander', module: 'yet-another-config-lib'
+                exclude group: 'dev.isxander'
 //                changing = false
 //                transitive = false
             }
