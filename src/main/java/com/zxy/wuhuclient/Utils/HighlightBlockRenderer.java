@@ -93,9 +93,9 @@ public class HighlightBlockRenderer implements IRenderer {
         RenderSystem.disableCull();
 
         //#if MC >= 12104
-        RenderSystem.setShader(RenderSystem.getShader());
+        //$$ RenderSystem.setShader(RenderSystem.getShader());
         //#else
-        //$$ RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         //#endif
 
         Tessellator tessellator = Tessellator.getInstance();

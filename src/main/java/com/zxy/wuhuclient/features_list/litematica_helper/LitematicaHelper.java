@@ -8,9 +8,11 @@ import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
+import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
 import fi.dy.masa.litematica.materials.MaterialListUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
@@ -188,7 +190,9 @@ public class LitematicaHelper {
         MaterialListBase materialList = DataManager.getMaterialList();
         if (materialList == null) return;
         MaterialListUtils.updateAvailableCounts(materialList.getMaterialsAll(), player);
-        List<MaterialListEntry> materialsMissingOnly = materialList.getMaterialsMissingOnly(false);
+        MaterialListHudRenderer hudRenderer = materialList.getHudRenderer();
+        boolean b = hudRenderer.getShouldRenderCustom() && hudRenderer.shouldRenderInGuis();
+        List<MaterialListEntry> materialsMissingOnly = materialList.getMaterialsMissingOnly(!b);
         List<BlockPos> list = new ArrayList<>();
         for (MaterialListEntry materialListEntry : materialsMissingOnly) {
             ItemStack stack = materialListEntry.getStack();

@@ -20,7 +20,7 @@ import net.minecraft.recipe.CraftingRecipe;
 
 
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.ServerRecipeManager;
+import net.minecraft.recipe.RecipeManager;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
@@ -357,17 +357,17 @@ public class Synthesis {
             //#if MC < 12100
             //$$ Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec, world);
             //#elseif MC < 12104 && MC >= 12100
-            //$$ Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
+            Optional<RecipeEntry<CraftingRecipe>> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
             //#elseif MC >= 12104
 //            Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
-
-            ServerWorld serverWorld = client.getServer() == null ? null : client.getServer().getWorld(world.getRegistryKey());
-            if (serverWorld == null) return false;
-            ServerRecipeManager serverRecipeManager = serverWorld.getRecipeManager();
-            Optional<RecipeEntry<CraftingRecipe>> optional;
-            if(serverRecipeManager != null){
-                optional = serverRecipeManager.getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
-            }else return false;
+            //$$
+            //$$ ServerWorld serverWorld = client.getServer() == null ? null : client.getServer().getWorld(world.getRegistryKey());
+            //$$ if (serverWorld == null) return false;
+            //$$ ServerRecipeManager serverRecipeManager = serverWorld.getRecipeManager();
+            //$$ Optional<RecipeEntry<CraftingRecipe>> optional;
+            //$$ if(serverRecipeManager != null){
+            //$$     optional = serverRecipeManager.getFirstMatch(RecipeType.CRAFTING, rec.createRecipeInput(), world);
+            //$$ }else return false;
             //#endif
 
             CraftingRecipe recipe = optional.map(RecipeEntry::value).orElse(null);
@@ -378,11 +378,11 @@ public class Synthesis {
             {
                 if ((recipe.isIgnoredInRecipeBook() ||
                         //#if MC < 12104
-                        //$$ world.getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) == false ||
-                        //$$ ((ClientPlayerEntity) player).getRecipeBook().contains(recipeEntry)))
+                        world.getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) == false ||
+                        ((ClientPlayerEntity) player).getRecipeBook().contains(recipeEntry)))
                         //#else
-                        serverWorld.getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) == false ||
-                            ((ClientPlayerEntity) player).getRecipeBook().getOrderedResults().contains(recipeEntry)))
+                        //$$ serverWorld.getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) == false ||
+                        //$$     ((ClientPlayerEntity) player).getRecipeBook().getOrderedResults().contains(recipeEntry)))
                         //#endif
                 {
                     //#if MC > 11802
