@@ -15,11 +15,6 @@ public class WidgetListBaseMixin{
     public void matchesFilter(String entryString, String filterText, CallbackInfoReturnable<Boolean> cir){
         if (!Configs.PINYIN.getBooleanValue()) return;
         String translate = StringUtils.translate(entryString);
-//        String translate2 = StringUtils.translate(StringUtils.splitCamelCase(entryString));
-//        System.out.println(StringUtils.splitCamelCase(entryString));
-//        System.out.println("entryString  "+ entryString);
-//        System.out.println("translate  "+ translate);
-//        System.out.println("translate2  "+ translate2);
         if (PinYinSearch.hasPinYin(translate,filterText) || translate.contains(filterText)) {
             cir.setReturnValue(true);
         }
