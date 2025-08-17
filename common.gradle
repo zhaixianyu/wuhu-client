@@ -37,19 +37,18 @@ repositories {
     }
 
     maven {
-        url = "https://jitpack.io"
-        content {
-            includeGroupAndSubgroups("com.github")
-        }
-    }
-
-    maven {
         name = "BlameJared"
         url = uri("https://maven.blamejared.com")
         content {
             includeGroupAndSubgroups("com.blamejared.searchables")
         }
     }
+    maven {
+        name = "CottonMC"
+        url = "https://server.bbkr.space/artifactory/libs-release"
+    }
+
+    maven { url = "https://maven.shedaniel.me/" }
     maven {
         name = "jackfredReleases"
         url = "https://maven.jackf.red/releases"
@@ -77,12 +76,14 @@ repositories {
 			includeGroupAndSubgroups("org.quiltmc")
 		}
     }
-    maven {
-        name = "CottonMC"
-        url = "https://server.bbkr.space/artifactory/libs-release"
-    }
 
-    maven { url = "https://maven.shedaniel.me/" }
+
+    maven {
+        url = "https://jitpack.io"
+        content {
+            includeGroupAndSubgroups("com.github")
+        }
+    }
 
 //	maven { url = "https://mvnrepository.com/artifact/com.github.open-android/pinyin4j " }
     // Add repositories to retrieve artifacts from in here.
@@ -111,35 +112,32 @@ configurations {
 }
 
 def sakura = mcVersion > 12006
-def jitpack = mcVersion >= 120060
 //  1 = modImplementation 2 = modImplementation include 	3 = modApi	4 = modCompileOnly
 // Module, Property prefix, Resolve condition, Transitive depende ncies.
+String getYacl() {
+    return "maven.modrinth:yacl";
+//    return mcVersion == 12002 ? "maven.modrinth:yacl" : "dev.isxander:yet-another-config-lib";
+}
+
+
 def mod_dependencies = [
         [(sakura ? "com.github.sakura-ryoko:malilib" : "fi.dy.masa.malilib") + ":${project.malilib_version}", 1],
         [(sakura ? "com.github.sakura-ryoko:itemscroller" : "curse.maven:item-scroller-242064") + ":${project.item_scrolle_version}", 1],
-        [(sakura ? "com.github.sakura-ryoko:litematica" : "curse.maven:litematica-308892") + ":${project.litematica_version}", 1],
-        [(jitpack ? "com.github.Haocen2004:quickshulker" : "curse.maven:quick-shulker-362669") + ":${project.quick_shulker_version}", mcVersion >= 12006 ? 4 : 1],
+        [(sakura ? "com.github.sakura-ryoko:litematica" : "maven.modrinth:litematica") + ":${project.litematica_version}", 1],
+        ["curse.maven:quick-shulker-362669:${project.quick_shulker_version}", mcVersion >= 12006 ? 4 : 1],  //若要在>=20.6测试 直接放入mods文件夹内即可
         ["net.kyrptonaught:kyrptconfig:${project.kyrptconfig_version}", mcVersion >= 12006 ? 4 : 1],
         ["net.kyrptonaught:shulkerutils:${project.shulkerutils_version}", mcVersion >= 12006 ? 4 : 1],
         ["com.terraformersmc:modmenu:${project.modmenu_version}", 1],
         [(mcVersion >= 12006 ? "curse.maven:carpet-349239" : "maven.modrinth:carpet") + ":${project.carpet_version}", 1],
-
-
-        //注释掉以下内容可以加快启动速度，但是会报错
         ["com.blamejared.searchables" + ":${project.searchables}"   , mcVersion >= 12001 ? 1 : 0],
-        [getYacl() + ":${project.yacl}", mcVersion >= 12001 ? 1 : 0],
-        [(mcVersion >= 12001 ? "red.jackf:chesttracker" :  "maven.modrinth:chest-tracker") + ":${project.chesttracker}", 1],
-        [(mcVersion >= 12001 ? "red.jackf:whereisit" : "maven.modrinth:where-is-it") + ":${project.whereisit}", 10],
+        ["red.jackf.jackfredlib:jackfredlib"+ ":${project.jackfredlib}", mcVersion >= 12001 ? 1 : 0],
+        [getYacl() + ":${project.yacl}", mcVersion >= 12001 ? (mcVersion > 12104 ? 4 : 1) : 0],
+        [(/*mcVersion >= 12001 ? "red.jackf:chesttracker" :*/  "maven.modrinth:chest-tracker") + ":${project.chesttracker}",mcVersion < 12105 ? 1 : 4],
+        [(/*mcVersion >= 12001 ? "red.jackf:whereisit" : */ "maven.modrinth:where-is-it") + ":${project.whereisit}",mcVersion < 12105 ? 1 : 4],
         ["maven.modrinth:cloth-config" + ":${project.cloth_config}", mcVersion < 12001 ? 1 : 0],
         ["me.shedaniel.cloth.api:cloth-api" + ":${project.cloth_api}", mcVersion < 11904 ? 1 : 0],
         ["io.github.cottonmc:LibGui" + ":${project.LibGui}", mcVersion < 12001 ? 1 : 0],
 ]
-
-String getYacl() {
-//    return "maven.modrinth:yacl";
-    return mcVersion == 12002 ? "maven.modrinth:yacl" : "dev.isxander:yet-another-config-lib";
-}
-
 
 dependencies {
     //拼音
@@ -150,7 +148,7 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 
     implementation 'com.github.jitpack:gradle-simple:1.0'
-    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation ("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
 //    modImplementation "dev.isxander:yet-another-config-lib:3.6.0+1.21-fabric"
@@ -167,13 +165,7 @@ dependencies {
         } else if (mode == 3) {
             modApi (idFix)
         } else if (mode == 4) {
-            modCompileOnly (idFix)
-        } else if (mode == 10) {
-            modImplementation (idFix){
-                exclude group: 'dev.isxander'
-//                changing = false
-//                transitive = false
-            }
+            modCompileOnly(idFix)
         }
     }
 //	modImplementation "maven.modrinth:jei:${project.jei}"
@@ -238,9 +230,9 @@ loom {
     runClient {
         defaultCharacterEncoding("UTF-8")
 
-        if (!new File("${projectDir}/run/client/options.txt").exists()) {
-            new File("${projectDir}/run/client").mkdirs()
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("${projectDir}/run/client/options.txt"))
+        if (!new File("${project.project.projectDir}/run/client/options.txt").exists()) {
+            new File("${project.projectDir}/run/client").mkdirs()
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("${project.projectDir}/run/client/options.txt"))
             bufferedWriter.writeLine("autoJump:false")
             bufferedWriter.writeLine("enableVsync:false")
             bufferedWriter.writeLine("forceUnicodeFont:false")
@@ -261,9 +253,9 @@ loom {
         defaultCharacterEncoding("UTF-8")
 
         // Agree eula before server init.
-        if (!new File("${projectDir}/run/server/eula.txt").exists()) {
-            new File("${projectDir}/run/server").mkdirs()
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("${projectDir}/run/server/eula.txt"))
+        if (!new File("${project.projectDir}/run/server/eula.txt").exists()) {
+            new File("${project.projectDir}/run/server").mkdirs()
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("${project.projectDir}/run/server/eula.txt"))
             bufferedWriter.writeLine("eula=true")
             bufferedWriter.close()
         }
@@ -279,7 +271,7 @@ tasks.register("serverPropertiesJar", Jar) {
         }
 
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(propsFile))
-        bufferedWriter.writeLine("fabric-loader-version=${project.fabric_loader_version}")
+        bufferedWriter.writeLine("fabric-loader-version=${project.loader_version}")
         bufferedWriter.writeLine("game-version=${project.minecraft_version}")
         bufferedWriter.close()
     }
@@ -345,7 +337,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 remapJar {
-    remapperIsolation.set(true)
+//    remapperIsolation.set(true)
 }
 
 

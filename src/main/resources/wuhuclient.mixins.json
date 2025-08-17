@@ -14,7 +14,6 @@
   },
   "client": [
     "BlockMixin",
-    "ClientChunkManagerMixin",
     "ClientPlayerEMixin",
     "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",

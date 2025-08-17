@@ -43,6 +43,10 @@ import net.minecraft.component.type.NbtComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 
+//#if MC > 12104
+//$$ import net.minecraft.screen.sync.ItemStackHash;
+//#endif
+
 import static com.zxy.wuhuclient.Utils.SwitchItem.reSwitchItem;
 import static com.zxy.wuhuclient.Utils.ZxyUtils.getPlayer;
 import static com.zxy.wuhuclient.config.Configs.QUICK_SHULKER;
@@ -84,7 +88,11 @@ public class InventoryUtils {
                             c = a == -1 ? c : a;
                             switchPlayerInvToHotbarAir(c);
                             fi.dy.masa.malilib.util.InventoryUtils.swapSlots(sc, y, c);
+                            //#if MC > 12104
+                            //$$ player.getInventory().setSelectedSlot(c);
+                            //#else
                             player.getInventory().selectedSlot = c;
+                            //#endif
                             player.closeHandledScreen();
                             items2 = new HashSet<>();
                             return;
@@ -198,13 +206,22 @@ public class InventoryUtils {
         //$$ uniqueItem.getOrCreateNbt().putDouble("force_resync", Double.NaN);
         //#endif
 
+        //#if MC >= 12105
+        //$$ ItemStackHash itemStackHash = ItemStackHash.fromItemStack(uniqueItem, networkHandler.method_68823());
+        //#endif
+
         networkHandler.sendPacket(new ClickSlotC2SPacket(
                 player.currentScreenHandler.syncId,
                 player.currentScreenHandler.getRevision(),
-                -999, 2,
+                (short) -999,(byte) 2,
                 SlotActionType.QUICK_CRAFT,
+                //#if MC < 12105
                 uniqueItem,
                 new Int2ObjectOpenHashMap<>()
+                //#else
+                //$$ new Int2ObjectOpenHashMap<>(),
+                //$$ itemStackHash
+                //#endif
 
         ));
     }

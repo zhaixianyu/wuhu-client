@@ -14,6 +14,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.math.BlockPos;
@@ -28,9 +30,12 @@ import net.minecraft.text.Text;
 
 //#if MC > 11802
 import net.minecraft.text.MutableText;
-
 //#else
 //$$ import net.minecraft.text.TranslatableText;
+//#endif
+
+//#if MC > 12105
+//$$ import net.minecraft.util.PlayerInput;
 //#endif
 
 import static com.zxy.wuhuclient.Utils.BlockFilters.equalsBlockName;
@@ -54,6 +59,19 @@ public class ZxyUtils {
         Test.tick();
         step();
         if (SyncInventory.num==2) SyncInventory.syncInv();
+    }
+
+    public static void setShift(boolean shift){
+        ClientPlayerEntity player = client.player;
+        //#if MC > 12105
+        //$$ PlayerInput input = new PlayerInput(player.input.playerInput.forward(), player.input.playerInput.backward(), player.input.playerInput.left(), player.input.playerInput.right(), player.input.playerInput.jump(), shift, player.input.playerInput.sprint());
+        //$$ PlayerInputC2SPacket packet = new PlayerInputC2SPacket(input);
+        //#else
+        ClientCommandC2SPacket packet = new ClientCommandC2SPacket(player, shift ? ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY : ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY);
+        //#endif
+
+        player.networkHandler.sendPacket(packet);
+
     }
     public static class TempData {
         public static int[] min;

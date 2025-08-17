@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.scheduler.tasks.TaskCountBlocksPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.Box;
+import net.fabricmc.loader.api.FabricLoader;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -16,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public class TaskCountBlocksPlacementMixin {
     //获取投影框 修改为选区
 
-    //#if MC >= 12004
+    //#if MC >= 12001 && MC != 12002
     @WrapOperation(method = "<init>(Lfi/dy/masa/litematica/schematic/placement/SchematicPlacement;Lfi/dy/masa/litematica/materials/IMaterialList;Z)V",at = @At(value = "INVOKE", target = "Lfi/dy/masa/litematica/schematic/placement/SchematicPlacement;getSubRegionBoxes(Lfi/dy/masa/litematica/schematic/placement/SubRegionPlacement$RequiredEnabled;)Lcom/google/common/collect/ImmutableMap;"),remap = false)
     //#else
     //$$ @WrapOperation(method = "<init>",at = @At(value = "INVOKE", target = "Lfi/dy/masa/litematica/schematic/placement/SchematicPlacement;getSubRegionBoxes(Lfi/dy/masa/litematica/schematic/placement/SubRegionPlacement$RequiredEnabled;)Lcom/google/common/collect/ImmutableMap;"),remap = false)
