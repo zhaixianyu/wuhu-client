@@ -115,8 +115,8 @@ def sakura = mcVersion > 12006
 //  1 = modImplementation 2 = modImplementation include 	3 = modApi	4 = modCompileOnly
 // Module, Property prefix, Resolve condition, Transitive depende ncies.
 String getYacl() {
-    return "maven.modrinth:yacl";
-//    return mcVersion == 12002 ? "maven.modrinth:yacl" : "dev.isxander:yet-another-config-lib";
+//    return "maven.modrinth:yacl";
+    return mcVersion == 12002 ? "maven.modrinth:yacl" : "dev.isxander:yet-another-config-lib";
 }
 
 

@@ -1,5 +1,6 @@
 package com.zxy.wuhuclient.mixin;
 
+import com.zxy.wuhuclient.Utils.ScreenManagement;
 import com.zxy.wuhuclient.config.Configs;
 import com.zxy.wuhuclient.features_list.Synthesis;
 import net.minecraft.client.MinecraftClient;
@@ -21,10 +22,11 @@ import static com.zxy.wuhuclient.features_list.Synthesis.*;
 public class MinecraftClientMixin {
     @Shadow @Nullable public ClientPlayerEntity player;
 
-    @Inject(at = @At("HEAD"),method = "setScreen", cancellable = true)
+    @Inject(at = @At(value = "HEAD"),method = "setScreen", cancellable = true)
     public void setScreen(Screen screen, CallbackInfo ci){
         if(closeScreen > 0 && screen instanceof HandledScreen<?>){
             closeScreen--;
+            ScreenManagement.screen = screen;
             ci.cancel();
         }
     }

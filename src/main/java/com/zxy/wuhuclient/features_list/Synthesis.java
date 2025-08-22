@@ -1,6 +1,7 @@
 package com.zxy.wuhuclient.features_list;
 
 
+import com.zxy.wuhuclient.Utils.ScreenManagement;
 import com.zxy.wuhuclient.Utils.ZxyUtils;
 import com.zxy.wuhuclient.config.Configs;
 import com.zxy.wuhuclient.mixin.CraftingScreenHandlerMixin;
@@ -201,141 +202,9 @@ public class Synthesis {
         }
         return result.get();
     }
-    public static void synthesis() {
-//        step = 0;
-        if (!updateRecipe()) return;
-        ClientPlayerEntity player = client.player;
-        ScreenHandler sc = player.currentScreenHandler;
-        client.inGameHud.setOverlayMessage(Text.of("合成中..."), false);
-        //检查是否满足合成条件
-        if (!isSynthesis()) return;
-
-        ItemStack[] recipeItems = recipe.getRecipeItems();
-//        System.out.println("222");
-//        if(runIng)return;
-//        new Thread(() ->{
-//            runIng = true;
-        int recipeLength = recipeItems.length;
-        for (int i = recipeLength + 1; i < sc.slots.size(); i++) {
-            client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.QUICK_CRAFT, client.player);
-
-            ItemStack stack = sc.slots.get(i).getStack().copy();
-            if (stack.isEmpty() || (stack.getMaxCount() != 1 && stack.getCount() == 1)) continue;
-
-            int index = -999;
-            //查当前槽的物品是否为合成所需,且缺少的该物品
-            for (int i1 = 1; i1 <= recipeLength; i1++) {
-                ItemStack stack1 = sc.slots.get(i1).getStack();
-                if (!InventoryUtils.areStacksEqual(recipeItems[i1 - 1], stack)) continue;
-                if (stack1.getCount() == stack1.getMaxCount()) continue;
-                index = i1;
-                break;
-            }
-            if (index == -999) continue;
-            if (!sc.getCursorStack().isEmpty()) {
-                client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.PICKUP, player);
-            }
-
-            int invCount = stack.getCount() - 1;
-            int synCount = sc.slots.get(index).getStack().getCount();
-            if(synCount>stack.getMaxCount()) {
-                System.out.println("+++++++++++++++++++");
-                System.out.println(synCount);
-            }
-            client.interactionManager.clickSlot(sc.syncId, i, 0, SlotActionType.PICKUP, player);
-            client.interactionManager.clickSlot(sc.syncId, i, 1, SlotActionType.PICKUP, player);
-            //改为拖动
-
-            client.interactionManager.clickSlot(sc.syncId, index, 0, SlotActionType.PICKUP, player);
-
-            //sc.getCursorStack()在一个游戏刻多次点击后获取的数量不靠谱，
-
-            //处理跟随鼠标物品
-            if (!sc.getCursorStack().isEmpty()) {
-                for (int i2 = 0; i2 < recipeLength; i2++) {
-                    if (InventoryUtils.areStacksEqual(recipeItems[i2], sc.getCursorStack())
-                            && sc.slots.get(i2 + 1).getStack().getCount() < recipeItems[i2].getMaxCount()) {
-                        client.interactionManager.clickSlot(sc.syncId, i2 + 1, 0, SlotActionType.PICKUP, player);
-                    }
-                    if (sc.getCursorStack().isEmpty()) break;
-                }
-                for (int i2 = recipeLength + 1; i2 < sc.slots.size() && !sc.getCursorStack().isEmpty(); i2++) {
-                    if (InventoryUtils.areStacksEqual(sc.slots.get(i2).getStack(), sc.getCursorStack())
-                            && sc.slots.get(i2).getStack().getCount() < sc.slots.get(i2).getStack().getMaxCount()) {
-                        client.interactionManager.clickSlot(sc.syncId, i2, 0, SlotActionType.PICKUP, player);
-                    }
-                    if (sc.getCursorStack().isEmpty()) break;
-                }
-                if (!sc.getCursorStack().isEmpty()) {
-                    client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.PICKUP, player);
-                }
-            }
-            long count1 = 0;
-            //均分
-//            for (int i1 = 9; i1 < sc.slots.size(); i1++) {
-//                ItemStack stack1 = sc.slots.get(i).getStack().copy();
-//                if(InventoryUtils.areStacksEqual(stack1, stack)
-//                        || (stack1.getCount() > 1 || stack1.getMaxCount() == 1)){
-//                    count1++;
-//                }
-//            }
-
-            HashMap<String, String> stringStringHashMap = new HashMap<>();
-            count1 = sc.slots.stream()
-                    .skip(recipeLength + 1)
-                    .filter(
-                            slot -> InventoryUtils.areStacksEqual(slot.getStack(), stack)
-                                    && slot.getStack().getCount() - 1 > 1)
-
-                    .count();
-            if (count1 == 0
-            ) {
-                System.out.println("average");
-//                for (int i2 = 0; i2 < recipeLength; i2++) {
-//                    System.out.println(sc.slots.get(i2 + 1).getStack());
-//                }
-//                检测背包是否有满足的物品 如果没有则将物品均分
-                int itemCount = 0;
-                for (int i2 = 0; i2 < recipeLength; i2++) {
-                    if (InventoryUtils.areStacksEqual(sc.slots.get(i2 + 1).getStack(), stack) && stack.getMaxCount() > 1)
-                        itemCount += sc.slots.get(i2 + 1).getStack().getCount();
-                }
-                int average = itemCount / must.get(stack.getItem());
-                for (int i2 = 0; i2 < recipeLength; i2++) {
-                    if (!InventoryUtils.areStacksEqual(sc.slots.get(i2 + 1).getStack(), stack)) continue;
-                    if (sc.getCursorStack().isEmpty() && sc.slots.get(i2 + 1).getStack().getCount() > average) {
-                        client.interactionManager.clickSlot(sc.syncId, i2 + 1, 0, SlotActionType.PICKUP, player);
-                        b1:
-                        for (int i3 = 0; i3 < recipeLength; i3++) {
-                            if (!InventoryUtils.areStacksEqual(recipeItems[i3], stack) || stack.getMaxCount() == 1)
-                                continue;
-                            for (int i4 = 0 ; sc.slots.get(i3 + 1).getStack().getCount() < average && i4 < 64 ;i4++) {
-                                client.interactionManager.clickSlot(sc.syncId, i3 + 1, 1, SlotActionType.PICKUP, player);
-                                if (sc.getCursorStack().isEmpty()) break b1;
-                            }
-                        }
-                    }
-                }
-                if (!sc.getCursorStack().isEmpty()) {
-                    client.interactionManager.clickSlot(sc.syncId, i, 0, SlotActionType.PICKUP, player);
-                    client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.PICKUP, player);
-                }
-                for (int j = 0; j < average; j++) {
-                    client.interactionManager.clickSlot(sc.syncId, 0, 1, SlotActionType.THROW, player);
-                }
-                return;
-            }
-            int rec = 0;
-            for (int i2 = 0; InventoryUtils.areStacksEqual(sc.slots.get(0).getStack(), recipe.getResult()) && i2 < 64; i2++) {
-                client.interactionManager.clickSlot(sc.syncId, 0, 1, SlotActionType.THROW, player);
-                rec++;
-            }
-            if (rec > 0) return;
-        }
-    }
 
     public static boolean satisfyCraft(){
-        if(GuiUtils.getCurrentScreen() instanceof HandledScreen<?> gui
+        if(ScreenManagement.screen instanceof HandledScreen<?> gui
         ){
             Slot slot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
             fi.dy.masa.itemscroller.util.InventoryUtils.updateCraftingOutputSlot(slot);
