@@ -28,6 +28,7 @@ public class AutoMending {
             else return;
         }
         for (int i = 0; i < sc.slots.size(); i++) {
+            if (sc.slots.get(i).getStack() == player.getMainHandStack()) continue;
             ItemStack copy = sc.slots.get(i).getStack().copy();
             if (
                             i <= 8 ||
