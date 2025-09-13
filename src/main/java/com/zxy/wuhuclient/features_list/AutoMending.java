@@ -31,11 +31,11 @@ public class AutoMending {
             if (sc.slots.get(i).getStack() == player.getMainHandStack()) continue;
             ItemStack copy = sc.slots.get(i).getStack().copy();
             if (
-                            i <= 8 ||
-                            copy.isEmpty() ||
-                            sc.slots.get(i).getStack() == player.getOffHandStack() ||
-                            InventoryUtils.getEnchantmentLevel(copy, Enchantments.MENDING) <= 0 ||
-                            !copy.isDamaged())
+                    i <= 8 ||
+                    copy.isEmpty() ||
+                    sc.slots.get(i).getStack() == player.getOffHandStack() ||
+                    InventoryUtils.getEnchantmentLevel(copy, Enchantments.MENDING) <= 0 ||
+                    !copy.isDamaged())
                 continue;
             switchSlot(sc,i);
             patching = true;
