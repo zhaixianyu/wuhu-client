@@ -8,8 +8,8 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.event.RenderEventHandler;
 import fi.dy.masa.malilib.interfaces.IRenderer;
-import fi.dy.masa.litematica.render.RenderUtils;
-import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.block.BlockState;
@@ -33,9 +33,9 @@ import org.joml.Matrix4fStack;
 //#if MC < 12106
 //$$ import com.mojang.blaze3d.buffers.BufferUsage;
 //#endif
-//$$ import com.mojang.blaze3d.vertex.VertexFormat;
-//$$ import fi.dy.masa.malilib.render.MaLiLibPipelines;
-//$$ import fi.dy.masa.malilib.render.RenderContext;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import fi.dy.masa.malilib.render.MaLiLibPipelines;
+import fi.dy.masa.malilib.render.RenderContext;
 //#endif
 
 import org.lwjgl.opengl.GL11;
@@ -51,7 +51,7 @@ import static com.zxy.wuhuclient.Utils.ZxyUtils.searchBlockThread;
 import static com.zxy.wuhuclient.WuHuClientMod.client;
 import static com.zxy.wuhuclient.config.Configs.LITEMATICA_HELPER;
 import static com.zxy.wuhuclient.config.Configs.SEARCH_BLOCK_LIMIT;
-import static fi.dy.masa.litematica.render.RenderUtils.*;
+import static fi.dy.masa.malilib.render.RenderUtils.*;
 import static net.minecraft.client.render.VertexFormats.POSITION_COLOR;
 
 public class HighlightBlockRenderer implements IRenderer {
@@ -97,18 +97,18 @@ public class HighlightBlockRenderer implements IRenderer {
 //            renderAreaSides(pos,pos,color4f,matrices,client);
 //        }
         //#if MC <= 12104
-        RenderSystem.disableDepthTest();
+        //$$ RenderSystem.disableDepthTest();
         //#endif
 
         //#if MC > 12104
             //#if MC > 12105
-            //$$ RenderSystem.setShaderFog(RenderSystem.getShaderFog());
+            RenderSystem.setShaderFog(RenderSystem.getShaderFog());
             //#else
             //$$ RenderSystem.setShaderFog(Fog.DUMMY);
             //#endif
         //#else
-        RenderSystem.enableBlend();
-        RenderSystem.disableCull();
+        //$$ RenderSystem.enableBlend();
+        //$$ RenderSystem.disableCull();
         //#endif
 
 
@@ -124,11 +124,11 @@ public class HighlightBlockRenderer implements IRenderer {
                 //#if MC == 12105
                 //$$ RenderContext ctx = new RenderContext(MaLiLibPipelines.POSITION_COLOR_TRANSLUCENT_DEPTH_MASK, BufferUsage.STATIC_WRITE);
                 //#else
-                //$$ RenderContext ctx = new RenderContext(() -> threadName ,MaLiLibPipelines.POSITION_COLOR_TRANSLUCENT_DEPTH_MASK);
+                RenderContext ctx = new RenderContext(() -> threadName ,MaLiLibPipelines.POSITION_COLOR_TRANSLUCENT_DEPTH_MASK);
                 //#endif
-            //$$ BufferBuilder buffer = ctx.getBuilder();
+            BufferBuilder buffer = ctx.getBuilder();
             //#else
-            BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+            //$$ BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             //#endif
         BuiltBuffer meshData;
         //#else
@@ -137,9 +137,9 @@ public class HighlightBlockRenderer implements IRenderer {
         //#endif
         for (BlockPos pos : posSet) {
             //#if MC >= 12105
-            //$$ RenderUtils.renderAreaSidesBatched(pos, pos, color4f, 0.002, buffer);
+            RenderUtils.renderAreaSidesBatched(pos, pos, color4f, 0.002, buffer);
             //#else
-            fi.dy.masa.litematica.render.RenderUtils.renderAreaSidesBatched(pos, pos, color4f, 0.002, buffer, client);
+            //$$ fi.dy.masa.litematica.render.RenderUtils.renderAreaSidesBatched(pos, pos, color4f, 0.002, buffer, client);
             //#endif
         }
 
@@ -149,13 +149,13 @@ public class HighlightBlockRenderer implements IRenderer {
                 //#if MC > 12006
                 meshData = buffer.end();
                     //#if MC > 12104
-                    //$$ ctx.upload(meshData, true);
-                    //$$ ctx.startResorting(meshData, ctx.createVertexSorter(fi.dy.masa.malilib.render.RenderUtils.camPos()));
-                    //$$ meshData.close();
-                    //$$ ctx.drawPost();
-                    //#else
-                    BufferRenderer.drawWithGlobalProgram(meshData);
+                    ctx.upload(meshData, true);
+                    ctx.startResorting(meshData, ctx.createVertexSorter(fi.dy.masa.malilib.render.RenderUtils.camPos()));
                     meshData.close();
+                    ctx.drawPost();
+                    //#else
+                    //$$ BufferRenderer.drawWithGlobalProgram(meshData);
+                    //$$ meshData.close();
                     //#endif
                 //#else
                 //$$ tessellator.draw();
@@ -168,14 +168,14 @@ public class HighlightBlockRenderer implements IRenderer {
         }
 
         //#if MC > 12104
-        //$$ RenderSystem.setShaderFog(RenderSystem.getShaderFog());
+        RenderSystem.setShaderFog(RenderSystem.getShaderFog());
         //#else
-        RenderSystem.enableCull();
-        RenderSystem.disableBlend();
+        //$$ RenderSystem.enableCull();
+        //$$ RenderSystem.disableBlend();
         //#endif
 
         //#if MC <= 12104
-        RenderSystem.enableDepthTest();
+        //$$ RenderSystem.enableDepthTest();
         //#endif
 
 //        fi.dy.masa.litematica.render.RenderUtils.renderAreaSides(pos, pos, color4f, matrices, client);

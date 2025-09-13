@@ -44,7 +44,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 
 //#if MC > 12104
-//$$ import net.minecraft.screen.sync.ItemStackHash;
+import net.minecraft.screen.sync.ItemStackHash;
 //#endif
 
 import static com.zxy.wuhuclient.Utils.SwitchItem.reSwitchItem;
@@ -89,9 +89,9 @@ public class InventoryUtils {
                             switchPlayerInvToHotbarAir(c);
                             fi.dy.masa.malilib.util.InventoryUtils.swapSlots(sc, y, c);
                             //#if MC > 12104
-                            //$$ player.getInventory().setSelectedSlot(c);
+                            player.getInventory().setSelectedSlot(c);
                             //#else
-                            player.getInventory().selectedSlot = c;
+                            //$$ player.getInventory().selectedSlot = c;
                             //#endif
                             player.closeHandledScreen();
                             items2 = new HashSet<>();
@@ -207,7 +207,7 @@ public class InventoryUtils {
         //#endif
 
         //#if MC >= 12105
-        //$$ ItemStackHash itemStackHash = ItemStackHash.fromItemStack(uniqueItem, networkHandler.method_68823());
+        ItemStackHash itemStackHash = ItemStackHash.fromItemStack(uniqueItem, networkHandler.getComponentHasher());
         //#endif
 
         networkHandler.sendPacket(new ClickSlotC2SPacket(
@@ -216,11 +216,11 @@ public class InventoryUtils {
                 (short) -999,(byte) 2,
                 SlotActionType.QUICK_CRAFT,
                 //#if MC < 12105
-                uniqueItem,
-                new Int2ObjectOpenHashMap<>()
+                //$$ uniqueItem,
+                //$$ new Int2ObjectOpenHashMap<>()
                 //#else
-                //$$ new Int2ObjectOpenHashMap<>(),
-                //$$ itemStackHash
+                new Int2ObjectOpenHashMap<>(),
+                itemStackHash
                 //#endif
 
         ));
@@ -262,9 +262,9 @@ public class InventoryUtils {
                 if ((isInventory && blockState.createScreenHandlerFactory(client.world,pos) == null) ||
                         (blockEntity instanceof ShulkerBoxBlockEntity entity &&
                                 //#if MC > 12101
-                                //$$ !client.world.isSpaceEmpty(ShulkerEntity.calculateBoundingBox(1.0F, blockState.get(FACING), 0.0F, 0.5F, pos.toBottomCenterPos()).offset(pos).contract(1.0E-6)) &&
+                                !client.world.isSpaceEmpty(ShulkerEntity.calculateBoundingBox(1.0F, blockState.get(FACING), 0.0F, 0.5F, pos.toBottomCenterPos()).offset(pos).contract(1.0E-6)) &&
                                 //#elseif MC <= 12101 && MC > 12004
-                                !client.world.isSpaceEmpty(ShulkerEntity.calculateBoundingBox(1.0F, blockState.get(FACING), 0.0F, 0.5F).offset(pos).contract(1.0E-6)) &&
+                                //$$ !client.world.isSpaceEmpty(ShulkerEntity.calculateBoundingBox(1.0F, blockState.get(FACING), 0.0F, 0.5F).offset(pos).contract(1.0E-6)) &&
                                 //#elseif MC <= 12004
                                 //$$ !client.world.isSpaceEmpty(ShulkerEntity.calculateBoundingBox(blockState.get(FACING), 0.0f, 0.5f).offset(pos).contract(1.0E-6)) &&
                                 //#endif

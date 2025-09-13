@@ -35,7 +35,7 @@ import net.minecraft.text.MutableText;
 //#endif
 
 //#if MC > 12105
-//$$ import net.minecraft.util.PlayerInput;
+import net.minecraft.util.PlayerInput;
 //#endif
 
 import static com.zxy.wuhuclient.Utils.BlockFilters.equalsBlockName;
@@ -64,10 +64,10 @@ public class ZxyUtils {
     public static void setShift(boolean shift){
         ClientPlayerEntity player = client.player;
         //#if MC > 12105
-        //$$ PlayerInput input = new PlayerInput(player.input.playerInput.forward(), player.input.playerInput.backward(), player.input.playerInput.left(), player.input.playerInput.right(), player.input.playerInput.jump(), shift, player.input.playerInput.sprint());
-        //$$ PlayerInputC2SPacket packet = new PlayerInputC2SPacket(input);
+        PlayerInput input = new PlayerInput(player.input.playerInput.forward(), player.input.playerInput.backward(), player.input.playerInput.left(), player.input.playerInput.right(), player.input.playerInput.jump(), shift, player.input.playerInput.sprint());
+        PlayerInputC2SPacket packet = new PlayerInputC2SPacket(input);
         //#else
-        ClientCommandC2SPacket packet = new ClientCommandC2SPacket(player, shift ? ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY : ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY);
+        //$$ ClientCommandC2SPacket packet = new ClientCommandC2SPacket(player, shift ? ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY : ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY);
         //#endif
 
         player.networkHandler.sendPacket(packet);

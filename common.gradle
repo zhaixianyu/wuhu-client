@@ -198,10 +198,10 @@ loom {
 
     runConfigs.named("client") {
         programArgs([
-                "--width",
-                "1280",
-                "--height",
-                "720",
+                "--width", "1280",
+                "--height", "720",
+                "--username", "zhaixianyu",
+                "--uuid", "a87377da-8bb1-49a0-adc6-0bb8a4863386"
         ])
         runDir("run/client")
     }

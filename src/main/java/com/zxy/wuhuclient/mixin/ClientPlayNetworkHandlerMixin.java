@@ -9,6 +9,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.network.packet.s2c.play.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,8 +42,11 @@ public class ClientPlayNetworkHandlerMixin {
     }
     @Inject(at = @At("HEAD"),method = "onExperienceBarUpdate")
     public void onExperienceBarUpdate(ExperienceBarUpdateS2CPacket packet, CallbackInfo ci){
-        if(Configs.AUTO_MENDING.getBooleanValue()) {
-            AutoMending.AUTO_MENDING.tick = 0;
-        }
+//        int experience = packet.getExperience();
+//        float barProgress = packet.getBarProgress();
+//        int experienceLevel = packet.getExperienceLevel();
+//        if(Configs.AUTO_MENDING.getBooleanValue()) {
+//            AutoMending.AUTO_MENDING.tick = 0;
+//        }
     }
 }

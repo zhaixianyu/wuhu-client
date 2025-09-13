@@ -15,8 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinExperienceOrbEntity {
         @Inject(at = @At("HEAD"),method = "onPlayerCollision")
         public void onPlayerCollision(PlayerEntity player, CallbackInfo ci){
-//             if(player instanceof ClientPlayerEntity && Configs.AUTO_MENDING.getBooleanValue()) {
-//                AutoMending.AUTO_MENDING.tick = 0;
-//            }
+             if(player instanceof ClientPlayerEntity && Configs.AUTO_MENDING.getBooleanValue()) {
+                AutoMending.AUTO_MENDING.tick = 0;
+            }
     }
 }

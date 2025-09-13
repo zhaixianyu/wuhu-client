@@ -28,7 +28,7 @@ public class QuickFirework {
 
     public static void accelerated(){
         ClientPlayerEntity player = client.player;
-        if (player == null || !player.isFallFlying()) return;
+        if (player == null || !player.isGliding()) return;
         ScreenHandler sc = player.currentScreenHandler;
         DefaultedList<Slot> slots = sc.slots;
         for (int i = 0; i < slots.size(); i++) {

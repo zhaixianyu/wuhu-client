@@ -33,6 +33,7 @@ public class CloseTheContainerAfterOpening {
         if (step == 0) {
             SyncInventory.getReadyColor();
             addPos();
+            if (pos.isEmpty()) return;
             SyncInventory.highlightPosList.addAll(pos);
             step = 1;
         } else {

@@ -11,23 +11,23 @@ import net.minecraft.inventory.RecipeInputInventory;
 //#endif
 
 //#if MC < 12104
-import net.minecraft.screen.CraftingScreenHandler;
+//$$ import net.minecraft.screen.CraftingScreenHandler;
 //#else
-//$$ import net.minecraft.screen.AbstractCraftingScreenHandler;
+import net.minecraft.screen.AbstractCraftingScreenHandler;
 //#endif
 
 @Mixin(
         //#if MC < 12104
-        CraftingScreenHandler.class
+        //$$ CraftingScreenHandler.class
         //#else
-        //$$ AbstractCraftingScreenHandler.class
+        AbstractCraftingScreenHandler.class
         //#endif
 )
 public interface CraftingScreenHandlerMixin {
     //#if MC < 12104
-    @Accessor("input")
+    //$$ @Accessor("input")
     //#else
-    //$$ @Accessor("craftingInventory")
+    @Accessor("craftingInventory")
     //#endif
 
     //#if MC < 12001

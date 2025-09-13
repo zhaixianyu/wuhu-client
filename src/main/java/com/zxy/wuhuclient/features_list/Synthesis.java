@@ -204,8 +204,7 @@ public class Synthesis {
     }
 
     public static boolean satisfyCraft(){
-        if(ScreenManagement.screen instanceof HandledScreen<?> gui
-        ){
+        if (ScreenManagement.screen instanceof HandledScreen<?> gui) {
             Slot slot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
             fi.dy.masa.itemscroller.util.InventoryUtils.updateCraftingOutputSlot(slot);
             ItemStack stack = slot.getStack();
@@ -298,6 +297,7 @@ public class Synthesis {
         for (int i2 = 1; satisfyCraft() && i2 < 64; i2++) {
             client.interactionManager.clickSlot(sc.syncId, 0, 1, SlotActionType.THROW, player);
         }
+        ScreenManagement.screen = null;
         player.closeHandledScreen();
         refreshPlayerInventory();
     }
