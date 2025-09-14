@@ -19,7 +19,7 @@ public class AutoMending {
 
     public void mending(){
         ClientPlayerEntity player = client.player;
-        if(player == null || !isPlayerScreenHandler()) return;
+        if(player == null) return;
 
         ScreenHandler sc = player.currentScreenHandler;
         ItemStack offHandStack = player.getOffHandStack();
@@ -44,7 +44,7 @@ public class AutoMending {
         }
     }
     public void tick(){
-        if(!Configs.AUTO_MENDING.getBooleanValue()) return;
+        if(!Configs.AUTO_MENDING.getBooleanValue() || !isPlayerScreenHandler()) return;
         if(tick == 0) mending();
 
         if (patching) {
@@ -57,7 +57,7 @@ public class AutoMending {
 
     }
     private void restoresSlot(){
-        if(tempSlot != -1 && client.player != null && isPlayerScreenHandler()){
+        if(tempSlot != -1 && client.player != null){
             switchSlot(client.player.currentScreenHandler,tempSlot);
             tempSlot = -1;
         }
