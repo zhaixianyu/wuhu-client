@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 pluginManagement {
 	repositories {
 		mavenLocal()
@@ -54,6 +56,7 @@ def versions = Arrays.asList(
 		"1.21.4",
 		"1.21.5",
 		"1.21.6",
+		"1.21.10",
 )
 
 
@@ -65,3 +68,52 @@ for (String version : versions) {
 }
 
 include(":fabricWrapper")
+
+
+
+// 自动设置 Git 钩子路径为 .githooks（仅在未配置时执行）
+def hookPath = ".githooks"
+try {
+	def proc = "git config --local core.hooksPath".execute(null, rootDir)
+	proc.waitFor()
+	def current = proc.text.trim()
+	if (current != hookPath) {
+		println "配置 Git 钩子路径为 $hookPath"
+		"git config --local core.hooksPath $hookPath".execute(null, rootDir).waitFor()
+	}
+} catch (Exception e) {
+	// 忽略错误（可能不在 Git 仓库中或 Git 未安装）
+	println "无法自动配置 Git 钩子，请手动执行：git config core.hooksPath .githooks"
+}
+
+
+
+def getDailyBuildNumber() {
+	def propsFile = rootDir.toPath().resolve('fabricWrapper/build-counter.properties')
+	Properties props = new Properties()
+	def today = new Date().format("yyyyMMdd", TimeZone.getTimeZone("GMT+08:00"))
+	int count = 1
+
+	if (Files.exists(propsFile)) {
+		props.load(propsFile.toFile().newInputStream())
+		def lastDate = props.getProperty('date')
+		if (lastDate == today) {
+			// 同一天，计数+1
+			count = props.getProperty('count').toInteger() + 1
+		} else {
+			// 新的一天，重置计数
+			count = 1
+		}
+	}
+
+	// 更新属性文件
+	props.setProperty('date', today)
+	props.setProperty('count', count.toString())
+	props.store(propsFile.toFile().newOutputStream(), "Daily build counter")
+
+	return count.toString()
+}
+
+def time = new Date().format("yyyyMMdd", TimeZone.getTimeZone("GMT+08:00"))
+def buildNumber = getDailyBuildNumber()
+gradle.ext.modVersion = "${mod_version}+${time}.${buildNumber}"
