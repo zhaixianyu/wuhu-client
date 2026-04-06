@@ -112,7 +112,7 @@ def mod_dependencies = [
         [getQuiShulkerBox()+":${project.quick_shulker_version}", mcVersion == 12006 ? 6 : 10,"quick_shulker_version","*"],
         ["net.kyrptonaught:kyrptconfig:${project.kyrptconfig_version}", mcVersion >= 12004 ? 0 : 1],
         ["net.kyrptonaught:shulkerutils:${project.shulkerutils_version}", mcVersion >= 12004 ? 0 : 1],
-        ["com.terraformersmc:modmenu:${project.modmenu_version}", 1],
+        ["maven.modrinth:modmenu:${project.modmenu_version}", 1],
         [(mcVersion >= 12006 ? "curse.maven:carpet-349239" : "maven.modrinth:carpet") + ":${project.carpet_version}", 1],
         ["com.blamejared.searchables" + ":${project.searchables}"   , mcVersion >= 12001 ? 1 : 0],
         ["red.jackf.jackfredlib:jackfredlib"+ ":${project.jackfredlib}", mcVersion >= 12001 ? 1 : 0],
