@@ -239,7 +239,7 @@ public class LitematicaHelper {
 
             Map<BlockPos,Memory> itemsMap = new LinkedHashMap<>();
             for (Map.Entry<BlockPos, Memory> entry : memoryBank.getMemories().get(key).getMemories().entrySet()) {
-                if (entry.getKey().getSquaredDistance(player.getPos()) > rangeSquared && range != Integer.MAX_VALUE) continue;
+                if (entry.getKey().getSquaredDistance(player.getEyePos()) > rangeSquared && range != Integer.MAX_VALUE) continue;
                 if (entry.getValue().items().stream()
                         .filter(item -> SearchRequest.check(item, searchRequest))
                         .anyMatch(item -> !((Block.getBlockFromItem(item.getItem())) instanceof ShulkerBoxBlock))) {

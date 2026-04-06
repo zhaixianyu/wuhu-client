@@ -38,7 +38,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameRules;
 
 //#if MC < 12001
 //$$ import net.minecraft.inventory.CraftingInventory;
@@ -140,7 +139,7 @@ public class Synthesis {
         step = 1;
         closeScreen = 1;
         invUpdated = false;
-        if(!dropPos.isWithinDistance(client.player.getPos(),5)){
+        if(!dropPos.isWithinDistance(client.player.getEyePos(),5)){
             dropPos = null;
             return;
         }
@@ -215,7 +214,7 @@ public class Synthesis {
 
     public static void synthesis2(){
         client.inGameHud.setOverlayMessage(Text.of("合成中..."), false);
-        if(!pos.isWithinDistance(client.player.getPos(),5)){
+        if(!pos.isWithinDistance(client.player.getEyePos(),5)){
             client.inGameHud.setOverlayMessage(Text.of("工作台或标记的方块超出范围，已重置。请再次点击开始合成"), false);
             pos = null;
             return;
@@ -339,7 +338,7 @@ public class Synthesis {
         if (client.player == null || !updateRecipe() || !isInventory(storagePos)) return;
         ClientPlayerEntity player = client.player;
         DefaultedList<Slot> slots = player.currentScreenHandler.slots;
-        if (storagePos != null && storagePos.isWithinDistance(player.getPos(), 5) && step != 3 && closeScreen <= 0) {
+        if (storagePos != null && storagePos.isWithinDistance(player.getEyePos(), 5) && step != 3 && closeScreen <= 0) {
             if (slots.stream()
                     .anyMatch(slot -> InventoryUtils.areStacksEqual(slot.getStack(), recipe.getResult()) && slot.getStack().getCount() > 1))
             {
