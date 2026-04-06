@@ -48,6 +48,10 @@ repositories {
     maven {
         name = "jackfredReleases"
         url = mcVersion >= 12106 ? "https://maven.pkg.github.com/ponuing/JackFredLib": "https://maven.jackf.red/releases"
+        credentials {
+            username = github_username
+            password = github_token
+        }
         content {
             includeGroupAndSubgroups("red.jackf")
         }
