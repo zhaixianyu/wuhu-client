@@ -9,13 +9,19 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import java.util.List;
 
 import static com.zxy.wuhuclient.WuHuClientMod.MOD_ID;
+import static com.zxy.wuhuclient.WuHuClientMod.MOD_NAME;
 import static com.zxy.wuhuclient.config.ConfigUi.Tab.*;
+
+//#if MC > 12006
+import fi.dy.masa.malilib.registry.Registry;
+import fi.dy.masa.malilib.util.data.ModInfo;
+//#endif
 
 public class ConfigUi extends GuiConfigsBase {
     private static Tab tab = Tab.ALL;
 
     public ConfigUi() {
-        super(10, 50, MOD_ID, null, "wuhu-client");
+        super(10, 50, MOD_ID, null, MOD_NAME, MOD_NAME);
     }
 
     @Override
@@ -37,6 +43,14 @@ public class ConfigUi extends GuiConfigsBase {
         this.addButton(button, new ButtonListener(tab, this));
 
         return button.getWidth() + 2;
+    }
+    public static void initMalilibConfig(){
+        //#if MC > 12006
+        Registry.CONFIG_SCREEN.registerConfigScreenFactory(
+                new ModInfo(MOD_ID, MOD_NAME, ConfigUi::new)
+        );
+        //#endif
+
     }
 
     //按钮宽度
