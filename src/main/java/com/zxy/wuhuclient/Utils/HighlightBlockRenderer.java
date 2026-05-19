@@ -1,6 +1,7 @@
 package com.zxy.wuhuclient.Utils;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import com.zxy.wuhuclient.MyThreadManager;
 import com.zxy.wuhuclient.features_list.litematica_helper.LitematicaHelper;
 import fi.dy.masa.litematica.Litematica;
@@ -12,18 +13,17 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderProgram;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.client.Minecraft;
+import com.mojang.blaze3d.opengl.GlProgram;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
 import org.joml.Matrix4f;
 //#if MC > 11802
 import org.joml.Matrix4fStack;
@@ -38,6 +38,9 @@ import fi.dy.masa.malilib.render.MaLiLibPipelines;
 import fi.dy.masa.malilib.render.RenderContext;
 //#endif
 
+//#if MC == 12105
+//$$ import net.minecraft.client.renderer.FogParameters;
+//#endif
 import org.lwjgl.opengl.GL11;
 
 import java.lang.reflect.Method;
@@ -52,7 +55,7 @@ import static com.zxy.wuhuclient.WuHuClientMod.client;
 import static com.zxy.wuhuclient.config.Configs.LITEMATICA_HELPER;
 import static com.zxy.wuhuclient.config.Configs.SEARCH_BLOCK_LIMIT;
 import static fi.dy.masa.malilib.render.RenderUtils.*;
-import static net.minecraft.client.render.VertexFormats.POSITION_COLOR;
+import static com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR;
 
 public class HighlightBlockRenderer implements IRenderer {
     public static HighlightBlockRenderer instance = new HighlightBlockRenderer();
@@ -90,7 +93,7 @@ public class HighlightBlockRenderer implements IRenderer {
     //#if MC > 12004
     public void highlightBlock(Matrix4f matrices, Color4f color4f, Set<BlockPos> posSet){
     //#else
-    //$$ public void highlightBlock(MatrixStack matrices ,Color4f color4f, Set<BlockPos> posSet){
+    //$$ public void highlightBlock(PoseStack matrices ,Color4f color4f, Set<BlockPos> posSet){
     //#endif
 
 //        for (BlockPos pos : posSet) {
@@ -104,7 +107,7 @@ public class HighlightBlockRenderer implements IRenderer {
             //#if MC > 12105
             RenderSystem.setShaderFog(RenderSystem.getShaderFog());
             //#else
-            //$$ RenderSystem.setShaderFog(Fog.DUMMY);
+            //$$ RenderSystem.setShaderFog(FogParameters.NO_FOG);
             //#endif
         //#else
         //$$ RenderSystem.enableBlend();
@@ -114,10 +117,10 @@ public class HighlightBlockRenderer implements IRenderer {
 
         //#if MC >= 12101
         //#else
-        //$$ RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        //$$ RenderSystem.setShader(GameRenderer::getPositionColorShader);
         //#endif
 
-        Tessellator tessellator = Tessellator.getInstance();
+        Tesselator tessellator = Tesselator.getInstance();
 
         //#if MC > 12006
             //#if MC > 12104
@@ -128,12 +131,12 @@ public class HighlightBlockRenderer implements IRenderer {
                 //#endif
             BufferBuilder buffer = ctx.getBuilder();
             //#else
-            //$$ BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+            //$$ BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             //#endif
-        BuiltBuffer meshData;
+        MeshData meshData;
         //#else
-        //$$ BufferBuilder buffer = tessellator.getBuffer();
-        //$$ buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        //$$ BufferBuilder buffer = tessellator.getBuilder();
+        //$$ buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         //#endif
         for (BlockPos pos : posSet) {
             //#if MC >= 12105
@@ -147,18 +150,18 @@ public class HighlightBlockRenderer implements IRenderer {
         {
             if(buffer != null){
                 //#if MC > 12006
-                meshData = buffer.end();
+                meshData = buffer.buildOrThrow();
                     //#if MC > 12104
                     ctx.upload(meshData, true);
                     ctx.startResorting(meshData, ctx.createVertexSorter(fi.dy.masa.malilib.render.RenderUtils.camPos()));
                     meshData.close();
                     ctx.drawPost();
                     //#else
-                    //$$ BufferRenderer.drawWithGlobalProgram(meshData);
+                    //$$ BufferUploader.drawWithShader(meshData);
                     //$$ meshData.close();
                     //#endif
                 //#else
-                //$$ tessellator.draw();
+                //$$ tessellator.end();
                 //#endif
             }
         }
@@ -208,7 +211,7 @@ public class HighlightBlockRenderer implements IRenderer {
     //#if MC > 12004
     public void onRenderWorldLast(Matrix4f matrices, Matrix4f projMatrix){
     //#else
-    //$$ public void onRenderWorldLast(MatrixStack matrices, Matrix4f projMatrix){
+    //$$ public void onRenderWorldLast(PoseStack matrices, Matrix4f projMatrix){
     //#endif
         //更改渲染
         setMap.forEach((k,v) -> {

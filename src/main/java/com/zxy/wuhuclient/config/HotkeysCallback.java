@@ -10,14 +10,14 @@ import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 import static com.zxy.wuhuclient.config.Configs.*;
 import static com.zxy.wuhuclient.features_list.QuickClickSlot.clickLastSlot;
 
 //监听按键
 public class HotkeysCallback implements IHotkeyCallback {
-    MinecraftClient client = MinecraftClient.getInstance();
+    Minecraft client = Minecraft.getInstance();
 
     //激活的热键会被key记录
     @Override

@@ -5,7 +5,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.MessageOutputType;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public final class EasyPlaceFix {
     public static boolean isPlacingWithEasyPlace = false;
@@ -13,7 +13,7 @@ public final class EasyPlaceFix {
     private EasyPlaceFix() {
     }
 
-    public static boolean handleEasyPlaceRestriction(MinecraftClient mc) {
+    public static boolean handleEasyPlaceRestriction(Minecraft mc) {
         boolean cancel = WorldUtilsAccessor.invokePlacementRestrictionInEffect(mc);
 
         if (cancel) {

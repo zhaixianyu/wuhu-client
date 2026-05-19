@@ -1,10 +1,10 @@
 package com.zxy.wuhuclient.mixin;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,9 +15,9 @@ import static com.zxy.wuhuclient.features_list.Synthesis.*;
 
 @Mixin(Block.class)
 public class BlockMixin {
-    @Inject(at = @At("TAIL"),method = "dropStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/entity/BlockEntity;)V")
-    private static void dropStacks(BlockState state, WorldAccess world, BlockPos pos, BlockEntity blockEntity, CallbackInfo ci){
-        if(!world.isClient()) return;
+    @Inject(at = @At("TAIL"),method = "dropResources(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/entity/BlockEntity;)V")
+    private static void dropStacks(BlockState state, LevelAccessor world, BlockPos pos, BlockEntity blockEntity, CallbackInfo ci){
+        if(!world.isClientSide()) return;
         if((step == 1  && pos.equals(dropPos)) || (step == 3 && (pos.equals(storagePos)))){
 //            System.out.println("onBreak  " + step);
             closeScreen = 0;

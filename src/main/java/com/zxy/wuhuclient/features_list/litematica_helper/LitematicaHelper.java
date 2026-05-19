@@ -14,17 +14,17 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.resources.Identifier;
+import net.minecraft.core.BlockPos;
 
 //#if MC > 11904
 import red.jackf.chesttracker.api.memory.CommonKeys;
@@ -63,14 +63,14 @@ public class LitematicaHelper {
     }
     public Map<ItemStack,Map<BlockPos,Integer>> inventoryList = new HashMap<>();
 
-    public static void process(ScreenHandler container) {
-        ClientPlayerEntity player = client.player;
+    public static void process(AbstractContainerMenu container) {
+        LocalPlayer player = client.player;
         if (player == null) return;
-        HandledScreen<?> containerScreen;
-        if(client.currentScreen instanceof HandledScreen){
-            containerScreen = (HandledScreen<?>)client.currentScreen;
+        AbstractContainerScreen<?> containerScreen;
+        if(client.screen instanceof AbstractContainerScreen){
+            containerScreen = (AbstractContainerScreen<?>)client.screen;
         }else return;
-        List<Slot> playerInvSlots = container.slots.stream().filter(slot -> slot.inventory instanceof PlayerInventory).collect(Collectors.toList());
+        List<Slot> playerInvSlots = container.slots.stream().filter(slot -> slot.container instanceof Inventory).collect(Collectors.toList());
         List<Slot> containerInvSlots = container.slots.stream().filter(slot -> areSlotsInSameInventory(slot, container.slots.get(0),false)).collect(Collectors.toList());
 
         MaterialListBase materialList = DataManager.getMaterialList();
@@ -91,10 +91,10 @@ public class LitematicaHelper {
                 }
                 int totalTaken = 0;
                 for (Slot slot : containerInvSlots) {
-                    if (InventoryUtils.areStacksEqual(stack, slot.getStack())) {
-                        int stackAmount = slot.getStack().getCount();
+                    if (InventoryUtils.areStacksEqual(stack, slot.getItem())) {
+                        int stackAmount = slot.getItem().getCount();
                         moveToPlayerInventory(containerScreen, playerInvSlots, slot, Math.min(missing, stackAmount));
-                        int moved = stackAmount - slot.getStack().getCount();
+                        int moved = stackAmount - slot.getItem().getCount();
                         missing -= moved;
                         totalTaken += moved;
                         if (moved == 0) {
@@ -110,18 +110,18 @@ public class LitematicaHelper {
                     String missingColor = missing == 0 ? GuiBase.TXT_GREEN : GuiBase.TXT_GOLD;
                     String stackName = stack.getRarity().
                             //#if MC > 12004
-                            getFormatting()
+                                    color()
                             //#else
-                            //$$ formatting
+                            //$$ color
                             //#endif
-                            + stack.getName().getString() + GuiBase.TXT_RST;
+                            + stack.getHoverName().getString() + GuiBase.TXT_RST;
 
                     log(
                             Message.MessageType.INFO,
                             "- %1$s 个%2$s，仍需 %3$s",
                             GuiBase.TXT_GOLD + totalTaken + GuiBase.TXT_RST,
                             stackName,
-                            missingColor + hudRendererAccessor.invokeGetFormattedCountString(missing, stack.getMaxCount()) + GuiBase.TXT_RST
+                            missingColor + hudRendererAccessor.invokeGetFormattedCountString(missing, stack.getMaxStackSize()) + GuiBase.TXT_RST
                     );
 
                 }
@@ -133,37 +133,37 @@ public class LitematicaHelper {
         } else {
             log(Message.MessageType.WARNING, "没有生效的材料列表");
         }
-        player.closeHandledScreen();
+        player.closeContainer();
     }
 
-    private static void moveToPlayerInventory(HandledScreen<?> containerScreen, List<Slot> playerInvSlots, Slot fromSlot, int amount) {
-        ItemStack stack = fromSlot.getStack().copy();
+    private static void moveToPlayerInventory(AbstractContainerScreen<?> containerScreen, List<Slot> playerInvSlots, Slot fromSlot, int amount) {
+        ItemStack stack = fromSlot.getItem().copy();
         if (amount == stack.getCount()) {
-            InventoryUtils.shiftClickSlot(containerScreen, fromSlot.id);
+            InventoryUtils.shiftClickSlot(containerScreen, fromSlot.index);
             return;
         } else if (amount > stack.getCount()) {
             return;
         }
         // ensure amount <= stack.getCount()
 
-        InventoryUtils.leftClickSlot(containerScreen, fromSlot.id);
+        InventoryUtils.leftClickSlot(containerScreen, fromSlot.index);
         // reversed iterating to match vanilla shift-click item putting order
         for (int idx = playerInvSlots.size() - 1; idx >= 0; idx--) {
             Slot slot = playerInvSlots.get(idx);
             int clickAmount = 0;
-            if (slot.hasStack() && InventoryUtils.areStacksEqual(slot.getStack(), stack)) {
-                ItemStack invStack = slot.getStack();
-                clickAmount = Math.min(invStack.getMaxCount() - invStack.getCount(), amount);
-            } else if (!slot.hasStack()) {
+            if (slot.hasItem() && InventoryUtils.areStacksEqual(slot.getItem(), stack)) {
+                ItemStack invStack = slot.getItem();
+                clickAmount = Math.min(invStack.getMaxStackSize() - invStack.getCount(), amount);
+            } else if (!slot.hasItem()) {
                 clickAmount = amount;
             }
-            for (int i = 0; i < clickAmount; i++) InventoryUtils.rightClickSlot(containerScreen, slot.id);
+            for (int i = 0; i < clickAmount; i++) InventoryUtils.rightClickSlot(containerScreen, slot.index);
             amount -= clickAmount;
             if (amount == 0) {
                 break;
             }
         }
-        InventoryUtils.leftClickSlot(containerScreen, fromSlot.id);
+        InventoryUtils.leftClickSlot(containerScreen, fromSlot.index);
 
     }
 
@@ -173,9 +173,9 @@ public class LitematicaHelper {
     }
 
     private static boolean areSlotsInSameInventory(Slot slot1, Slot slot2, boolean treatHotbarAsDifferent) {
-        if (slot1.inventory != slot2.inventory) {
+        if (slot1.container != slot2.container) {
             return false;
-        } else if (treatHotbarAsDifferent && slot1.inventory instanceof PlayerInventory) {
+        } else if (treatHotbarAsDifferent && slot1.container instanceof Inventory) {
             int index1 = AccessorUtils.getSlotIndex(slot1);
             int index2 = AccessorUtils.getSlotIndex(slot2);
             return index1 == 40 || index2 == 40 || index1 < 9 == index2 < 9;
@@ -185,7 +185,7 @@ public class LitematicaHelper {
     }
 
     public void highlightInventoryBlock(){
-        ClientPlayerEntity player = client.player;
+        LocalPlayer player = client.player;
         if (!Configs.LITEMATICA_HELPER.getBooleanValue() || player == null) return;
         MaterialListBase materialList = DataManager.getMaterialList();
         if (materialList == null) return;
@@ -207,9 +207,9 @@ public class LitematicaHelper {
 
     public List<BlockPos> searchChestTrackerMemory(ItemStack itemStack){
         List<BlockPos> blockPos = new ArrayList<>();
-        ClientWorld world = client.world;
+        ClientLevel world = client.level;
         if (world == null) return blockPos;
-        Identifier registry = world.getRegistryKey().getValue();
+        Identifier registry = world.dimension().identifier();
         //#if MC > 11904
         Map<BlockPos, Memory> blockPosMemoryMap = memoriesSearch(registry, itemStack, MemoryBankAccessImpl.INSTANCE.getLoadedInternal().orElse(null));
         if (blockPosMemoryMap == null) return blockPos;
@@ -227,7 +227,7 @@ public class LitematicaHelper {
     //#if MC > 11904
     public Map<BlockPos, Memory> memoriesSearch(Identifier key, ItemStack itemStack, MemoryBankImpl memoryBank) {
         if (key == null || itemStack == null) return null;
-        ClientPlayerEntity player = client.player;
+        LocalPlayer player = client.player;
         if (player == null) return null;
         if (memoryBank != null && memoryBank.getMemories() != null &&
                 memoryBank.getMemories().get(key) != null &&
@@ -239,10 +239,10 @@ public class LitematicaHelper {
 
             Map<BlockPos,Memory> itemsMap = new LinkedHashMap<>();
             for (Map.Entry<BlockPos, Memory> entry : memoryBank.getMemories().get(key).getMemories().entrySet()) {
-                if (entry.getKey().getSquaredDistance(player.getEyePos()) > rangeSquared && range != Integer.MAX_VALUE) continue;
+                if (entry.getKey().distToCenterSqr(player.getEyePosition()) > rangeSquared && range != Integer.MAX_VALUE) continue;
                 if (entry.getValue().items().stream()
                         .filter(item -> SearchRequest.check(item, searchRequest))
-                        .anyMatch(item -> !((Block.getBlockFromItem(item.getItem())) instanceof ShulkerBoxBlock))) {
+                        .anyMatch(item -> !((Block.byItem(item.getItem())) instanceof ShulkerBoxBlock))) {
                     itemsMap.put(entry.getKey(),entry.getValue());
                 }
             }

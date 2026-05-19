@@ -9,33 +9,33 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerInputPacket;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.BlockPos;
 
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 
 //#if MC > 11802
-import net.minecraft.text.MutableText;
+import net.minecraft.network.chat.MutableComponent;
 //#else
-//$$ import net.minecraft.text.TranslatableText;
+//$$ import net.minecraft.network.chat.TranslatableComponent;
 //#endif
 
 //#if MC > 12105
-import net.minecraft.util.PlayerInput;
+import net.minecraft.world.entity.player.Input;
 //#endif
 
 import static com.zxy.wuhuclient.Utils.BlockFilters.equalsBlockName;
@@ -62,15 +62,15 @@ public class ZxyUtils {
     }
 
     public static void setShift(boolean shift){
-        ClientPlayerEntity player = client.player;
+        LocalPlayer player = client.player;
         //#if MC > 12105
-        PlayerInput input = new PlayerInput(player.input.playerInput.forward(), player.input.playerInput.backward(), player.input.playerInput.left(), player.input.playerInput.right(), player.input.playerInput.jump(), shift, player.input.playerInput.sprint());
-        PlayerInputC2SPacket packet = new PlayerInputC2SPacket(input);
+        Input input = new Input(player.input.keyPresses.forward(), player.input.keyPresses.backward(), player.input.keyPresses.left(), player.input.keyPresses.right(), player.input.keyPresses.jump(), shift, player.input.keyPresses.sprint());
+        ServerboundPlayerInputPacket packet = new ServerboundPlayerInputPacket(input);
         //#else
-        //$$ ClientCommandC2SPacket packet = new ClientCommandC2SPacket(player, shift ? ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY : ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY);
+        //$$ ServerboundPlayerCommandPacket packet = new ServerboundPlayerCommandPacket(player, shift ? ServerboundPlayerCommandPacket.Action.PRESS_SHIFT_KEY : ServerboundPlayerCommandPacket.Action.RELEASE_SHIFT_KEY);
         //#endif
 
-        player.networkHandler.sendPacket(packet);
+        player.connection.send(packet);
 
     }
     public static class TempData {
@@ -100,14 +100,14 @@ public class ZxyUtils {
         static boolean comparePos(Box box, BlockPos pos) {
             if (box == null || pos == null) return false;
             MyBox myBox = new MyBox(box);
-            return myBox.contains(Vec3d.of(pos));
+            return myBox.contains(Vec3.atLowerCornerOf(pos));
         }
 
-        public ClientPlayerEntity player;
-        public ClientWorld world;
+        public LocalPlayer player;
+        public ClientLevel world;
         public WorldSchematic worldSchematic;
 
-        public TempData(ClientPlayerEntity player, ClientWorld world, WorldSchematic worldSchematic) {
+        public TempData(LocalPlayer player, ClientLevel world, WorldSchematic worldSchematic) {
             this.player = player;
             this.world = world;
             this.worldSchematic = worldSchematic;
@@ -124,8 +124,8 @@ public class ZxyUtils {
             MyBox myBox = new MyBox(value);
             for (BlockPos pos : myBox) {
                 BlockState state = null;
-                if (client.world != null) {
-                    state = client.world.getBlockState(pos);
+                if (client.level != null) {
+                    state = client.level.getBlockState(pos);
                 }
 
                 if (state != null && equalsBlockName(blockName, state, pos)) {
@@ -175,17 +175,17 @@ public class ZxyUtils {
             }
         }
     }
-    public static Optional<ClientPlayerEntity> getPlayer(){
+    public static Optional<LocalPlayer> getPlayer(){
         return Optional.ofNullable(client.player);
     }
 
     public static void actionBar(String message){
-        MinecraftClient minecraftClient = MinecraftClient.getInstance();
+        Minecraft minecraftClient = Minecraft.getInstance();
         //#if MC > 11802
-        MutableText translatable = Text.translatable(message);
+        MutableComponent translatable = Component.translatable(message);
         //#else
-        //$$ TranslatableText translatable = new TranslatableText(message);
+        //$$ TranslatableComponent translatable = new TranslatableComponent(message);
         //#endif
-        minecraftClient.inGameHud.setOverlayMessage(translatable,false);
+        minecraftClient.gui.setOverlayMessage(translatable,false);
     }
 }

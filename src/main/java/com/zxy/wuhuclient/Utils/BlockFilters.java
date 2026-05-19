@@ -1,8 +1,8 @@
 package com.zxy.wuhuclient.Utils;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,8 +29,8 @@ public class BlockFilters {
 //        return equalsBlockName(blockName,blockState);
 //    }
 
-    public static boolean equalsBlockName(String blockName, BlockState blockState,BlockPos pos){
-        String string = Registries.BLOCK.getId(blockState.getBlock()).toString();
+    public static boolean equalsBlockName(String blockName, BlockState blockState, BlockPos pos){
+        String string = BuiltInRegistries.BLOCK.getKey(blockState.getBlock()).toString();
         String[] strs = blockName.split(",");
         String blockName1 = strs[0];
         if(strs.length > 1){
@@ -46,8 +46,8 @@ public class BlockFilters {
             AtomicBoolean theLabelIsTheSame = new AtomicBoolean(false);
             String fix1 = blockName1.split("#")[1];
             String[] finalStrs = strs;
-            blockState.streamTags().forEach(tag -> {
-                String tagName = tag.id().toString();
+            blockState.getTags().forEach(tag -> {
+                String tagName = tag.location().toString();
                 if (BlockFilters.filters(tagName,fix1, finalStrs)) {
                     theLabelIsTheSame.set(true);
                 }

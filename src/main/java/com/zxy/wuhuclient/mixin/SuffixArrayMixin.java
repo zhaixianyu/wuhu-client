@@ -2,12 +2,12 @@ package com.zxy.wuhuclient.mixin;
 
 import com.zxy.wuhuclient.Utils.PinYinSearch;
 import com.zxy.wuhuclient.config.Configs;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.search.SuffixArray;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.searchtree.SuffixArray;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,14 +18,14 @@ import java.util.List;
 
 @Mixin(SuffixArray.class)
 public class SuffixArrayMixin<T> {
-    @Inject(at = @At("TAIL"),method = "findAll")
+    @Inject(at = @At("TAIL"),method = "search")
     public void findAll1(String text, CallbackInfoReturnable<List<T>> cir){
         if (!Configs.PINYIN.getBooleanValue()) return;
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        if (player != null && player.currentScreenHandler instanceof CreativeInventoryScreen.CreativeScreenHandler) {
-            Registries.ITEM.stream().forEach(item -> {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player != null && player.containerMenu instanceof CreativeModeInventoryScreen.ItemPickerMenu) {
+            BuiltInRegistries.ITEM.stream().forEach(item -> {
                 if (PinYinSearch.hasPinYin(item.getName().getString().toLowerCase(),text) || item.toString().contains(text)) {
-                    ((CreativeInventoryScreen.CreativeScreenHandler) player.currentScreenHandler).itemList.add(new ItemStack(item));
+                    ((CreativeModeInventoryScreen.ItemPickerMenu) player.containerMenu).items.add(new ItemStack(item));
                 }
             });
         }

@@ -2,11 +2,11 @@ package com.zxy.wuhuclient.features_list;
 
 import com.zxy.wuhuclient.Utils.InventoryUtils;
 import com.zxy.wuhuclient.config.Configs;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 
 import static com.zxy.wuhuclient.Utils.InventoryUtils.client;
 
@@ -18,22 +18,22 @@ public class AutoMending {
     public int tick = 1;
 
     public void mending(){
-        ClientPlayerEntity player = client.player;
+        LocalPlayer player = client.player;
         if(player == null) return;
 
-        ScreenHandler sc = player.currentScreenHandler;
-        ItemStack offHandStack = player.getOffHandStack();
+        AbstractContainerMenu sc = player.containerMenu;
+        ItemStack offHandStack = player.getOffhandItem();
         if(patching){
-            if(!offHandStack.isDamaged() && InventoryUtils.getEnchantmentLevel(offHandStack,Enchantments.MENDING) > 0) restoresSlot();
+            if(!offHandStack.isDamaged() && InventoryUtils.getEnchantmentLevel(offHandStack, Enchantments.MENDING) > 0) restoresSlot();
             else return;
         }
         for (int i = 0; i < sc.slots.size(); i++) {
-            if (sc.slots.get(i).getStack() == player.getMainHandStack()) continue;
-            ItemStack copy = sc.slots.get(i).getStack().copy();
+            if (sc.slots.get(i).getItem() == player.getMainHandItem()) continue;
+            ItemStack copy = sc.slots.get(i).getItem().copy();
             if (
                     i <= 8 ||
                     copy.isEmpty() ||
-                    sc.slots.get(i).getStack() == player.getOffHandStack() ||
+                    sc.slots.get(i).getItem() == player.getOffhandItem() ||
                     InventoryUtils.getEnchantmentLevel(copy, Enchantments.MENDING) <= 0 ||
                     !copy.isDamaged())
                 continue;
@@ -58,16 +58,16 @@ public class AutoMending {
     }
     private void restoresSlot(){
         if(tempSlot != -1 && client.player != null){
-            switchSlot(client.player.currentScreenHandler,tempSlot);
+            switchSlot(client.player.containerMenu,tempSlot);
             tempSlot = -1;
         }
     }
-    private void switchSlot(ScreenHandler sc,int i){
-        client.interactionManager.clickSlot(sc.syncId, i, 40, SlotActionType.SWAP, client.player);
+    private void switchSlot(AbstractContainerMenu sc, int i){
+        client.gameMode.handleInventoryMouseClick(sc.containerId, i, 40, ClickType.SWAP, client.player);
     }
 
     public boolean isPlayerScreenHandler(){
-        return client.player.currentScreenHandler.equals(client.player.playerScreenHandler);
+        return client.player.containerMenu.equals(client.player.inventoryMenu);
     }
 
     private AutoMending(){}

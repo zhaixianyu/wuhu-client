@@ -9,14 +9,14 @@ import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InputEventHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.zxy.wuhuclient.config.ConfigUi;
 
 public class WuHuClientMod implements ClientModInitializer, ModInitializer {
 
-	public static MinecraftClient client = MinecraftClient.getInstance();
+	public static Minecraft client = Minecraft.getInstance();
 	public static final String MOD_ID = "wuhuclient";
 	public static final String MOD_NAME = "WuHu Client";
 	public static final Logger LOGGER = LogManager.getLogger();

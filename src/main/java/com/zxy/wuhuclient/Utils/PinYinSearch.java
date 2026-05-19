@@ -1,6 +1,6 @@
 package com.zxy.wuhuclient.Utils;
 
-import net.minecraft.component.type.FoodComponent;
+import net.minecraft.world.food.FoodProperties;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;

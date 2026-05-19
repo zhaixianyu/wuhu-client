@@ -4,47 +4,46 @@ package com.zxy.wuhuclient.features_list;
 import com.zxy.wuhuclient.Utils.ScreenManagement;
 import com.zxy.wuhuclient.Utils.ZxyUtils;
 import com.zxy.wuhuclient.config.Configs;
-import com.zxy.wuhuclient.mixin.CraftingScreenHandlerMixin;
+import com.zxy.wuhuclient.mixin.CraftingMenuMixin;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.RecipePattern;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.multiplayer.ClientLevel;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.recipe.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 
 
-import net.minecraft.screen.CraftingScreenHandler;
-import net.minecraft.screen.PlayerScreenHandler;
-import net.minecraft.screen.ScreenHandler;
+import net.minecraft.world.inventory.CraftingMenu;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 
 //#if MC < 12001
-//$$ import net.minecraft.inventory.CraftingInventory;
+//$$ import net.minecraft.world.inventory.CraftingContainer;
 //#elseif MC == 12001
-//$$ import net.minecraft.inventory.RecipeInputInventory;
+//$$ import net.minecraft.world.inventory.CraftingContainer;
 //#else
-import net.minecraft.inventory.RecipeInputInventory;
+import net.minecraft.world.inventory.CraftingContainer;
 //#endif
 
 import java.util.*;
@@ -57,7 +56,7 @@ import static com.zxy.wuhuclient.Utils.ScreenManagement.closeScreen;
 
 public class Synthesis {
     public static boolean isLoadMod = FabricLoader.getInstance().isModLoaded("itemscroller");
-    public static MinecraftClient client = MinecraftClient.getInstance();
+    public static Minecraft client = Minecraft.getInstance();
     public static RecipePattern recipe = null;
     //1 丢出容器物品 2 合成 3 装箱
     public static int step = 0;
@@ -98,14 +97,14 @@ public class Synthesis {
     public static void start(BlockPos pos) {
         tick = 0;
         if (!updateRecipe()) {
-            client.inGameHud.setOverlayMessage(Text.of("当前快捷合成配方为空"), false);
+            client.gui.setOverlayMessage(Component.literal("当前快捷合成配方为空"), false);
             return;
         }
 //        if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK) {
 //            BlockPos pos = ((BlockHitResult) mc.crosshairTarget).getBlockPos();
-        if (client.world != null) {
-            BlockState blockState = client.world.getBlockState(pos);
-            if (blockState.isOf(Blocks.CRAFTING_TABLE)) {
+        if (client.level != null) {
+            BlockState blockState = client.level.getBlockState(pos);
+            if (blockState.is(Blocks.CRAFTING_TABLE)) {
                 //工作台合成
 //                step = 2;
                 Synthesis.pos = pos;
@@ -119,8 +118,8 @@ public class Synthesis {
                 }
                 return;
             }
-            if (client.player.isSneaking()) {
-                client.inGameHud.setOverlayMessage(Text.of("合成取物已标记"), false);
+            if (client.player.isShiftKeyDown()) {
+                client.gui.setOverlayMessage(Component.literal("合成取物已标记"), false);
                 autoDrop = true;
             }else{
                 autoDrop = false;
@@ -139,7 +138,7 @@ public class Synthesis {
         step = 1;
         closeScreen = 1;
         invUpdated = false;
-        if(!dropPos.isWithinDistance(client.player.getEyePos(),5)){
+        if(!dropPos.closerToCenterThan(client.player.getEyePosition(),5)){
             dropPos = null;
             return;
         }
@@ -148,9 +147,9 @@ public class Synthesis {
     }
     public static void useBlock(BlockPos pos){
         //#if MC > 11802
-        client.interactionManager.interactBlock(client.player, Hand.MAIN_HAND, new BlockHitResult(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
+        client.gameMode.useItemOn(client.player, InteractionHand.MAIN_HAND, new BlockHitResult(new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
         //#else
-        //$$ client.interactionManager.interactBlock(client.player,client.world, Hand.MAIN_HAND, new BlockHitResult(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
+        //$$ client.gameMode.useItemOn(client.player,client.level, InteractionHand.MAIN_HAND, new BlockHitResult(new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.UP, pos, false));
         //#endif
     }
     private static Map<Item, Integer> must = new HashMap<>();
@@ -171,16 +170,16 @@ public class Synthesis {
 
             recipeMap.put(item, 0);
         }
-        for (Slot slot : client.player.currentScreenHandler.slots) {
-            ItemStack stack = slot.getStack();
+        for (Slot slot : client.player.containerMenu.slots) {
+            ItemStack stack = slot.getItem();
             //#if MC > 12004
 
             if (stack.isEmpty() || stack.getComponents().isEmpty()) continue;
             //#else
-            //$$ if (stack.isEmpty() || stack.hasNbt()) continue;
+            //$$ if (stack.isEmpty() || stack.hasTag()) continue;
             //#endif
             recipeMap.forEach((k, v) -> {
-                int num = stack.getMaxCount() == 1 ? 0 : 1;
+                int num = stack.getMaxStackSize() == 1 ? 0 : 1;
                 if (stack.getItem().equals(k)) recipeMap.put(k, v + (stack.getCount() - num));
             });
         }
@@ -203,27 +202,27 @@ public class Synthesis {
     }
 
     public static boolean satisfyCraft(){
-        if (ScreenManagement.screen instanceof HandledScreen<?> gui) {
+        if (ScreenManagement.screen instanceof AbstractContainerScreen<?> gui) {
             Slot slot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
             fi.dy.masa.itemscroller.util.InventoryUtils.updateCraftingOutputSlot(slot);
-            ItemStack stack = slot.getStack();
+            ItemStack stack = slot.getItem();
             return !stack.isEmpty() && stack.getItem().equals(Synthesis.recipe.getResult().getItem());
         }
         return false;
     }
 
     public static void synthesis2(){
-        client.inGameHud.setOverlayMessage(Text.of("合成中..."), false);
-        if(!pos.isWithinDistance(client.player.getEyePos(),5)){
-            client.inGameHud.setOverlayMessage(Text.of("工作台或标记的方块超出范围，已重置。请再次点击开始合成"), false);
+        client.gui.setOverlayMessage(Component.literal("合成中..."), false);
+        if(!pos.closerToCenterThan(client.player.getEyePosition(),5)){
+            client.gui.setOverlayMessage(Component.literal("工作台或标记的方块超出范围，已重置。请再次点击开始合成"), false);
             pos = null;
             return;
         }
         if(!isSynthesis()) return;
 
-        ClientPlayerEntity player = client.player;
-        ScreenHandler sc = player.currentScreenHandler;
-        if (sc.equals(player.playerScreenHandler)) return;
+        LocalPlayer player = client.player;
+        AbstractContainerMenu sc = player.containerMenu;
+        if (sc.equals(player.inventoryMenu)) return;
 
         ItemStack[] recipeItems = recipe.getRecipeItems();
 //        int[] playerInv = new int[sc.slots.size()];
@@ -234,37 +233,37 @@ public class Synthesis {
 //        }
 
         for (int i = recipeItems.length+1; i < sc.slots.size(); i++) {
-            ItemStack stack = sc.slots.get(i).getStack().copy();
-            if (stack.isEmpty() || (stack.getMaxCount() != 1 && stack.getCount() == 1)) continue;
+            ItemStack stack = sc.slots.get(i).getItem().copy();
+            if (stack.isEmpty() || (stack.getMaxStackSize() != 1 && stack.getCount() == 1)) continue;
             if (Arrays.stream(recipeItems).noneMatch(rec -> InventoryUtils.areStacksEqual(rec,stack))) continue;
 
             int stackCount = stack.getCount()-1;
             int cursorStackCount = stack.getCount()-1;
-            client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.PICKUP, player);
-            client.interactionManager.clickSlot(sc.syncId, i, 0, SlotActionType.PICKUP, player);
-            client.interactionManager.clickSlot(sc.syncId, i, 1, SlotActionType.PICKUP, player);
-            client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.QUICK_CRAFT, client.player);
+            client.gameMode.handleInventoryMouseClick(sc.containerId, -999, 0, ClickType.PICKUP, player);
+            client.gameMode.handleInventoryMouseClick(sc.containerId, i, 0, ClickType.PICKUP, player);
+            client.gameMode.handleInventoryMouseClick(sc.containerId, i, 1, ClickType.PICKUP, player);
+            client.gameMode.handleInventoryMouseClick(sc.containerId, -999, 0, ClickType.QUICK_CRAFT, client.player);
 
             int skip = 0;
             int craft = 0;
             ArrayList<Integer> numArr = new ArrayList<>();
             for (int i1 = 1; i1 <= recipeItems.length; i1++) {
-                ItemStack stack1 = sc.slots.get(i1).getStack();
+                ItemStack stack1 = sc.slots.get(i1).getItem();
                 if (craft >= stackCount) break;
                 if(!InventoryUtils.areStacksEqual(stack,recipeItems[i1-1])) continue;
 
-                if (recInv[i1-1] >= stack.getMaxCount()){
+                if (recInv[i1-1] >= stack.getMaxStackSize()){
                     skip++;
                     continue;
                 }
                 numArr.add(i1-1);
                 craft++;
-                client.interactionManager.clickSlot(sc.syncId, i1, 1, SlotActionType.QUICK_CRAFT, client.player);
+                client.gameMode.handleInventoryMouseClick(sc.containerId, i1, 1, ClickType.QUICK_CRAFT, client.player);
             }
-            client.interactionManager.clickSlot(sc.syncId, -999, 2, SlotActionType.QUICK_CRAFT, client.player);
+            client.gameMode.handleInventoryMouseClick(sc.containerId, -999, 2, ClickType.QUICK_CRAFT, client.player);
 
             if(craft== 0){
-                client.interactionManager.clickSlot(sc.syncId, i, 0, SlotActionType.PICKUP, player);
+                client.gameMode.handleInventoryMouseClick(sc.containerId, i, 0, ClickType.PICKUP, player);
                 continue;
             }
             if(craft > cursorStackCount){
@@ -276,8 +275,8 @@ public class Synthesis {
             }else {
                 for (Integer integer : numArr) {
 
-                    if(recInv[integer] + stackCount/craft >= stack.getMaxCount()){
-                        int num = stack.getMaxCount() - recInv[integer];
+                    if(recInv[integer] + stackCount/craft >= stack.getMaxStackSize()){
+                        int num = stack.getMaxStackSize() - recInv[integer];
                         cursorStackCount -= num;
                         recInv[integer] += num;
                     }else {
@@ -287,60 +286,60 @@ public class Synthesis {
                 }
             }
             if(cursorStackCount > 0){
-                client.interactionManager.clickSlot(sc.syncId, i, 0, SlotActionType.PICKUP, player);
+                client.gameMode.handleInventoryMouseClick(sc.containerId, i, 0, ClickType.PICKUP, player);
             }
 
             if(skip == recipeItems.length) break;
         }
 //        for (int i2 = 0; InventoryUtils.areStacksEqual(sc.slots.get(0).getStack(), recipe.getResult()) && i2 < 64; i2++) {
         for (int i2 = 1; satisfyCraft() && i2 < 64; i2++) {
-            client.interactionManager.clickSlot(sc.syncId, 0, 1, SlotActionType.THROW, player);
+            client.gameMode.handleInventoryMouseClick(sc.containerId, 0, 1, ClickType.THROW, player);
         }
         ScreenManagement.screen = null;
-        player.closeHandledScreen();
+        player.closeContainer();
         refreshPlayerInventory();
     }
 
     public static void dropItem(ItemStack itemStack, boolean isPlayerInventory) {
-        ClientPlayerEntity player = client.player;
+        LocalPlayer player = client.player;
         if (player == null) return;
-        ScreenHandler sc = player.currentScreenHandler;
+        AbstractContainerMenu sc = player.containerMenu;
         int size = 0;
-        if (isPlayerInventory && sc.equals(client.player.playerScreenHandler)) {
+        if (isPlayerInventory && sc.equals(client.player.inventoryMenu)) {
             size = sc.slots.size();
-        } else if (!isPlayerInventory && !sc.equals(player.playerScreenHandler)) {
-            size = sc.slots.get(0).inventory.size();
+        } else if (!isPlayerInventory && !sc.equals(player.inventoryMenu)) {
+            size = sc.slots.get(0).container.getContainerSize();
         }
         if (size == 0) return;
         for (int i = 0; i < size; i++) {
-            if (InventoryUtils.areStacksEqual(sc.slots.get(i).getStack(), itemStack)) {
-                client.interactionManager.clickSlot(sc.syncId, i, 1, SlotActionType.THROW, player);
+            if (InventoryUtils.areStacksEqual(sc.slots.get(i).getItem(), itemStack)) {
+                client.gameMode.handleInventoryMouseClick(sc.containerId, i, 1, ClickType.THROW, player);
             }
         }
     }
 
     public static void dropInventory() {
         if (!updateRecipe()) return;
-        client = MinecraftClient.getInstance();
-        ClientPlayerEntity player;
+        client = Minecraft.getInstance();
+        LocalPlayer player;
         if (client.player == null) return;
         player = client.player;
-        if (player.currentScreenHandler.equals(player.playerScreenHandler)) return;
+        if (player.containerMenu.equals(player.inventoryMenu)) return;
         for (ItemStack recipeItem : recipe.getRecipeItems()) {
             dropItem(recipeItem, false);
         }
-        player.closeHandledScreen();
+        player.closeContainer();
     }
     public static BlockPos storagePos = null;
     public static boolean autoStorage = false;
 
     public static void autoStorage() {
         if (client.player == null || !updateRecipe() || !isInventory(storagePos)) return;
-        ClientPlayerEntity player = client.player;
-        DefaultedList<Slot> slots = player.currentScreenHandler.slots;
-        if (storagePos != null && storagePos.isWithinDistance(player.getEyePos(), 5) && step != 3 && closeScreen <= 0) {
+        LocalPlayer player = client.player;
+        NonNullList<Slot> slots = player.containerMenu.slots;
+        if (storagePos != null && storagePos.closerToCenterThan(player.getEyePosition(), 5) && step != 3 && closeScreen <= 0) {
             if (slots.stream()
-                    .anyMatch(slot -> InventoryUtils.areStacksEqual(slot.getStack(), recipe.getResult()) && slot.getStack().getCount() > 1))
+                    .anyMatch(slot -> InventoryUtils.areStacksEqual(slot.getItem(), recipe.getResult()) && slot.getItem().getCount() > 1))
             {
 //                System.out.println("autoStorage");
                 closeScreen = 1;
@@ -353,39 +352,39 @@ public class Synthesis {
     }
     public static void storage() {
         if (!updateRecipe()) return;
-        ClientPlayerEntity player = client.player;
+        LocalPlayer player = client.player;
         if (player == null) return;
-        ScreenHandler sc = player.currentScreenHandler;
-        if(sc.equals(player.playerScreenHandler)) return;
-        DefaultedList<Slot> slots = sc.slots;
+        AbstractContainerMenu sc = player.containerMenu;
+        if(sc.equals(player.inventoryMenu)) return;
+        NonNullList<Slot> slots = sc.slots;
         if (slots.stream()
-                .limit(slots.get(0).inventory.size())
-                .allMatch(slot -> InventoryUtils.areStacksEqual(slot.getStack(), recipe.getResult())
-                        && slot.getStack().getCount() >= slot.getStack().getMaxCount())) {
-            client.inGameHud.setOverlayMessage(Text.of("合成助手: 该容器已满"), false);
-            player.closeHandledScreen();
+                .limit(slots.get(0).container.getContainerSize())
+                .allMatch(slot -> InventoryUtils.areStacksEqual(slot.getItem(), recipe.getResult())
+                        && slot.getItem().getCount() >= slot.getItem().getMaxStackSize())) {
+            client.gui.setOverlayMessage(Component.literal("合成助手: 该容器已满"), false);
+            player.closeContainer();
             return;
         }
         //从玩家背包寻找合成物
-        for (int i = slots.get(0).inventory.size(); i < slots.size(); i++) {
-            ItemStack stack = slots.get(i).getStack();
+        for (int i = slots.get(0).container.getContainerSize(); i < slots.size(); i++) {
+            ItemStack stack = slots.get(i).getItem();
             if (InventoryUtils.areStacksEqual(stack, recipe.getResult()) && stack.getCount() > 1) {
-                client.interactionManager.clickSlot(sc.syncId, i, 0, SlotActionType.PICKUP, player);
-                client.interactionManager.clickSlot(sc.syncId, i, 1, SlotActionType.PICKUP, player);
+                client.gameMode.handleInventoryMouseClick(sc.containerId, i, 0, ClickType.PICKUP, player);
+                client.gameMode.handleInventoryMouseClick(sc.containerId, i, 1, ClickType.PICKUP, player);
                 //检测容器中能放下的空位
-                for (int i2 = 0; i2 < slots.get(0).inventory.size(); i2++) {
-                    if ((InventoryUtils.areStacksEqual(slots.get(i2).getStack(), recipe.getResult())
-                            && slots.get(i2).getStack().getCount() <= slots.get(i2).getStack().getMaxCount())
-                            || slots.get(i2).getStack().isEmpty()
-                    ) client.interactionManager.clickSlot(sc.syncId, i2, 0, SlotActionType.PICKUP, player);
+                for (int i2 = 0; i2 < slots.get(0).container.getContainerSize(); i2++) {
+                    if ((InventoryUtils.areStacksEqual(slots.get(i2).getItem(), recipe.getResult())
+                            && slots.get(i2).getItem().getCount() <= slots.get(i2).getItem().getMaxStackSize())
+                            || slots.get(i2).getItem().isEmpty()
+                    ) client.gameMode.handleInventoryMouseClick(sc.containerId, i2, 0, ClickType.PICKUP, player);
                 }
-                if(!sc.getCursorStack().isEmpty()){
-                    client.interactionManager.clickSlot(sc.syncId, i, 0, SlotActionType.PICKUP, player);
-                    client.interactionManager.clickSlot(sc.syncId, -999, 0, SlotActionType.PICKUP, player);
+                if(!sc.getCarried().isEmpty()){
+                    client.gameMode.handleInventoryMouseClick(sc.containerId, i, 0, ClickType.PICKUP, player);
+                    client.gameMode.handleInventoryMouseClick(sc.containerId, -999, 0, ClickType.PICKUP, player);
                 }
             }
         }
-        player.closeHandledScreen();
+        player.closeContainer();
     }
 
     private static boolean updateRecipe() {
@@ -395,11 +394,11 @@ public class Synthesis {
 
     public static void continueSynthesis() {
         if (pos != null ) {
-            ScreenHandler sc = client.player.currentScreenHandler;
+            AbstractContainerMenu sc = client.player.containerMenu;
             ItemStack[] recipeItems = recipe.getRecipeItems();
-            if (((recipeItems.length == 9 && !(sc instanceof CraftingScreenHandler)) || (recipeItems.length == 4 && !(sc instanceof PlayerScreenHandler)))) {
-                if (recipeItems.length == 9 && sc instanceof PlayerScreenHandler && closeScreen <= 0) {
-                    if (client.world.getBlockState(pos).isAir()) return;
+            if (((recipeItems.length == 9 && !(sc instanceof CraftingMenu)) || (recipeItems.length == 4 && !(sc instanceof InventoryMenu)))) {
+                if (recipeItems.length == 9 && sc instanceof InventoryMenu && closeScreen <= 0) {
+                    if (client.level.getBlockState(pos).isAir()) return;
 //                    System.out.println(".............");
                     closeScreen = 1;
 //                    tick = 0;
@@ -408,12 +407,12 @@ public class Synthesis {
                     ZxyUtils.setShift(false);
                     useBlock(pos);
                 } else if (recipeItems.length == 4) {
-                    client.player.closeHandledScreen();
+                    client.player.closeContainer();
                 }
             }else if(invUpdated && step == 2) {
                 synthesis2();
             }else{
-                client.player.closeScreen();
+                client.player.clientSideCloseContainer();
             }
         }
     }

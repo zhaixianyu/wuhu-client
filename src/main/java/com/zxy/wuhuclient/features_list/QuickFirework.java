@@ -2,21 +2,21 @@ package com.zxy.wuhuclient.features_list;
 
 import com.zxy.wuhuclient.Utils.ZxyUtils;
 import com.zxy.wuhuclient.WuHuClientMod;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.player.LocalPlayer;
 
-import net.minecraft.item.FireworkRocketItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.world.item.FireworkRocketItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.NonNullList;
 import java.util.List;
 //#if MC > 12004
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FireworksComponent;
-import net.minecraft.component.type.FireworkExplosionComponent;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.Fireworks;
+import net.minecraft.world.item.component.FireworkExplosion;
 //#else
 //$$
 //#endif
@@ -27,20 +27,20 @@ import static com.zxy.wuhuclient.WuHuClientMod.*;
 public class QuickFirework {
 
     public static void accelerated(){
-        ClientPlayerEntity player = client.player;
-        if (player == null || !player.isGliding()) return;
-        ScreenHandler sc = player.currentScreenHandler;
-        DefaultedList<Slot> slots = sc.slots;
+        LocalPlayer player = client.player;
+        if (player == null || !player.isFallFlying()) return;
+        AbstractContainerMenu sc = player.containerMenu;
+        NonNullList<Slot> slots = sc.slots;
         for (int i = 0; i < slots.size(); i++) {
-            ItemStack stack = slots.get(i).getStack();
+            ItemStack stack = slots.get(i).getItem();
             //#if MC > 12004
-            FireworksComponent fireworksComponent = stack.get(DataComponentTypes.FIREWORKS);
+            Fireworks fireworksComponent = stack.get(DataComponents.FIREWORKS);
             if (fireworksComponent != null && fireworksComponent.explosions().isEmpty()) {
                 interactItem(sc,i);
                 return;
             }
             //#else
-            //$$ NbtCompound nbtCompound = stack.getSubNbt("Fireworks");
+            //$$ CompoundTag nbtCompound = stack.getTagElement("Fireworks");
             //$$ if(nbtCompound != null && nbtCompound.getList("Explosions", 10).isEmpty()){
             //$$     interactItem(sc,i);
             //$$     return;
@@ -48,13 +48,13 @@ public class QuickFirework {
             //#endif
         }
     }
-    public static void interactItem(ScreenHandler sc , int i) {
-        client.interactionManager.clickSlot(sc.syncId, i, 40, SlotActionType.SWAP, client.player);
+    public static void interactItem(AbstractContainerMenu sc , int i) {
+        client.gameMode.handleInventoryMouseClick(sc.containerId, i, 40, ClickType.SWAP, client.player);
         //#if MC > 11802
-        client.interactionManager.interactItem(client.player, Hand.OFF_HAND);
+        client.gameMode.useItem(client.player, InteractionHand.OFF_HAND);
         //#else
-        //$$ client.interactionManager.interactItem(client.player,client.world, Hand.OFF_HAND);
+        //$$ client.gameMode.useItem(client.player,client.level, InteractionHand.OFF_HAND);
         //#endif
-        client.interactionManager.clickSlot(sc.syncId, i, 40, SlotActionType.SWAP, client.player);
+        client.gameMode.handleInventoryMouseClick(sc.containerId, i, 40, ClickType.SWAP, client.player);
     }
 }

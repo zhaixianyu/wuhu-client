@@ -1,14 +1,11 @@
-apply(plugin: "fabric-loom")
+int mcVersion = project.mcVersion
+boolean useMappings = mcVersion < 26_00_00
+
+apply(plugin: useMappings ? "net.fabricmc.fabric-loom-remap" : "net.fabricmc.fabric-loom")
 apply(plugin: "maven-publish")
 apply(plugin: "com.replaymod.preprocess")
 
-int mcVersion = 1
 
-
-preprocess {
-    mcVersion = vars.get().get("MC")
-//    tabIndentation.set(false)
-}
 
 repositories {
     var github_username  = System.getenv("GITHUB_USERNAME")
@@ -94,6 +91,29 @@ repositories {
 }
 //  1 = modImplementation 2 = modImplementation include 	3 = modApi	4 = modCompileOnly
 // Module, Property prefix, Resolve condition, Transitive depende ncies.
+
+
+boolean isRepositoryAvailable(String url, int timeout = 5000) {
+    try {
+        URL checkUrl = new URL(url)
+        HttpURLConnection connection = (HttpURLConnection) checkUrl.openConnection()
+        connection.setRequestMethod("HEAD")  // 只获取头信息，节省流量
+        connection.setConnectTimeout(timeout)
+        connection.setReadTimeout(timeout)
+        connection.setInstanceFollowRedirects(true) // 自动跟随重定向
+
+        int responseCode = connection.getResponseCode()
+        // 2xx 或 3xx 状态码通常表示可用
+        return responseCode >= 200 && responseCode < 400
+    } catch (Exception e) {
+        // 连接失败或超时等异常视为不可用
+        println "嘻嘻 我跑路了哦 $url - ${e.message}"
+        return false
+    }
+}
+
+boolean LibGuiStatus = isRepositoryAvailable("https://staging.alexiil.uk/maven/")
+
 String getYacl() {
 //    return "maven.modrinth:yacl";
     return mcVersion == 12002 ? "maven.modrinth:yacl" : "dev.isxander:yet-another-config-lib";
@@ -130,8 +150,11 @@ dependencies {
 
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+//    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 
+    if(useMappings){
+        mappings loom.officialMojangMappings()
+    }
     implementation 'com.github.jitpack:gradle-simple:1.0'
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation ("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
@@ -163,8 +186,6 @@ dependencies {
             modImplementation files(file)
         }
     }
-//	modImplementation "maven.modrinth:jei:${project.jei}"
-//	modImplementation "maven.modrinth:carpet-tis-addition:${project.carpet_tis_addition}"
 
     // Uncomment the following line to enable the deprecated Fabric API modules.
     // These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
@@ -426,6 +447,16 @@ publishing {
 
         maven {
             url("$rootDir/publish")
+        }
+    }
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.allTasks.any { task -> task.name == 'setCoreVersion'}) {
+        tasks.withType(JavaCompile).tap {
+            configureEach {
+                options.failOnError = false
+            }
         }
     }
 }

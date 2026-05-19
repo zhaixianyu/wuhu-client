@@ -1,13 +1,13 @@
 package com.zxy.wuhuclient.Utils;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
-public class MyBox extends Box implements Iterable<BlockPos> {
+public class MyBox extends AABB implements Iterable<BlockPos> {
     public boolean yIncrement = true;
     public Iterator<BlockPos> iterator;
     public MyBox(double x1, double y1, double z1, double x2, double y2, double z2) {
@@ -15,9 +15,9 @@ public class MyBox extends Box implements Iterable<BlockPos> {
     }
 
     public MyBox(fi.dy.masa.litematica.selection.Box box) {
-        this(Vec3d.of(box.getPos1()), Vec3d.of(box.getPos2()));
+        this(Vec3.atLowerCornerOf(box.getPos1()), Vec3.atLowerCornerOf(box.getPos2()));
     }
-    public MyBox(Box box) {
+    public MyBox(AABB box) {
         this(box.minX,box.minY,box.minZ,box.maxX,box.maxY,box.maxZ);
     }
 
@@ -25,7 +25,7 @@ public class MyBox extends Box implements Iterable<BlockPos> {
         this((double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), (double) (pos.getX()), (double) (pos.getY()), (double) (pos.getZ()));
     }
 
-    public MyBox(Vec3d pos1, Vec3d pos2) {
+    public MyBox(Vec3 pos1, Vec3 pos2) {
         this(pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z);
     }
 
@@ -35,7 +35,7 @@ public class MyBox extends Box implements Iterable<BlockPos> {
         return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY && z >= this.minZ && z <= this.maxZ;
     }
     @Override
-    public MyBox expand(double x, double y, double z) {
+    public MyBox inflate(double x, double y, double z) {
         double d = this.minX - x;
         double e = this.minY - y;
         double f = this.minZ - z;
@@ -45,8 +45,8 @@ public class MyBox extends Box implements Iterable<BlockPos> {
         return new MyBox(d, e, f, g, h, i);
     }
     @Override
-    public MyBox expand(double value) {
-        return this.expand(value, value, value);
+    public MyBox inflate(double value) {
+        return this.inflate(value, value, value);
     }
     public void initIterator(){
         if (this.iterator == null) this.iterator = iterator();

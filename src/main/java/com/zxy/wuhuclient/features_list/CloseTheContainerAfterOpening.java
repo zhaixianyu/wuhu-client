@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
 
 import static com.zxy.wuhuclient.Utils.InventoryUtils.canOpenInv;
 
@@ -63,9 +63,9 @@ public class CloseTheContainerAfterOpening {
                     ZxyUtils.actionBar("剩余 " + pos.size() + " 个需要打开的容器，再次按下快捷键取消");
                     break;
                 case 2:
-                    ClientPlayerEntity player = Synthesis.client.player;
+                    LocalPlayer player = Synthesis.client.player;
                     if (player != null) {
-                        player.closeHandledScreen();
+                        player.closeContainer();
                     }
 
                     step = 1;

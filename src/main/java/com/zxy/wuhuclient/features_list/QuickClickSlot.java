@@ -1,10 +1,10 @@
 package com.zxy.wuhuclient.features_list;
 
 
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.CraftingScreenHandler;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.CraftingMenu;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 
 
 import static com.zxy.wuhuclient.Utils.ZxyUtils.getPlayer;
@@ -14,12 +14,12 @@ public class QuickClickSlot {
 
     public static void clickLastSlot() {
         getPlayer().ifPresent(clientPlayer -> {
-            ScreenHandler sc = clientPlayer.currentScreenHandler;
-            if (clientPlayer.currentScreenHandler.equals(clientPlayer.playerScreenHandler)) return;
+            AbstractContainerMenu sc = clientPlayer.containerMenu;
+            if (clientPlayer.containerMenu.equals(clientPlayer.inventoryMenu)) return;
             for (int i = 0; i < sc.slots.size(); i++) {
-                if (sc.slots.get(i).inventory instanceof PlayerInventory && i > 0) {
-                    if (sc instanceof CraftingScreenHandler) i = 1;
-                    client.interactionManager.clickSlot(sc.syncId, i-1, 0, SlotActionType.QUICK_MOVE, client.player);
+                if (sc.slots.get(i).container instanceof Inventory && i > 0) {
+                    if (sc instanceof CraftingMenu) i = 1;
+                    client.gameMode.handleInventoryMouseClick(sc.containerId, i-1, 0, ClickType.QUICK_MOVE, client.player);
                     return;
                 }
             }

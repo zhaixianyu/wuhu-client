@@ -5,16 +5,16 @@ import com.zxy.wuhuclient.Utils.InventoryUtils;
 import com.zxy.wuhuclient.Utils.ScreenManagement;
 import com.zxy.wuhuclient.features_list.Synthesis;
 import com.zxy.wuhuclient.config.Configs;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,18 +25,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import static com.zxy.wuhuclient.features_list.Synthesis.*;
 
 
-@Mixin(ClientPlayerInteractionManager.class)
-public class ClientPlayerInteractionManagerMixin {
-    @Shadow @Final private MinecraftClient client;
+@Mixin(MultiPlayerGameMode.class)
+public class MultiPlayerGameModeMixin {
+    @Shadow @Final private Minecraft minecraft;
 
-    @Inject(at = @At("HEAD"),method = "interactBlock")
-    public void interactBlock(ClientPlayerEntity player,
+    @Inject(at = @At("HEAD"),method = "useItemOn")
+    public void interactBlock(LocalPlayer player,
                               //#if MC > 11802
 
                               //#else
-                              //$$ ClientWorld world,
+                              //$$ ClientLevel world,
                               //#endif
-                                Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir){
+                              InteractionHand hand, BlockHitResult hitResult, CallbackInfoReturnable<InteractionResult> cir){
 //        System.out.println("interactBlock");
         if(isLoadMod && Configs.SYNTHESIS.getBooleanValue() && step != 1){
             if (InventoryUtils.isInventory(hitResult.getBlockPos())) {
@@ -50,14 +50,14 @@ public class ClientPlayerInteractionManagerMixin {
             }
         }
     }
-    @Inject(at = @At("TAIL"),method = "attackBlock")
+    @Inject(at = @At("TAIL"),method = "startDestroyBlock")
     public void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir){
         if(isLoadMod && Configs.SYNTHESIS.getBooleanValue()){
             if(pos.equals(Synthesis.pos)){
                 Synthesis.pos = null;
                 step = 0;
-                client.inGameHud.setOverlayMessage(Text.of("合成停止"),false);
-                client.player.closeHandledScreen();
+                minecraft.gui.setOverlayMessage(Component.literal("合成停止"),false);
+                minecraft.player.closeContainer();
                 return;
             }
             Synthesis.start(pos);
