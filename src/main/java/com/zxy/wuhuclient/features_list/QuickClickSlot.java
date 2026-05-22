@@ -19,7 +19,7 @@ public class QuickClickSlot {
             for (int i = 0; i < sc.slots.size(); i++) {
                 if (sc.slots.get(i).container instanceof Inventory && i > 0) {
                     if (sc instanceof CraftingMenu) i = 1;
-                    client.gameMode.handleInventoryMouseClick(sc.containerId, i-1, 0, ClickType.QUICK_MOVE, client.player);
+                    sc.clicked(i-1, 0, ClickType.QUICK_MOVE, client.player);
                     return;
                 }
             }

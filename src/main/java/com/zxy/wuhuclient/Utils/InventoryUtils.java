@@ -275,4 +275,12 @@ public class InventoryUtils {
             return false;
         }
     }
+
+    public static String getItemName(ItemStack itemStack){
+        //#if MC > 12101
+        return itemStack.getItemName().getString();
+        //#else
+        //$$ return itemStack.getDescriptionId();
+        //#endif
+    }
 }

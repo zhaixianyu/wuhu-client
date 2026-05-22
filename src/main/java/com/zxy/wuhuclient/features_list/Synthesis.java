@@ -239,10 +239,10 @@ public class Synthesis {
 
             int stackCount = stack.getCount()-1;
             int cursorStackCount = stack.getCount()-1;
-            client.gameMode.handleInventoryMouseClick(sc.containerId, -999, 0, ClickType.PICKUP, player);
-            client.gameMode.handleInventoryMouseClick(sc.containerId, i, 0, ClickType.PICKUP, player);
-            client.gameMode.handleInventoryMouseClick(sc.containerId, i, 1, ClickType.PICKUP, player);
-            client.gameMode.handleInventoryMouseClick(sc.containerId, -999, 0, ClickType.QUICK_CRAFT, client.player);
+            sc.clicked(-999, 0, ClickType.PICKUP, player);
+            sc.clicked(i, 0, ClickType.PICKUP, player);
+            sc.clicked(i, 1, ClickType.PICKUP, player);
+            sc.clicked(-999, 0, ClickType.QUICK_CRAFT, client.player);
 
             int skip = 0;
             int craft = 0;
@@ -258,12 +258,12 @@ public class Synthesis {
                 }
                 numArr.add(i1-1);
                 craft++;
-                client.gameMode.handleInventoryMouseClick(sc.containerId, i1, 1, ClickType.QUICK_CRAFT, client.player);
+                sc.clicked( i1, 1, ClickType.QUICK_CRAFT, client.player);
             }
-            client.gameMode.handleInventoryMouseClick(sc.containerId, -999, 2, ClickType.QUICK_CRAFT, client.player);
+            sc.clicked(-999, 2, ClickType.QUICK_CRAFT, client.player);
 
             if(craft== 0){
-                client.gameMode.handleInventoryMouseClick(sc.containerId, i, 0, ClickType.PICKUP, player);
+                sc.clicked(i, 0, ClickType.PICKUP, player);
                 continue;
             }
             if(craft > cursorStackCount){
@@ -286,14 +286,14 @@ public class Synthesis {
                 }
             }
             if(cursorStackCount > 0){
-                client.gameMode.handleInventoryMouseClick(sc.containerId, i, 0, ClickType.PICKUP, player);
+                sc.clicked(i, 0, ClickType.PICKUP, player);
             }
 
             if(skip == recipeItems.length) break;
         }
 //        for (int i2 = 0; InventoryUtils.areStacksEqual(sc.slots.get(0).getStack(), recipe.getResult()) && i2 < 64; i2++) {
         for (int i2 = 1; satisfyCraft() && i2 < 64; i2++) {
-            client.gameMode.handleInventoryMouseClick(sc.containerId, 0, 1, ClickType.THROW, player);
+            sc.clicked(0, 1, ClickType.THROW, player);
         }
         ScreenManagement.screen = null;
         player.closeContainer();
@@ -313,7 +313,7 @@ public class Synthesis {
         if (size == 0) return;
         for (int i = 0; i < size; i++) {
             if (InventoryUtils.areStacksEqual(sc.slots.get(i).getItem(), itemStack)) {
-                client.gameMode.handleInventoryMouseClick(sc.containerId, i, 1, ClickType.THROW, player);
+                sc.clicked(i, 1, ClickType.THROW, player);
             }
         }
     }
@@ -369,18 +369,18 @@ public class Synthesis {
         for (int i = slots.get(0).container.getContainerSize(); i < slots.size(); i++) {
             ItemStack stack = slots.get(i).getItem();
             if (InventoryUtils.areStacksEqual(stack, recipe.getResult()) && stack.getCount() > 1) {
-                client.gameMode.handleInventoryMouseClick(sc.containerId, i, 0, ClickType.PICKUP, player);
-                client.gameMode.handleInventoryMouseClick(sc.containerId, i, 1, ClickType.PICKUP, player);
+                sc.clicked(i, 0, ClickType.PICKUP, player);
+                sc.clicked(i, 1, ClickType.PICKUP, player);
                 //检测容器中能放下的空位
                 for (int i2 = 0; i2 < slots.get(0).container.getContainerSize(); i2++) {
                     if ((InventoryUtils.areStacksEqual(slots.get(i2).getItem(), recipe.getResult())
                             && slots.get(i2).getItem().getCount() <= slots.get(i2).getItem().getMaxStackSize())
                             || slots.get(i2).getItem().isEmpty()
-                    ) client.gameMode.handleInventoryMouseClick(sc.containerId, i2, 0, ClickType.PICKUP, player);
+                    ) sc.clicked(i2, 0, ClickType.PICKUP, player);
                 }
                 if(!sc.getCarried().isEmpty()){
-                    client.gameMode.handleInventoryMouseClick(sc.containerId, i, 0, ClickType.PICKUP, player);
-                    client.gameMode.handleInventoryMouseClick(sc.containerId, -999, 0, ClickType.PICKUP, player);
+                    sc.clicked(i, 0, ClickType.PICKUP, player);
+                    sc.clicked(-999, 0, ClickType.PICKUP, player);
                 }
             }
         }

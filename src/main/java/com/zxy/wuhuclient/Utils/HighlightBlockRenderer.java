@@ -14,6 +14,9 @@ import fi.dy.masa.malilib.util.data.Color4f;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderBuffers;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.client.Minecraft;
@@ -48,6 +51,14 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+
+//#if MC > 12111
+//$$ import com.mojang.blaze3d.buffers.GpuBufferSlice;
+//$$ import net.minecraft.client.renderer.state.level.CameraRenderState;
+//$$ import org.joml.Matrix4fc;
+//$$ import org.joml.Vector4f;
+//$$ import com.mojang.blaze3d.pipeline.RenderTarget;
+//#endif
 
 import static com.zxy.wuhuclient.Utils.ZxyUtils.searchBlockId;
 import static com.zxy.wuhuclient.Utils.ZxyUtils.searchBlockThread;
@@ -91,14 +102,11 @@ public class HighlightBlockRenderer implements IRenderer {
 
 
     //#if MC > 12004
-    public void highlightBlock(Matrix4f matrices, Color4f color4f, Set<BlockPos> posSet){
+    public void highlightBlock(Color4f color4f, Set<BlockPos> posSet){
     //#else
-    //$$ public void highlightBlock(PoseStack matrices ,Color4f color4f, Set<BlockPos> posSet){
+    //$$ public void highlightBlock(Color4f color4f, Set<BlockPos> posSet){
     //#endif
 
-//        for (BlockPos pos : posSet) {
-//            renderAreaSides(pos,pos,color4f,matrices,client);
-//        }
         //#if MC <= 12104
         //$$ RenderSystem.disableDepthTest();
         //#endif
@@ -181,7 +189,6 @@ public class HighlightBlockRenderer implements IRenderer {
         //$$ RenderSystem.enableDepthTest();
         //#endif
 
-//        fi.dy.masa.litematica.render.RenderUtils.renderAreaSides(pos, pos, color4f, matrices, client);
     }
 
     public static void init(){
@@ -209,7 +216,11 @@ public class HighlightBlockRenderer implements IRenderer {
 
     @Override
     //#if MC > 12004
-    public void onRenderWorldLast(Matrix4f matrices, Matrix4f projMatrix){
+        //#if MC > 12111
+        //$$ public void onRenderWorldLast(RenderTarget fb, Matrix4fc modelViewMatrix, CameraRenderState cameraState, Frustum culling, RenderBuffers buffers, GpuBufferSlice terrainFog, Vector4f fogColor, ProfilerFiller profiler) {
+        //#else
+        public void onRenderWorldLast(Matrix4f matrices, Matrix4f projMatrix){
+        //#endif
     //#else
     //$$ public void onRenderWorldLast(PoseStack matrices, Matrix4f projMatrix){
     //#endif
@@ -235,7 +246,7 @@ public class HighlightBlockRenderer implements IRenderer {
         highlightTheProjectMap.forEach((key, value) -> {
             if (!LITEMATICA_HELPER.getBooleanValue() && LitematicaHelper.instance.litematicaHelper.equals(key)) return;
             Color4f color = value.color4f.getColor();
-            highlightBlock(matrices, color, value.pos);
+            highlightBlock(color, value.pos);
 
         });
         shaderIng = false;

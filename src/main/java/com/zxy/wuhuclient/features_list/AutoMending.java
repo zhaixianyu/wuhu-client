@@ -63,7 +63,7 @@ public class AutoMending {
         }
     }
     private void switchSlot(AbstractContainerMenu sc, int i){
-        client.gameMode.handleInventoryMouseClick(sc.containerId, i, 40, ClickType.SWAP, client.player);
+        sc.clicked(i, 40, ClickType.SWAP, client.player);
     }
 
     public boolean isPlayerScreenHandler(){

@@ -49,12 +49,12 @@ public class QuickFirework {
         }
     }
     public static void interactItem(AbstractContainerMenu sc , int i) {
-        client.gameMode.handleInventoryMouseClick(sc.containerId, i, 40, ClickType.SWAP, client.player);
+        sc.clicked(i, 40, ClickType.SWAP, client.player);
         //#if MC > 11802
         client.gameMode.useItem(client.player, InteractionHand.OFF_HAND);
         //#else
         //$$ client.gameMode.useItem(client.player,client.level, InteractionHand.OFF_HAND);
         //#endif
-        client.gameMode.handleInventoryMouseClick(sc.containerId, i, 40, ClickType.SWAP, client.player);
+        sc.clicked(i, 40, ClickType.SWAP, client.player);
     }
 }

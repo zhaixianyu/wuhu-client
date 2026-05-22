@@ -46,7 +46,13 @@ public class BlockFilters {
             AtomicBoolean theLabelIsTheSame = new AtomicBoolean(false);
             String fix1 = blockName1.split("#")[1];
             String[] finalStrs = strs;
-            blockState.getTags().forEach(tag -> {
+            blockState.
+                    //#if MC > 12111
+                    //$$ tags()
+                    //#else
+                    getTags()
+                    //#endif
+                    .forEach(tag -> {
                 String tagName = tag.location().toString();
                 if (BlockFilters.filters(tagName,fix1, finalStrs)) {
                     theLabelIsTheSame.set(true);

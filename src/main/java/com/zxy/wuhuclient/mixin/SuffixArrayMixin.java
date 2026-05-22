@@ -16,6 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
+import static com.zxy.wuhuclient.Utils.InventoryUtils.getItemName;
+
 @Mixin(SuffixArray.class)
 public class SuffixArrayMixin<T> {
     @Inject(at = @At("TAIL"),method = "search")
@@ -24,7 +26,7 @@ public class SuffixArrayMixin<T> {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null && player.containerMenu instanceof CreativeModeInventoryScreen.ItemPickerMenu) {
             BuiltInRegistries.ITEM.stream().forEach(item -> {
-                if (PinYinSearch.hasPinYin(item.getName().getString().toLowerCase(),text) || item.toString().contains(text)) {
+                if (PinYinSearch.hasPinYin(getItemName(item.getDefaultInstance()).toLowerCase(),text) || item.toString().contains(text)) {
                     ((CreativeModeInventoryScreen.ItemPickerMenu) player.containerMenu).items.add(new ItemStack(item));
                 }
             });

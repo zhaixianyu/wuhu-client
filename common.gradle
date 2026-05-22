@@ -145,6 +145,8 @@ def mod_dependencies = [
 ]
 
 dependencies {
+    def autoImplementation = { Object... args -> useMappings ? modImplementation(*args) : implementation(*args) }
+    def autoCompileOnly = { Object... args -> useMappings ? modCompileOnly(*args) : compileOnly(*args) }
     //拼音
     implementation include("com.belerweb:pinyin4j:2.5.1")
 
@@ -156,10 +158,9 @@ dependencies {
         mappings loom.officialMojangMappings()
     }
     implementation 'com.github.jitpack:gradle-simple:1.0'
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation ("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+    autoImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    autoImplementation ("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
-//    modImplementation "dev.isxander:yet-another-config-lib:3.6.0+1.21-fabric"
     mod_dependencies.forEach { item ->
         def dependencyNotation = item[0]
         def mode = item[1]
@@ -167,30 +168,29 @@ dependencies {
 //		if(mode != 0) idFix = "${dependencyNotation}:${project.property("${id}")}"
         if (mode != 0) idFix = dependencyNotation
         if (mode == 1) {
-            modImplementation (idFix)
+            autoImplementation (idFix)
         } else if (mode == 10) {
-            modImplementation (idFix){ exclude group: item[3] }
+            autoImplementation (idFix){ exclude group: item[3] }
         } else if (mode == 2) {
-            modImplementation include(idFix)
+            autoImplementation include(idFix)
         } else if (mode == 3) {
             modApi (idFix)
         } else if (mode == 4) {
-            modCompileOnly(idFix)
+            autoCompileOnly(idFix)
         } else if (mode == 45) {
-            modCompileOnly files(dependencyNotation)
+            autoCompileOnly files(dependencyNotation)
         } else if (mode == 5) {
-            modImplementation files(dependencyNotation)
+            autoImplementation files(dependencyNotation)
         } else if (mode == 6){
             def file = downloadMod(dependencyNotation, "${project.property("${item[2]}")}")
             if (file == null) return;
-            modImplementation files(file)
+            autoImplementation files(file)
         }
     }
 
     // Uncomment the following line to enable the deprecated Fabric API modules.
     // These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 
-    // modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
     runtimeOnly(project(path: ":fabricWrapper"))
 }
@@ -350,14 +350,13 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding("UTF-8")
 }
 
-remapJar {
-//    remapperIsolation.set(true)
-}
 
 
 def MIXIN_CONFIG_PATHS = ['wuhuclient.mixins.json']
 JavaVersion JAVA_COMPATIBILITY
-if (mcVersion >= 12005) {
+if (mcVersion >= 260100) {
+    JAVA_COMPATIBILITY = JavaVersion.VERSION_25
+} else if (mcVersion >= 12005) {
     JAVA_COMPATIBILITY = JavaVersion.VERSION_21
 } else if (mcVersion >= 11800) {
     JAVA_COMPATIBILITY = JavaVersion.VERSION_17
@@ -369,7 +368,9 @@ if (mcVersion >= 12005) {
 JavaVersion MIXIN_COMPATIBILITY_LEVEL = JAVA_COMPATIBILITY
 
 tasks.withType(JavaCompile).configureEach {
-    if (mcVersion >= 12005) {
+    if (mcVersion >= 260100) {
+        it.options.release = 25
+    } else if (mcVersion >= 12005) {
         it.options.release = 21
     } else if (mcVersion >= 11800) {
         it.options.release = 17
