@@ -2,6 +2,7 @@ package com.zxy.wuhuclient.mixin;
 
 
 import com.zxy.wuhuclient.Utils.InventoryUtils;
+import com.zxy.wuhuclient.Utils.Messager;
 import com.zxy.wuhuclient.Utils.ScreenManagement;
 import com.zxy.wuhuclient.features_list.Synthesis;
 import com.zxy.wuhuclient.config.Configs;
@@ -56,7 +57,7 @@ public class MultiPlayerGameModeMixin {
             if(pos.equals(Synthesis.pos)){
                 Synthesis.pos = null;
                 step = 0;
-                minecraft.gui.setOverlayMessage(Component.literal("合成停止"),false);
+                Messager.actionBar("合成停止");
                 minecraft.player.closeContainer();
                 return;
             }

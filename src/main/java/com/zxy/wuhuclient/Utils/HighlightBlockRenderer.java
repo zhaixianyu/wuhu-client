@@ -53,11 +53,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 //#if MC > 12111
-//$$ import com.mojang.blaze3d.buffers.GpuBufferSlice;
-//$$ import net.minecraft.client.renderer.state.level.CameraRenderState;
-//$$ import org.joml.Matrix4fc;
-//$$ import org.joml.Vector4f;
-//$$ import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import org.joml.Matrix4fc;
+import org.joml.Vector4f;
+import com.mojang.blaze3d.pipeline.RenderTarget;
 //#endif
 
 import static com.zxy.wuhuclient.Utils.ZxyUtils.searchBlockId;
@@ -128,14 +128,20 @@ public class HighlightBlockRenderer implements IRenderer {
         //$$ RenderSystem.setShader(GameRenderer::getPositionColorShader);
         //#endif
 
-        Tesselator tessellator = Tesselator.getInstance();
+        //#if MC <= 260100
+        //$$ Tesselator tessellator = Tesselator.getInstance();
+        //#endif
 
         //#if MC > 12006
             //#if MC > 12104
                 //#if MC == 12105
                 //$$ RenderContext ctx = new RenderContext(MaLiLibPipelines.POSITION_COLOR_TRANSLUCENT_DEPTH_MASK, BufferUsage.STATIC_WRITE);
                 //#else
-                RenderContext ctx = new RenderContext(() -> threadName ,MaLiLibPipelines.POSITION_COLOR_TRANSLUCENT_DEPTH_MASK);
+                RenderContext ctx = new RenderContext(() -> threadName ,MaLiLibPipelines.POSITION_COLOR_TRANSLUCENT_DEPTH_MASK
+                        //#if MC > 260100
+                        ,0
+                        //#endif
+                );
                 //#endif
             BufferBuilder buffer = ctx.getBuilder();
             //#else
@@ -217,9 +223,9 @@ public class HighlightBlockRenderer implements IRenderer {
     @Override
     //#if MC > 12004
         //#if MC > 12111
-        //$$ public void onRenderWorldLast(RenderTarget fb, Matrix4fc modelViewMatrix, CameraRenderState cameraState, Frustum culling, RenderBuffers buffers, GpuBufferSlice terrainFog, Vector4f fogColor, ProfilerFiller profiler) {
+        public void onRenderWorldLast(RenderTarget fb, Matrix4fc modelViewMatrix, CameraRenderState cameraState, Frustum culling, RenderBuffers buffers, GpuBufferSlice terrainFog, Vector4f fogColor, ProfilerFiller profiler) {
         //#else
-        public void onRenderWorldLast(Matrix4f matrices, Matrix4f projMatrix){
+        //$$ public void onRenderWorldLast(Matrix4f matrices, Matrix4f projMatrix){
         //#endif
     //#else
     //$$ public void onRenderWorldLast(PoseStack matrices, Matrix4f projMatrix){

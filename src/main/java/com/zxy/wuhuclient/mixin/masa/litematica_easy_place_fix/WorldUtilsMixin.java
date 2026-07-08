@@ -39,10 +39,13 @@ public class WorldUtilsMixin {
         EasyPlaceFix.isPlacingWithEasyPlace = false;
     }
 
-    @Inject(method = "placementRestrictionInEffect", at = @At(value = "INVOKE", target = "Lfi/dy/masa/litematica/materials/MaterialCache;getInstance()Lfi/dy/masa/litematica/materials/MaterialCache;"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,remap = false)
-    private static void stopEasyPlaceWhenBlockAlreadyCorrect(Minecraft mc, CallbackInfoReturnable<Boolean> cir, HitResult trace, ItemStack stack, BlockHitResult blockHitResult, BlockPlaceContext ctx, BlockPos pos, BlockState stateClient, Level worldSchematic, LayerRange range, boolean schematicHasAir, BlockState stateSchematic) {
-        if (EASY_PLACED_FIX.getBooleanValue() && stateClient == stateSchematic) {
-            cir.setReturnValue(Boolean.TRUE);
-        }
-    }
+    //#if MC <= 260100
+    //$$ @Inject(method = "placementRestrictionInEffect", at = @At(value = "INVOKE", target = "Lfi/dy/masa/litematica/materials/MaterialCache;getInstance()Lfi/dy/masa/litematica/materials/MaterialCache;"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,remap = false)
+    //$$ private static void stopEasyPlaceWhenBlockAlreadyCorrect(Minecraft mc, CallbackInfoReturnable<Boolean> cir, HitResult trace, ItemStack stack, BlockHitResult blockHitResult, BlockPlaceContext ctx, BlockPos pos, BlockState stateClient, Level worldSchematic, LayerRange range, boolean schematicHasAir, BlockState stateSchematic) {
+    //$$     if (EASY_PLACED_FIX.getBooleanValue() && stateClient == stateSchematic) {
+    //$$         cir.setReturnValue(Boolean.TRUE);
+    //$$     }
+    //$$ }
+    //#endif
+
 }

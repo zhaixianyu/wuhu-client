@@ -14,6 +14,7 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -63,12 +64,21 @@ public class LitematicaHelper {
     }
     public Map<ItemStack,Map<BlockPos,Integer>> inventoryList = new HashMap<>();
 
+    public static Screen getScreen(){
+        return client.
+                //#if MC > 260100
+                gui.screen();
+                //#else
+                //$$ screen;
+                //#endif
+    }
+
     public static void process(AbstractContainerMenu container) {
         LocalPlayer player = client.player;
         if (player == null) return;
         AbstractContainerScreen<?> containerScreen;
-        if(client.screen instanceof AbstractContainerScreen){
-            containerScreen = (AbstractContainerScreen<?>)client.screen;
+        if(getScreen() instanceof AbstractContainerScreen){
+            containerScreen = (AbstractContainerScreen<?>)getScreen();
         }else return;
         List<Slot> playerInvSlots = container.slots.stream().filter(slot -> slot.container instanceof Inventory).collect(Collectors.toList());
         List<Slot> containerInvSlots = container.slots.stream().filter(slot -> areSlotsInSameInventory(slot, container.slots.get(0),false)).collect(Collectors.toList());

@@ -25,7 +25,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.Holder;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.BlockPos;
@@ -78,7 +78,7 @@ public class InventoryUtils {
                             int c = Integer.parseInt(s) - 1;
                             if (BuiltInRegistries.ITEM.getKey(player.getInventory().getItem(c).getItem()).toString().contains("shulker_box") &&
                                     QUICK_SHULKER.getBooleanValue()) {
-                                Minecraft.getInstance().gui.setOverlayMessage(Component.literal("没有可替换的槽位，请将预选位的濳影盒换个位置"),false);
+                                Messager.actionBar("没有可替换的槽位，请将预选位的濳影盒换个位置");
                                 continue;
                             }
                             SwitchItem.newItem(slots.get(y).getItem(), null,null,y, shulkerBoxSlot);
@@ -215,7 +215,7 @@ public class InventoryUtils {
                 player.containerMenu.containerId,
                 player.containerMenu.getStateId(),
                 (short) -999,(byte) 2,
-                ClickType.QUICK_CRAFT,
+                ContainerInput.QUICK_CRAFT,
                 //#if MC < 12105
                 //$$ uniqueItem,
                 //$$ new Int2ObjectOpenHashMap<>()

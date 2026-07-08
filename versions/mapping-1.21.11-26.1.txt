@@ -6,3 +6,4 @@ fi.dy.masa.malilib.util.JsonUtils fi.dy.masa.malilib.util.data.json.JsonUtils
 net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry playS2C() serverboundPlay()
 net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry playC2S() clientboundPlay()
 net.minecraft.client.gui.components.ChatComponent addMessage() addClientSystemMessage()
+net.minecraft.client.multiplayer.MultiPlayerGameMode handleInventoryMouseClick() handleContainerInput()
