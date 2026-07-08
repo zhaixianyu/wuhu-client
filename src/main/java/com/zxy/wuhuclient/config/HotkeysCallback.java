@@ -23,7 +23,11 @@ public class HotkeysCallback implements IHotkeyCallback {
     @Override
     public boolean onKeyAction(KeyAction action, IKeybind key) {
         if(key == WUHU_CLIENT.getKeybind()){
-            client.setScreen(new ConfigUi());
+            client.
+                    //#if MC > 260100
+                    gui.
+                    //#endif
+                    setScreen(new ConfigUi());
             return true;
         }else if(key == SYNC_INVENTORY.getKeybind()){
             SyncInventory.startOrOffSyncInventory();

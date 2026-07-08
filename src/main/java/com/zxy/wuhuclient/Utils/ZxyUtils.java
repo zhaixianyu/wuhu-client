@@ -178,14 +178,4 @@ public class ZxyUtils {
     public static Optional<LocalPlayer> getPlayer(){
         return Optional.ofNullable(client.player);
     }
-
-    public static void actionBar(String message){
-        Minecraft minecraftClient = Minecraft.getInstance();
-        //#if MC > 11802
-        MutableComponent translatable = Component.translatable(message);
-        //#else
-        //$$ TranslatableComponent translatable = new TranslatableComponent(message);
-        //#endif
-        minecraftClient.gui.setOverlayMessage(translatable,false);
-    }
 }

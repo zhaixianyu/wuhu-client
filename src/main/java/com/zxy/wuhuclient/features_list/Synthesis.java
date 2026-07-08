@@ -1,6 +1,7 @@
 package com.zxy.wuhuclient.features_list;
 
 
+import com.zxy.wuhuclient.Utils.Messager;
 import com.zxy.wuhuclient.Utils.ScreenManagement;
 import com.zxy.wuhuclient.Utils.ZxyUtils;
 import com.zxy.wuhuclient.config.Configs;
@@ -28,7 +29,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -97,7 +98,7 @@ public class Synthesis {
     public static void start(BlockPos pos) {
         tick = 0;
         if (!updateRecipe()) {
-            client.gui.setOverlayMessage(Component.literal("当前快捷合成配方为空"), false);
+            Messager.actionBar("当前快捷合成配方为空");
             return;
         }
 //        if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK) {
@@ -119,7 +120,7 @@ public class Synthesis {
                 return;
             }
             if (client.player.isShiftKeyDown()) {
-                client.gui.setOverlayMessage(Component.literal("合成取物已标记"), false);
+                Messager.actionBar("合成取物已标记");
                 autoDrop = true;
             }else{
                 autoDrop = false;
@@ -212,9 +213,9 @@ public class Synthesis {
     }
 
     public static void synthesis2(){
-        client.gui.setOverlayMessage(Component.literal("合成中..."), false);
+        Messager.actionBar("合成中...");
         if(!pos.closerToCenterThan(client.player.getEyePosition(),5)){
-            client.gui.setOverlayMessage(Component.literal("工作台或标记的方块超出范围，已重置。请再次点击开始合成"), false);
+            Messager.actionBar("工作台或标记的方块超出范围，已重置。请再次点击开始合成");
             pos = null;
             return;
         }
@@ -239,10 +240,10 @@ public class Synthesis {
 
             int stackCount = stack.getCount()-1;
             int cursorStackCount = stack.getCount()-1;
-            sc.clicked(-999, 0, ClickType.PICKUP, player);
-            sc.clicked(i, 0, ClickType.PICKUP, player);
-            sc.clicked(i, 1, ClickType.PICKUP, player);
-            sc.clicked(-999, 0, ClickType.QUICK_CRAFT, client.player);
+            client.gameMode.handleContainerInput(sc.containerId,-999, 0, ContainerInput.PICKUP, player);
+            client.gameMode.handleContainerInput(sc.containerId,i, 0, ContainerInput.PICKUP, player);
+            client.gameMode.handleContainerInput(sc.containerId,i, 1, ContainerInput.PICKUP, player);
+            client.gameMode.handleContainerInput(sc.containerId,-999, 0, ContainerInput.QUICK_CRAFT, client.player);
 
             int skip = 0;
             int craft = 0;
@@ -258,12 +259,12 @@ public class Synthesis {
                 }
                 numArr.add(i1-1);
                 craft++;
-                sc.clicked( i1, 1, ClickType.QUICK_CRAFT, client.player);
+                client.gameMode.handleContainerInput(sc.containerId, i1, 1, ContainerInput.QUICK_CRAFT, client.player);
             }
-            sc.clicked(-999, 2, ClickType.QUICK_CRAFT, client.player);
+            client.gameMode.handleContainerInput(sc.containerId,-999, 2, ContainerInput.QUICK_CRAFT, client.player);
 
             if(craft== 0){
-                sc.clicked(i, 0, ClickType.PICKUP, player);
+                client.gameMode.handleContainerInput(sc.containerId,i, 0, ContainerInput.PICKUP, player);
                 continue;
             }
             if(craft > cursorStackCount){
@@ -286,14 +287,14 @@ public class Synthesis {
                 }
             }
             if(cursorStackCount > 0){
-                sc.clicked(i, 0, ClickType.PICKUP, player);
+                client.gameMode.handleContainerInput(sc.containerId,i, 0, ContainerInput.PICKUP, player);
             }
 
             if(skip == recipeItems.length) break;
         }
 //        for (int i2 = 0; InventoryUtils.areStacksEqual(sc.slots.get(0).getStack(), recipe.getResult()) && i2 < 64; i2++) {
         for (int i2 = 1; satisfyCraft() && i2 < 64; i2++) {
-            sc.clicked(0, 1, ClickType.THROW, player);
+            client.gameMode.handleContainerInput(sc.containerId,0, 1, ContainerInput.THROW, player);
         }
         ScreenManagement.screen = null;
         player.closeContainer();
@@ -313,7 +314,7 @@ public class Synthesis {
         if (size == 0) return;
         for (int i = 0; i < size; i++) {
             if (InventoryUtils.areStacksEqual(sc.slots.get(i).getItem(), itemStack)) {
-                sc.clicked(i, 1, ClickType.THROW, player);
+                client.gameMode.handleContainerInput(sc.containerId,i, 1, ContainerInput.THROW, player);
             }
         }
     }
@@ -361,7 +362,7 @@ public class Synthesis {
                 .limit(slots.get(0).container.getContainerSize())
                 .allMatch(slot -> InventoryUtils.areStacksEqual(slot.getItem(), recipe.getResult())
                         && slot.getItem().getCount() >= slot.getItem().getMaxStackSize())) {
-            client.gui.setOverlayMessage(Component.literal("合成助手: 该容器已满"), false);
+            Messager.actionBar("合成助手: 目标器已满");
             player.closeContainer();
             return;
         }
@@ -369,18 +370,18 @@ public class Synthesis {
         for (int i = slots.get(0).container.getContainerSize(); i < slots.size(); i++) {
             ItemStack stack = slots.get(i).getItem();
             if (InventoryUtils.areStacksEqual(stack, recipe.getResult()) && stack.getCount() > 1) {
-                sc.clicked(i, 0, ClickType.PICKUP, player);
-                sc.clicked(i, 1, ClickType.PICKUP, player);
+                client.gameMode.handleContainerInput(sc.containerId,i, 0, ContainerInput.PICKUP, player);
+                client.gameMode.handleContainerInput(sc.containerId,i, 1, ContainerInput.PICKUP, player);
                 //检测容器中能放下的空位
                 for (int i2 = 0; i2 < slots.get(0).container.getContainerSize(); i2++) {
                     if ((InventoryUtils.areStacksEqual(slots.get(i2).getItem(), recipe.getResult())
                             && slots.get(i2).getItem().getCount() <= slots.get(i2).getItem().getMaxStackSize())
                             || slots.get(i2).getItem().isEmpty()
-                    ) sc.clicked(i2, 0, ClickType.PICKUP, player);
+                    ) client.gameMode.handleContainerInput(sc.containerId,i2, 0, ContainerInput.PICKUP, player);
                 }
                 if(!sc.getCarried().isEmpty()){
-                    sc.clicked(i, 0, ClickType.PICKUP, player);
-                    sc.clicked(-999, 0, ClickType.PICKUP, player);
+                    client.gameMode.handleContainerInput(sc.containerId,i, 0, ContainerInput.PICKUP, player);
+                    client.gameMode.handleContainerInput(sc.containerId,-999, 0, ContainerInput.PICKUP, player);
                 }
             }
         }

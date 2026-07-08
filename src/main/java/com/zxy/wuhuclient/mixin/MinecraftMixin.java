@@ -1,5 +1,6 @@
 package com.zxy.wuhuclient.mixin;
 
+import com.zxy.wuhuclient.Utils.Messager;
 import com.zxy.wuhuclient.Utils.ScreenManagement;
 import com.zxy.wuhuclient.config.Configs;
 import com.zxy.wuhuclient.features_list.Synthesis;
@@ -22,18 +23,21 @@ import static com.zxy.wuhuclient.features_list.Synthesis.*;
 public class MinecraftMixin {
     @Shadow @Nullable public LocalPlayer player;
 
-    @Inject(at = @At(value = "HEAD"),method = "setScreen", cancellable = true)
-    public void setScreen(Screen screen, CallbackInfo ci){
-        if(closeScreen > 0 && screen instanceof AbstractContainerScreen<?>){
-            closeScreen--;
-            ScreenManagement.screen = screen;
-            ci.cancel();
-        }
-    }
+    //#if MC <= 260100
+    //$$ @Inject(at = @At(value = "HEAD"),method = "setScreen", cancellable = true)
+    //$$ public void setScreen(Screen screen, CallbackInfo ci){
+    //$$     if(closeScreen > 0 && screen instanceof AbstractContainerScreen<?>){
+    //$$         closeScreen--;
+    //$$         ScreenManagement.screen = screen;
+    //$$         ci.cancel();
+    //$$     }
+    //$$ }
+    //#endif
+
     @Inject(at = @At("HEAD"),method = "startUseItem")
     public void doItemUse(CallbackInfo ci){
         if ((Synthesis.autoStorage = Configs.SYNTHESIS.getBooleanValue()) && player != null && player.isShiftKeyDown()) {
-            client.gui.setOverlayMessage(Component.literal("合成装容已标记"), false);
+            Messager.actionBar("合成装容已标记");
         }
     }
 }

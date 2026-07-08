@@ -6,7 +6,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 
 import static com.zxy.wuhuclient.Utils.InventoryUtils.client;
 
@@ -63,7 +63,7 @@ public class AutoMending {
         }
     }
     private void switchSlot(AbstractContainerMenu sc, int i){
-        sc.clicked(i, 40, ClickType.SWAP, client.player);
+        client.gameMode.handleContainerInput(sc.containerId,i, 40, ContainerInput.SWAP, client.player);
     }
 
     public boolean isPlayerScreenHandler(){

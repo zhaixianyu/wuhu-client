@@ -6,6 +6,7 @@
 package com.zxy.wuhuclient.features_list;
 
 import com.zxy.wuhuclient.Utils.InventoryUtils;
+import com.zxy.wuhuclient.Utils.Messager;
 import com.zxy.wuhuclient.Utils.ZxyUtils;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,7 +61,7 @@ public class CloseTheContainerAfterOpening {
                         }
                     }
 
-                    ZxyUtils.actionBar("剩余 " + pos.size() + " 个需要打开的容器，再次按下快捷键取消");
+                    Messager.actionBar("剩余 " + pos.size() + " 个需要打开的容器，再次按下快捷键取消");
                     break;
                 case 2:
                     LocalPlayer player = Synthesis.client.player;

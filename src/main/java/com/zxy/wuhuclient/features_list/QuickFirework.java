@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.core.NonNullList;
 import java.util.List;
@@ -49,12 +49,12 @@ public class QuickFirework {
         }
     }
     public static void interactItem(AbstractContainerMenu sc , int i) {
-        sc.clicked(i, 40, ClickType.SWAP, client.player);
+        client.gameMode.handleContainerInput(sc.containerId, i, 40, ContainerInput.SWAP, client.player);
         //#if MC > 11802
         client.gameMode.useItem(client.player, InteractionHand.OFF_HAND);
         //#else
         //$$ client.gameMode.useItem(client.player,client.level, InteractionHand.OFF_HAND);
         //#endif
-        sc.clicked(i, 40, ClickType.SWAP, client.player);
+        client.gameMode.handleContainerInput(sc.containerId,i, 40, ContainerInput.SWAP, client.player);
     }
 }

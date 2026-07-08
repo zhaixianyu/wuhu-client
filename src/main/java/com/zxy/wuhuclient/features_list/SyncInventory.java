@@ -2,6 +2,7 @@ package com.zxy.wuhuclient.features_list;
 
 import com.zxy.wuhuclient.Utils.HighlightBlockRenderer;
 import com.zxy.wuhuclient.Utils.InventoryUtils;
+import com.zxy.wuhuclient.Utils.Messager;
 import com.zxy.wuhuclient.Utils.ScreenManagement;
 import com.zxy.wuhuclient.mixin.ShulkerBoxBlockAccessor;
 import net.minecraft.world.level.block.Block;
@@ -12,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.core.NonNullList;
@@ -59,14 +60,14 @@ public class SyncInventory {
                     if ((inventory && blockState.getMenuProvider(client.level,pos) == null)  ||
                             (blockEntity instanceof ShulkerBoxBlockEntity entity &&
                                     !ShulkerBoxBlockAccessor.canOpen(blockState,client.level,pos,entity))) {
-                        client.gui.setOverlayMessage(Component.literal("容器无法打开"), false);
+                        Messager.actionBar("容器无法打开");
                         return;
                     }else if(!inventory) {
-                        client.gui.setOverlayMessage(Component.literal("这不是容器 无法同步"), false);
+                        Messager.actionBar("这不是容器 无法同步");
                         return;
                     }
                 } catch (Exception e) {
-                    client.gui.setOverlayMessage(Component.literal("这不是容器 无法同步"), false);
+                    Messager.actionBar("这不是容器 无法同步");
                     return;
                 }
             }
@@ -88,13 +89,13 @@ public class SyncInventory {
             syncPosList = new LinkedList<>();
             if (client.player != null) client.player.clientSideCloseContainer();
             num = 0;
-            client.gui.setOverlayMessage(Component.literal("已取消同步"), false);
+            Messager.actionBar("已取消同步");
         }
     }
 
     public static boolean openInv(BlockPos pos, boolean ignoreThePrompt) {
         if (client.player != null && client.player.getEyePosition().distanceToSqr(Vec3.atCenterOf(pos)) > 25D) {
-            if (!ignoreThePrompt) client.gui.setOverlayMessage(Component.literal("距离过远无法打开容器"), false);
+            if (!ignoreThePrompt) Messager.actionBar("距离过远无法打开容器");
             return false;
         }
         if (client.gameMode != null) {
@@ -151,7 +152,7 @@ public class SyncInventory {
                 //打开列表中的容器 只要容器同步列表不为空 就会一直执行此处
                 if (client.player == null) return;
                 playerItemsCount = new HashMap<>();
-                client.gui.setOverlayMessage(Component.literal("剩余 " + syncPosList.size() + " 个容器. 再次按下快捷键取消同步"), false);
+                Messager.actionBar("剩余 " + syncPosList.size() + " 个容器. 再次按下快捷键取消同步");
                 if (!client.player.containerMenu.equals(client.player.inventoryMenu)) return;
                 NonNullList<Slot> slots = client.player.inventoryMenu.slots;
                 slots.forEach(slot -> itemsCount(playerItemsCount, slot.getItem()));
@@ -173,7 +174,7 @@ public class SyncInventory {
                 }
                 if (syncPosList.isEmpty()) {
                     num = 0;
-                    client.gui.setOverlayMessage(Component.literal("同步完成"), false);
+                    Messager.actionBar("同步完成");
                 }
             }
             case 3 -> {
@@ -194,12 +195,12 @@ public class SyncInventory {
                     if (same) {
                         //有多
                         while (currNum > tarNum) {
-                            sc.clicked( i, 0, ClickType.THROW, client.player);
+                            client.gameMode.handleContainerInput(sc.containerId, i, 0, ContainerInput.THROW, client.player);
                             currNum--;
                         }
                     } else {
                         //不同直接扔出
-                        sc.clicked( i, 1, ClickType.THROW, client.player);
+                        client.gameMode.handleContainerInput(sc.containerId, i, 1, ContainerInput.THROW, client.player);
                         times++;
                     }
                     boolean thereAreItems = false;
@@ -211,12 +212,12 @@ public class SyncInventory {
                         boolean same2 = thereAreItems = equalsItem(item2, stack);
                         if (same2 && !stack.isEmpty()) {
                             int i2 = stack.getCount();
-                            sc.clicked( i1, 0, ClickType.PICKUP, client.player);
+                            client.gameMode.handleContainerInput(sc.containerId, i1, 0, ContainerInput.PICKUP, client.player);
                             for (; currNum < tarNum && i2 > 0; i2--) {
-                                sc.clicked( i, 1, ClickType.PICKUP, client.player);
+                                client.gameMode.handleContainerInput(sc.containerId, i, 1, ContainerInput.PICKUP, client.player);
                                 currNum++;
                             }
-                            sc.clicked( i1, 0, ClickType.PICKUP, client.player);
+                            client.gameMode.handleContainerInput(sc.containerId, i1, 0, ContainerInput.PICKUP, client.player);
                         }
                         //这里判断没啥用，因为一个游戏刻操作背包太多次.getStack().getCount()获取的数量不准确 下次一定优化，
                         if (currNum != tarNum) times++;

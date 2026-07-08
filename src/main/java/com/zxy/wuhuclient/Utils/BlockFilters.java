@@ -48,9 +48,9 @@ public class BlockFilters {
             String[] finalStrs = strs;
             blockState.
                     //#if MC > 12111
-                    //$$ tags()
+                    tags()
                     //#else
-                    getTags()
+                    //$$ getTags()
                     //#endif
                     .forEach(tag -> {
                 String tagName = tag.location().toString();

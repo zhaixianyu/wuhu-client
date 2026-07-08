@@ -6,9 +6,8 @@ apply(plugin: "maven-publish")
 apply(plugin: "com.replaymod.preprocess")
 
 
-
 repositories {
-    var github_username  = System.getenv("GITHUB_USERNAME")
+    var github_username = System.getenv("GITHUB_USERNAME")
     var github_token = System.getenv("GITHUB_TOKEN")
 
     maven { url = 'https://masa.dy.fi/maven' }
@@ -44,7 +43,7 @@ repositories {
     maven { url = "https://maven.shedaniel.me/" }
     maven {
         name = "jackfredReleases"
-        url = mcVersion >= 12106 ? "https://maven.pkg.github.com/ponuing/JackFredLib": "https://maven.jackf.red/releases"
+        url = mcVersion >= 12106 ? "https://maven.pkg.github.com/ponuing/JackFredLib" : "https://maven.jackf.red/releases"
         credentials {
             username = github_username
             password = github_token
@@ -59,19 +58,19 @@ repositories {
         name = "Xander Maven"
         url = uri("https://maven.isxander.dev/releases")
         content {
-			includeGroupAndSubgroups("dev.isxander")
-			includeGroupAndSubgroups("org.quiltmc")
-		}
+            includeGroupAndSubgroups("dev.isxander")
+            includeGroupAndSubgroups("org.quiltmc")
+        }
     }
 
     // YACL Snapshots
     maven {
         name = "Xander Snapshot Maven"
         url = uri("https://maven.isxander.dev/snapshots")
-		content {
-			includeGroupAndSubgroups("dev.isxander")
-			includeGroupAndSubgroups("org.quiltmc")
-		}
+        content {
+            includeGroupAndSubgroups("dev.isxander")
+            includeGroupAndSubgroups("org.quiltmc")
+        }
     }
 
 
@@ -121,7 +120,9 @@ String getYacl() {
 
 String getQuiShulkerBox() {
     String path = mcVersion >= 12101 ? "com.github.MoRanpcy:quickshulker" : "curse.maven:quick-shulker-362669"
-    if (mcVersion == 12006) { path = "Haocen2004/quickshulker"}
+    if (mcVersion == 12006) {
+        path = "Haocen2004/quickshulker"
+    }
     return path;
 }
 
@@ -129,16 +130,16 @@ def mod_dependencies = [
         ["maven.modrinth:malilib" + ":${project.malilib_version}", 1],
         ["maven.modrinth:item-scroller" + ":${project.item_scrolle_version}", 1],
         ["maven.modrinth:litematica" + ":${project.litematica_version}", 1],
-        [getQuiShulkerBox()+":${project.quick_shulker_version}", mcVersion == 12006 ? 6 : 10,"quick_shulker_version","*"],
+        [getQuiShulkerBox() + ":${project.quick_shulker_version}", mcVersion == 12006 ? 6 : 10, "quick_shulker_version", "*"],
         ["net.kyrptonaught:kyrptconfig:${project.kyrptconfig_version}", mcVersion >= 12004 ? 0 : 1],
         ["net.kyrptonaught:shulkerutils:${project.shulkerutils_version}", mcVersion >= 12004 ? 0 : 1],
         ["maven.modrinth:modmenu:${project.modmenu_version}", 1],
-        [(mcVersion >= 12006 ? "curse.maven:carpet-349239" : "maven.modrinth:carpet") + ":${project.carpet_version}", 1],
-        ["com.blamejared.searchables" + ":${project.searchables}"   , mcVersion >= 12001 ? 1 : 0],
-        ["red.jackf.jackfredlib:jackfredlib"+ ":${project.jackfredlib}", mcVersion >= 12001 ? 1 : 0],
+        [(mcVersion >= 12006 ? "curse.maven:carpet-349239" : "maven.modrinth:carpet") + ":${project.carpet_version}", mcVersion < 260100 ? 1 : 4],
+        ["com.blamejared.searchables" + ":${project.searchables}", mcVersion >= 12001 ? 1 : 0],
+        ["red.jackf.jackfredlib:jackfredlib" + ":${project.jackfredlib}", mcVersion >= 12001 ? 1 : 0],
         [getYacl() + ":${project.yacl}", mcVersion >= 12001 ? 1 : 0],
-        [("maven.modrinth:chest-tracker") + (mcVersion >= 12106 ? "-port" : "") + ":${project.chesttracker}",1],
-        [("maven.modrinth:where-is-it" + (mcVersion >= 12106 ? "-port" : "")) + ":${project.whereisit}",1],
+        [("maven.modrinth:chest-tracker") + (mcVersion >= 12106 ? "-port" : "") + ":${project.chesttracker}", 1],
+        [("maven.modrinth:where-is-it" + (mcVersion >= 12106 ? "-port" : "")) + ":${project.whereisit}", 1],
         ["maven.modrinth:cloth-config" + ":${project.cloth_config}", mcVersion < 12001 ? 1 : 0],
         ["me.shedaniel.cloth.api:cloth-api" + ":${project.cloth_api}", mcVersion < 11904 ? 1 : 0],
         ["io.github.cottonmc:LibGui" + ":${project.LibGui}", mcVersion < 12001 ? 1 : 0],
@@ -154,12 +155,11 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
 //    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 
-    if(useMappings){
+    if (useMappings) {
         mappings loom.officialMojangMappings()
     }
-    implementation 'com.github.jitpack:gradle-simple:1.0'
     autoImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    autoImplementation ("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+    autoImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
     mod_dependencies.forEach { item ->
         def dependencyNotation = item[0]
@@ -168,20 +168,20 @@ dependencies {
 //		if(mode != 0) idFix = "${dependencyNotation}:${project.property("${id}")}"
         if (mode != 0) idFix = dependencyNotation
         if (mode == 1) {
-            autoImplementation (idFix)
+            autoImplementation(idFix)
         } else if (mode == 10) {
-            autoImplementation (idFix){ exclude group: item[3] }
+            autoImplementation(idFix) { exclude group: item[3] }
         } else if (mode == 2) {
             autoImplementation include(idFix)
         } else if (mode == 3) {
-            modApi (idFix)
+            modApi(idFix)
         } else if (mode == 4) {
             autoCompileOnly(idFix)
         } else if (mode == 45) {
             autoCompileOnly files(dependencyNotation)
         } else if (mode == 5) {
             autoImplementation files(dependencyNotation)
-        } else if (mode == 6){
+        } else if (mode == 6) {
             def file = downloadMod(dependencyNotation, "${project.property("${item[2]}")}")
             if (file == null) return;
             autoImplementation files(file)
@@ -237,7 +237,7 @@ def downloadMod(String repo, String version) {
 
     // 如果找不到匹配版本的，可改为抛出异常或使用第一个非源码 jar
     if (!jarAsset) {
-        println "警告：未找到包含 MC 版本" +minecraftVersion+ "的 jar，将使用第一个非源码 jar"
+        println "警告：未找到包含 MC 版本" + minecraftVersion + "的 jar，将使用第一个非源码 jar"
         jarAsset = assets.find { it.name.endsWith('.jar') && !it.name.contains('-sources') }
     }
 
@@ -263,6 +263,7 @@ def downloadMod(String repo, String version) {
     println "Downloaded to ${outputFile.absolutePath}"
     return outputFile
 }
+
 version = gradle.modVersion
 group = project.mod_maven_group
 
@@ -349,7 +350,6 @@ loom {
 tasks.withType(JavaCompile).configureEach {
     options.encoding("UTF-8")
 }
-
 
 
 def MIXIN_CONFIG_PATHS = ['wuhuclient.mixins.json']
@@ -453,7 +453,7 @@ publishing {
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.allTasks.any { task -> task.name == 'setCoreVersion'}) {
+    if (taskGraph.allTasks.any { task -> task.name == 'setCoreVersion' }) {
         tasks.withType(JavaCompile).tap {
             configureEach {
                 options.failOnError = false

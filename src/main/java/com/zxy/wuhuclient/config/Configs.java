@@ -10,7 +10,7 @@ import fi.dy.masa.malilib.config.IHotkeyTogglable;
 import fi.dy.masa.malilib.config.options.*;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
-import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.data.json.JsonUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -134,7 +134,7 @@ public class Configs implements IConfigHandler {
         if (settingFile.isFile() && settingFile.exists()) {
             JsonElement jsonElement = JsonUtils.parseJsonFile(settingFile
                     //#if MC > 12111
-                    //$$ .toPath()
+                    .toPath()
                     //#endif
             );
             if (jsonElement != null && jsonElement.isJsonObject()) {
@@ -151,7 +151,7 @@ public class Configs implements IConfigHandler {
             ConfigUtils.writeConfigBase(configRoot, MOD_ID, ALL_CONFIGS);
             JsonUtils.writeJsonToFile(configRoot, new File(FILE_PATH)
                             //#if MC > 12111
-                            //$$ .toPath()
+                            .toPath()
                             //#endif
             );
         }

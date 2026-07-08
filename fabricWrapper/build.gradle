@@ -5,7 +5,6 @@ plugins {
     id("java-library")
     id("maven-publish")
 }
-
 version = gradle.modVersion
 tasks.register('printVersion') {
     doLast {
@@ -40,6 +39,8 @@ jar {
         delete fileTree("build/tmp/submods/META-INF/jars")
 
         copy {
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            
             from {
                 fabric_subprojects.collect {
                     if(it.ext.mcVersion > 12111)it.jar.outputs.files
